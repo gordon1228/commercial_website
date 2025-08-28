@@ -142,9 +142,9 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
       {/* Breadcrumb */}
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-accent transition-colors">Home</Link>
+          <Link href="/" className="hover:text-gray-600 transition-colors">Home</Link>
           <ChevronRight className="h-4 w-4" />
-          <Link href="/vehicles" className="hover:text-accent transition-colors">Vehicles</Link>
+          <Link href="/vehicles" className="hover:text-gray-600 transition-colors">Vehicles</Link>
           <ChevronRight className="h-4 w-4" />
           <span className="text-white">{vehicle.name}</span>
         </nav>
@@ -187,7 +187,7 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
                 onClick={() => setIsSaved(!isSaved)}
                 className="absolute top-4 left-4 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
               >
-                <Heart className={`h-5 w-5 ${isSaved ? 'fill-accent text-accent' : ''}`} />
+                <Heart className={`h-5 w-5 ${isSaved ? 'fill-gray-600 text-gray-600' : ''}`} />
               </button>
             </div>
 
@@ -198,7 +198,7 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
                   key={index}
                   onClick={() => setCurrentImageIndex(index)}
                   className={`aspect-square rounded-md overflow-hidden border-2 transition-colors ${
-                    currentImageIndex === index ? 'border-accent' : 'border-gray-700 hover:border-gray-600'
+                    currentImageIndex === index ? 'border-gray-900' : 'border-gray-700 hover:border-gray-600'
                   }`}
                 >
                   <Image
@@ -225,7 +225,7 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
                     onClick={() => setActiveTab(tab.id)}
                     className={`py-4 px-2 border-b-2 transition-colors ${
                       activeTab === tab.id
-                        ? 'border-accent text-accent'
+                        ? 'border-gray-900 text-gray-900'
                         : 'border-transparent text-muted-foreground hover:text-white hover:border-gray-600'
                     }`}
                   >
@@ -248,7 +248,7 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
                   <ul className="space-y-2">
                     {vehicle.keyHighlights.map((highlight, index) => (
                       <li key={index} className="flex items-center text-muted-foreground">
-                        <div className="w-2 h-2 bg-accent rounded-full mr-3" />
+                        <div className="w-2 h-2 bg-gray-900 rounded-full mr-3" />
                         {highlight}
                       </li>
                     ))}
@@ -273,7 +273,7 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {vehicle.features.map((feature, index) => (
                     <div key={index} className="flex items-center text-muted-foreground">
-                      <Shield className="h-4 w-4 text-accent mr-3" />
+                      <Shield className="h-4 w-4 text-gray-600 mr-3" />
                       {feature}
                     </div>
                   ))}
@@ -293,22 +293,22 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
               </div>
               <h1 className="text-3xl font-bold text-white mb-2">{vehicle.name}</h1>
               <p className="text-muted-foreground mb-4">{vehicle.category}</p>
-              <p className="text-4xl font-bold text-accent mb-6">{formatPrice(vehicle.price)}</p>
+              <p className="text-4xl font-bold text-gray-900 mb-6">{formatPrice(vehicle.price)}</p>
 
               {/* Key Specs */}
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
-                  <Fuel className="h-6 w-6 text-accent mx-auto mb-2" />
+                  <Fuel className="h-6 w-6 text-gray-600 mx-auto mb-2" />
                   <div className="text-sm text-muted-foreground mb-1">Fuel Economy</div>
                   <div className="text-white font-semibold">{vehicle.specifications.fuelEconomy}</div>
                 </div>
                 <div className="text-center">
-                  <Users className="h-6 w-6 text-accent mx-auto mb-2" />
+                  <Users className="h-6 w-6 text-gray-600 mx-auto mb-2" />
                   <div className="text-sm text-muted-foreground mb-1">Seating</div>
                   <div className="text-white font-semibold">{vehicle.specifications.seatingCapacity}</div>
                 </div>
                 <div className="text-center">
-                  <Weight className="h-6 w-6 text-accent mx-auto mb-2" />
+                  <Weight className="h-6 w-6 text-gray-600 mx-auto mb-2" />
                   <div className="text-sm text-muted-foreground mb-1">Payload</div>
                   <div className="text-white font-semibold">{vehicle.specifications.payload}</div>
                 </div>
@@ -328,9 +328,9 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
             </div>
 
             {/* Inquiry Form */}
-            <Card className="bg-gray-900/50 border-gray-800">
+            <Card className="bg-gray-300/50 border-gray-400">
               <CardHeader>
-                <CardTitle className="text-white">Get Information</CardTitle>
+                <CardTitle className="text-black">Get Information</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleInquirySubmit} className="space-y-4">
@@ -369,21 +369,21 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
             </Card>
 
             {/* Contact Info */}
-            <Card className="bg-gray-900/50 border-gray-800">
+            <Card className="bg-gray-300/50 border-gray-400">
               <CardContent className="pt-6">
                 <div className="space-y-4">
                   <div className="flex items-center">
-                    <Phone className="h-5 w-5 text-accent mr-3" />
+                    <Phone className="h-5 w-5 text-gray-600 mr-3" />
                     <div>
-                      <div className="text-sm text-muted-foreground">Sales</div>
-                      <div className="text-white font-medium">+1 (555) 123-4567</div>
+                      <div className="text-sm text-gray-600">Sales</div>
+                      <div className="text-black font-medium">+1 (555) 123-4567</div>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <Mail className="h-5 w-5 text-accent mr-3" />
+                    <Mail className="h-5 w-5 text-gray-600 mr-3" />
                     <div>
-                      <div className="text-sm text-muted-foreground">Email</div>
-                      <div className="text-white font-medium">sales@elitefleet.com</div>
+                      <div className="text-sm text-gray-600">Email</div>
+                      <div className="text-black font-medium">sales@elitefleet.com</div>
                     </div>
                   </div>
                 </div>
@@ -394,11 +394,11 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
 
         {/* Related Vehicles */}
         <div className="mt-16">
-          <h2 className="text-3xl font-bold text-white mb-8">Related Vehicles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <h2 className="text-3xl font-bold text-black mb-8">Related Vehicles</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
             {relatedVehicles.map((vehicle) => (
               <Link key={vehicle.id} href={`/vehicles/${vehicle.slug}`} className="group">
-                <div className="card-hover bg-gray-900/50 border-gray-800 overflow-hidden">
+                <div className="card-hover bg-gray-300/50 border-gray-800 overflow-hidden">
                   <div className="relative aspect-[4/3]">
                     <Image
                       src={vehicle.image}
@@ -407,11 +407,11 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-accent transition-colors">
+                  <div className="p-6 ">
+                    <h3 className="text-lg font-semibold text-black  mb-2 group-hover:text-gray-600 transition-colors">
                       {vehicle.name}
                     </h3>
-                    <p className="text-2xl font-bold text-accent">{formatPrice(vehicle.price)}</p>
+                    <p className="text-2xl font-bold text-gray-900">{formatPrice(vehicle.price)}</p>
                   </div>
                 </div>
               </Link>

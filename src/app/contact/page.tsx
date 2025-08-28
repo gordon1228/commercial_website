@@ -153,7 +153,7 @@ export default function ContactPage() {
           {services.map((service, index) => {
             const IconComponent = service.icon
             return (
-              <Card key={index} className="bg-gray-900/50 border-gray-800 hover:border-gray-700 transition-colors">
+              <Card key={index} className="bg-gray-900/50 bg-gray-100 border-gray-300 transition-colors">
                 <CardContent className="p-6 text-center">
                   <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                     <IconComponent className="h-6 w-6 text-gray-600" />
@@ -169,7 +169,7 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Contact Form */}
           <div className="lg:col-span-2">
-            <Card className="bg-gray-900/50 border-gray-800">
+            <Card className="bg-gray-100 border-gray-300">
               <CardHeader>
                 <CardTitle className="text-2xl text-gray-900">Send us a message</CardTitle>
                 {vehicleSlug && (
@@ -350,7 +350,7 @@ export default function ContactPage() {
             {contactMethods.map((method, index) => {
               const IconComponent = method.icon
               return (
-                <Card key={index} className="bg-gray-900/50 border-gray-800">
+                <Card key={index} className="bg-gray-100 border-gray-300">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
                       <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
