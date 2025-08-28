@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Car, Users, MessageSquare, TrendingUp, Eye, Plus } from 'lucide-react'
+import { useSession, signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { Car, Users, MessageSquare, TrendingUp, Eye, Plus, LogOut } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -95,16 +97,27 @@ const recentVehicles = [
 ]
 
 export default function AdminDashboard() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    // The middleware already handles authentication, so we just need to wait for session to load
+    if (status === 'loading') return // Still loading
+
     // Simulate loading data
     const timer = setTimeout(() => {
       setIsLoading(false)
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [])
+  }, [status])
+
+  const handleLogout = () => {
+    // Get current origin to ensure we redirect to the correct port
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : ''
+    signOut({ callbackUrl: `${currentOrigin}/` })
+  }
 
   if (isLoading) {
     return (
@@ -124,11 +137,20 @@ export default function AdminDashboard() {
   return (
     <div className="px-6">
       {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
-        <p className="text-gray-600 mt-2">
-          Welcome to your EliteFleet admin dashboard. Here's what's happening with your business today.
-        </p>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
+          <p className="text-gray-600 mt-2">
+            Welcome to your EliteFleet admin dashboard. Here's what's happening with your business today.
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-600">Welcome, {session?.user?.email}</span>
+          <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -157,6 +179,35 @@ export default function AdminDashboard() {
           )
         })}
       </div>
+
+      {/* Quick Actions */}
+      <Card className="mb-6 bg-white border border-gray-200">
+        <CardHeader>
+          <CardTitle className="text-xl text-gray-900">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link href="/admin/vehicles/create">
+              <Button className="w-full flex items-center gap-2 h-12">
+                <Plus className="h-4 w-4" />
+                Add New Vehicle
+              </Button>
+            </Link>
+            <Link href="/admin/vehicles">
+              <Button variant="outline" className="w-full flex items-center gap-2 h-12">
+                <Car className="h-4 w-4" />
+                Manage Vehicles
+              </Button>
+            </Link>
+            <Link href="/admin/inquiries">
+              <Button variant="outline" className="w-full flex items-center gap-2 h-12">
+                <MessageSquare className="h-4 w-4" />
+                View Inquiries
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

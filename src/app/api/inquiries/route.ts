@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit
 
     // Build where clause for filtering
-    const where: any = {}
+    const where: Record<string, unknown> = {}
     
     if (status) {
       const statuses = status.split(',')
@@ -70,21 +70,17 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const {
-      firstName,
-      lastName,
+      customerName,
       email,
       phone,
-      company,
-      inquiryType,
-      vehicleId,
       message,
-      preferredContact
+      vehicleId
     } = body
 
     // Validate required fields
-    if (!firstName || !lastName || !email || !message || !inquiryType) {
+    if (!customerName || !email || !message) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields: customerName, email, message' },
         { status: 400 }
       )
     }
@@ -114,15 +110,11 @@ export async function POST(request: NextRequest) {
 
     const inquiry = await prisma.inquiry.create({
       data: {
-        firstName,
-        lastName,
+        customerName,
         email,
-        phone,
-        company,
-        inquiryType,
-        vehicleId,
+        phone: phone || null,
         message,
-        preferredContact: preferredContact || 'EMAIL',
+        vehicleId: vehicleId || null,
         status: 'NEW'
       },
       include: {

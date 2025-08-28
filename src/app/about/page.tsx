@@ -47,38 +47,38 @@ const values = [
   }
 ]
 
-const milestones = [
-  {
-    year: '1998',
-    title: 'Founded',
-    description: 'EliteFleet was established with a vision to provide premium commercial vehicles to growing businesses.'
-  },
-  {
-    year: '2005',
-    title: 'Expanded Operations',
-    description: 'Opened our second location and expanded our fleet to include specialty commercial vehicles.'
-  },
-  {
-    year: '2012',
-    title: 'Digital Innovation',
-    description: 'Launched our first online platform, making it easier for customers to browse and purchase vehicles.'
-  },
-  {
-    year: '2018',
-    title: '1000+ Vehicles',
-    description: 'Reached the milestone of 1000+ vehicles sold, establishing ourselves as industry leaders.'
-  },
-  {
-    year: '2020',
-    title: 'Green Initiative',
-    description: 'Introduced eco-friendly vehicle options and sustainable business practices.'
-  },
-  {
-    year: '2024',
-    title: 'Modern Platform',
-    description: 'Launched our state-of-the-art digital platform for enhanced customer experience.'
-  }
-]
+// const milestones = [
+//   {
+//     year: '1998',
+//     title: 'Founded',
+//     description: 'EliteFleet was established with a vision to provide premium commercial vehicles to growing businesses.'
+//   },
+//   {
+//     year: '2005',
+//     title: 'Expanded Operations',
+//     description: 'Opened our second location and expanded our fleet to include specialty commercial vehicles.'
+//   },
+//   {
+//     year: '2012',
+//     title: 'Digital Innovation',
+//     description: 'Launched our first online platform, making it easier for customers to browse and purchase vehicles.'
+//   },
+//   {
+//     year: '2018',
+//     title: '1000+ Vehicles',
+//     description: 'Reached the milestone of 1000+ vehicles sold, establishing ourselves as industry leaders.'
+//   },
+//   {
+//     year: '2020',
+//     title: 'Green Initiative',
+//     description: 'Introduced eco-friendly vehicle options and sustainable business practices.'
+//   },
+//   {
+//     year: '2024',
+//     title: 'Modern Platform',
+//     description: 'Launched our state-of-the-art digital platform for enhanced customer experience.'
+//   }
+// ]
 
 const team = [
   {

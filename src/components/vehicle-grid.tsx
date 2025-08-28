@@ -7,6 +7,9 @@ import { useSearchParams } from 'next/navigation'
 import { Heart, Eye, Fuel, Users, Weight } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+// import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { ErrorDisplay } from '@/components/ui/error-display'
+import { useToast } from '@/components/ui/toast'
 
 interface Vehicle {
   id: string
@@ -43,6 +46,29 @@ interface ApiResponse {
 function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
   const [isSaved, setIsSaved] = useState(false)
 
+  useEffect(() => {
+    // Check if vehicle is in favorites on component mount
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+    setIsSaved(favorites.includes(vehicle.id))
+  }, [vehicle.id])
+
+  const toggleFavorite = () => {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+    let updatedFavorites
+
+    if (favorites.includes(vehicle.id)) {
+      // Remove from favorites
+      updatedFavorites = favorites.filter((id: string) => id !== vehicle.id)
+      setIsSaved(false)
+    } else {
+      // Add to favorites
+      updatedFavorites = [...favorites, vehicle.id]
+      setIsSaved(true)
+    }
+
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites))
+  }
+
   return (
     <div className="group card-hover bg-white border-gray-200 overflow-hidden">
       {/* Image */}
@@ -70,10 +96,10 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         {/* Action buttons */}
         <div className="absolute top-3 right-3 flex space-x-2">
           <button
-            onClick={() => setIsSaved(!isSaved)}
+            onClick={toggleFavorite}
             className="w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
           >
-            <Heart className={`h-4 w-4 ${isSaved ? 'fill-gray-600 text-gray-600' : ''}`} />
+            <Heart className={`h-4 w-4 ${isSaved ? 'fill-red-500 text-red-500' : 'text-white'}`} />
           </button>
           <Link
             href={`/vehicles/${vehicle.slug}`}
@@ -129,6 +155,7 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
 
 export default function VehicleGrid() {
   const searchParams = useSearchParams()
+  const { showError } = useToast()
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [sortBy, setSortBy] = useState('name')
   const [viewCount, setViewCount] = useState(0)
@@ -168,7 +195,9 @@ export default function VehicleGrid() {
         setViewCount(data.pagination.total)
       } catch (err) {
         console.error('Error fetching vehicles:', err)
-        setError('Failed to load vehicles')
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load vehicles'
+        setError(errorMessage)
+        showError('Failed to load vehicles', errorMessage)
         setVehicles([])
         setViewCount(0)
       } finally {
@@ -218,15 +247,54 @@ export default function VehicleGrid() {
           ))}
         </div>
       ) : error ? (
-        <div className="text-center py-12">
-          <div className="text-gray-400 mb-4">
-            <svg className="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Error loading vehicles</h3>
-          <p className="text-gray-600">{error}</p>
-        </div>
+        <ErrorDisplay
+          title="Error loading vehicles"
+          message={error}
+          onRetry={() => {
+            setError(null)
+            const fetchVehicles = async () => {
+              setIsLoading(true)
+              setError(null)
+
+              try {
+                // Build query parameters
+                const params = new URLSearchParams()
+                
+                const category = searchParams.get('category')
+                const status = searchParams.get('status')
+                const search = searchParams.get('search')
+                const priceMin = searchParams.get('priceMin')
+                const priceMax = searchParams.get('priceMax')
+
+                if (category) params.set('category', category)
+                if (status) params.set('status', status)
+                if (search) params.set('search', search)
+                if (priceMin) params.set('priceMin', priceMin)
+                if (priceMax) params.set('priceMax', priceMax)
+                if (sortBy) params.set('sortBy', sortBy)
+
+                const response = await fetch(`/api/vehicles?${params.toString()}`)
+                
+                if (!response.ok) {
+                  throw new Error('Failed to fetch vehicles')
+                }
+
+                const data: ApiResponse = await response.json()
+                setVehicles(data.vehicles)
+                setViewCount(data.pagination.total)
+              } catch (err) {
+                console.error('Error fetching vehicles:', err)
+                const errorMessage = err instanceof Error ? err.message : 'Failed to load vehicles'
+                setError(errorMessage)
+                setVehicles([])
+                setViewCount(0)
+              } finally {
+                setIsLoading(false)
+              }
+            }
+            fetchVehicles()
+          }}
+        />
       ) : vehicles.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {vehicles.map((vehicle) => (

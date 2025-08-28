@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { signIn, getSession } from 'next-auth/react'
 import { Car, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,17 +24,22 @@ export default function AdminLoginPage() {
     setError('')
 
     try {
-      // Simulate API call - in real app, call your authentication API
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Demo credentials for testing
-      if (formData.email === 'admin@elitefleet.com' && formData.password === 'admin123') {
-        // Generate a mock token
-        const token = btoa(`${formData.email}:${Date.now()}`)
-        localStorage.setItem('admin-token', token)
-        router.push('/admin')
-      } else {
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      })
+
+      if (result?.error) {
         setError('Invalid email or password')
+      } else if (result?.ok) {
+        // Successful login - redirect to admin dashboard
+        // Use a small delay to ensure session is fully set
+        setTimeout(() => {
+          window.location.href = '/admin'
+        }, 100)
+      } else {
+        setError('Login failed. Please try again.')
       }
     } catch (error) {
       setError('Login failed. Please try again.')

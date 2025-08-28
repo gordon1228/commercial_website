@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import NextAuthSessionProvider from "@/components/providers/session-provider";
+import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "EliteFleet - Premium Commercial Vehicles",
@@ -16,12 +18,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-background font-sans antialiased">
-        <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
+      <body className="min-h-screen bg-background font-sans antialiased flex flex-col">
+        <ToastProvider>
+          <NextAuthSessionProvider>
+            <Header />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </NextAuthSessionProvider>
+        </ToastProvider>
       </body>
     </html>
   );

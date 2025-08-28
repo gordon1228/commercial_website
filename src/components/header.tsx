@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Heart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function Header() {
@@ -33,6 +33,9 @@ export default function Header() {
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">
+            <Link href="/favorites" className="text-black hover:text-gray-600 transition-colors p-2">
+              <Heart className="h-5 w-5" />
+            </Link>
             <Button variant="ghost" asChild>
               <Link href="/vehicles">Browse Fleet</Link>
             </Button>

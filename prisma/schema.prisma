@@ -14,12 +14,13 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   password  String
-  role      Role     @default(STAFF)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  inquiries Inquiry[]
 
   @@map("users")
 }
@@ -53,12 +54,15 @@ model Vehicle {
 
 model Inquiry {
   id           String        @id @default(cuid())
-  vehicleId    String
-  vehicle      Vehicle       @relation(fields: [vehicleId], references: [id])
+  vehicleId    String?
+  vehicle      Vehicle?      @relation(fields: [vehicleId], references: [id])
+  userId       String?
+  user         User?         @relation(fields: [userId], references: [id])
   customerName String
   email        String
   phone        String?
   message      String
+  notes        String?
   status       InquiryStatus @default(NEW)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -68,7 +72,8 @@ model Inquiry {
 
 enum Role {
   ADMIN
-  STAFF
+  MANAGER
+  USER
 }
 
 enum Status {
@@ -79,7 +84,7 @@ enum Status {
 
 enum InquiryStatus {
   NEW
-  READ
-  RESPONDED
+  CONTACTED
+  RESOLVED
   CLOSED
 }

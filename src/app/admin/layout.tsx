@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useState } from 'react'
+import { useSession, signOut } from 'next-auth/react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { 
   LayoutDashboard, 
@@ -23,29 +24,17 @@ const navigation = [
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter()
+  const { data: session, status } = useSession()
   const pathname = usePathname()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  useEffect(() => {
-    const token = localStorage.getItem('admin-token')
-    if (!token && pathname !== '/admin/login') {
-      router.push('/admin/login')
-    } else if (token) {
-      setIsAuthenticated(true)
-    }
-    setIsLoading(false)
-  }, [pathname, router])
-
   const handleLogout = () => {
-    localStorage.removeItem('admin-token')
-    setIsAuthenticated(false)
-    router.push('/admin/login')
+    // Get current origin to ensure we redirect to the correct port
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : ''
+    signOut({ callbackUrl: `${currentOrigin}/admin/login` })
   }
 
-  if (isLoading) {
+  if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -53,13 +42,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     )
   }
 
-  if (!isAuthenticated && pathname !== '/admin/login') {
-    return null
-  }
-
   if (pathname === '/admin/login') {
     return <>{children}</>
   }
+
+  // For admin routes, the middleware handles auth, so we just need to show the layout
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
@@ -138,7 +125,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-600">
-                Welcome back, Admin
+                Welcome back, {session?.user?.email || 'Admin'}
               </div>
             </div>
           </div>

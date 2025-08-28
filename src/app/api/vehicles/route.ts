@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit
 
     // Build where clause for filtering
-    const where: any = {}
+    const where: Record<string, unknown> = {}
     
     if (category) {
       const categories = category.split(',')
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build orderBy clause
-    let orderBy: any = { name: 'asc' }
+    let orderBy: Record<string, 'asc' | 'desc'> = { name: 'asc' }
     switch (sortBy) {
       case 'price-low':
         orderBy = { price: 'asc' }
