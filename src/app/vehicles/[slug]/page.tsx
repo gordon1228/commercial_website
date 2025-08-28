@@ -12,8 +12,6 @@ import {
   Fuel, 
   Users, 
   Weight,
-  Calendar,
-  Gauge,
   Shield,
   Phone,
   Mail
@@ -103,7 +101,7 @@ const relatedVehicles = [
   }
 ]
 
-export default function VehicleDetailPage({ params }: { params: { slug: string } }) {
+export default function VehicleDetailPage({ params: _ }: { params: { slug: string } }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [activeTab, setActiveTab] = useState('overview')
   const [isSaved, setIsSaved] = useState(false)

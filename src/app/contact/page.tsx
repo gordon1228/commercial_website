@@ -11,12 +11,15 @@ import {
   MessageCircle,
   Calculator,
   Calendar,
-  User,
-  Building
+  User
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { useToast } from '@/components/ui/toast'
+import { useFormSubmit } from '@/hooks/use-api'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { InlineError } from '@/components/ui/error-display'
 
 const contactMethods = [
   {
@@ -87,6 +90,8 @@ const services = [
 export default function ContactPage() {
   const searchParams = useSearchParams()
   const vehicleSlug = searchParams?.get('vehicle')
+  const { showSuccess, showError } = useToast()
+  const { submit, error, clearError, isSubmitting } = useFormSubmit()
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -100,35 +105,41 @@ export default function ContactPage() {
     preferredContact: 'email'
   })
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
+    clearError()
     
-    try {
-      // In real app, submit to API
-      console.log('Form submitted:', formData)
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
-      alert('Thank you for your inquiry! We will contact you within 24 hours.')
-      
-      // Reset form
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        company: '',
-        inquiryType: 'general',
-        vehicleInterest: '',
-        message: '',
-        preferredContact: 'email'
-      })
-    } catch (error) {
-      alert('Sorry, there was an error submitting your inquiry. Please try again.')
-    } finally {
-      setIsSubmitting(false)
+    const submissionData = {
+      customerName: `${formData.firstName} ${formData.lastName}`,
+      email: formData.email,
+      phone: formData.phone || undefined,
+      message: `${formData.message}\n\nInquiry Type: ${formData.inquiryType}\n${formData.company ? `Company: ${formData.company}\n` : ''}${formData.vehicleInterest ? `Vehicle Interest: ${formData.vehicleInterest}\n` : ''}Preferred Contact: ${formData.preferredContact}`,
+      vehicleId: null // General inquiry
     }
+
+    await submit('/api/inquiries', submissionData, {
+      onSuccess: () => {
+        showSuccess(
+          'Inquiry submitted successfully!', 
+          'We will contact you within 24 hours.'
+        )
+        // Reset form
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          company: '',
+          inquiryType: 'general',
+          vehicleInterest: '',
+          message: '',
+          preferredContact: 'email'
+        })
+      },
+      onError: (error) => {
+        showError('Failed to submit inquiry', error)
+      }
+    })
   }
 
   const handleInputChange = (field: string, value: string) => {
@@ -321,6 +332,14 @@ export default function ContactPage() {
                     </div>
                   </div>
 
+                  {/* Error Display */}
+                  {error && (
+                    <InlineError 
+                      message={error}
+                      onDismiss={clearError}
+                    />
+                  )}
+
                   {/* Submit Button */}
                   <Button 
                     type="submit" 
@@ -330,7 +349,7 @@ export default function ContactPage() {
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                        <LoadingSpinner size="sm" className="mr-2" />
                         Sending...
                       </>
                     ) : (
