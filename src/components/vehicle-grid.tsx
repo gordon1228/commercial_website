@@ -8,95 +8,39 @@ import { Heart, Eye, Fuel, Users, Weight } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
-// Mock data - in real app this would come from API
-const mockVehicles = [
-  {
-    id: '1',
-    name: 'Mercedes Sprinter 3500',
-    slug: 'mercedes-sprinter-3500',
-    price: 75000,
-    category: 'vans',
-    status: 'AVAILABLE',
-    image: '/images/truck1.jpg',
-    specs: {
-      fuel: '21 MPG',
-      capacity: '15 seats',
-      weight: '11,030 lbs'
-    }
-  },
-  {
-    id: '2',
-    name: 'Ford F-650 Box Truck',
-    slug: 'ford-f650-box-truck',
-    price: 89000,
-    category: 'trucks',
-    status: 'AVAILABLE',
-    image: '/images/truck2.jpg',
-    specs: {
-      fuel: '12 MPG',
-      capacity: '2 seats',
-      weight: '25,950 lbs'
-    }
-  },
-  {
-    id: '3',
-    name: 'Freightliner Cascadia',
-    slug: 'freightliner-cascadia',
-    price: 165000,
-    category: 'trucks',
-    status: 'AVAILABLE',
-    image: '/images/truck3.jpg',
-    specs: {
-      fuel: '7.5 MPG',
-      capacity: '2 seats',
-      weight: '80,000 lbs'
-    }
-  },
-  {
-    id: '4',
-    name: 'Blue Bird School Bus',
-    slug: 'blue-bird-school-bus',
-    price: 125000,
-    category: 'buses',
-    status: 'RESERVED',
-    image: '/images/truck4.jpg',
-    specs: {
-      fuel: '8 MPG',
-      capacity: '72 seats',
-      weight: '34,000 lbs'
-    }
-  },
-  {
-    id: '5',
-    name: 'Isuzu NPR HD',
-    slug: 'isuzu-npr-hd',
-    price: 58000,
-    category: 'trucks',
-    status: 'AVAILABLE',
-    image: '/images/truck1.jpg',
-    specs: {
-      fuel: '13 MPG',
-      capacity: '3 seats',
-      weight: '14,500 lbs'
-    }
-  },
-  {
-    id: '6',
-    name: 'Ford Transit 350',
-    slug: 'ford-transit-350',
-    price: 42000,
-    category: 'vans',
-    status: 'AVAILABLE',
-    image: '/images/truck2.jpg',
-    specs: {
-      fuel: '18 MPG',
-      capacity: '12 seats',
-      weight: '9,070 lbs'
-    }
+interface Vehicle {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  price: number
+  images: string[]
+  specs: {
+    fuel: string
+    capacity: string
+    weight: string
+    engine?: string
+    horsepower?: string
   }
-]
+  status: string
+  category: {
+    id: string
+    name: string
+  }
+}
 
-function VehicleCard({ vehicle }: { vehicle: typeof mockVehicles[0] }) {
+interface ApiResponse {
+  vehicles: Vehicle[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    pages: number
+  }
+}
+
+
+function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
   const [isSaved, setIsSaved] = useState(false)
 
   return (
@@ -104,7 +48,7 @@ function VehicleCard({ vehicle }: { vehicle: typeof mockVehicles[0] }) {
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden">
         <Image
-          src={vehicle.image}
+          src={vehicle.images?.[0] || '/images/truck1.jpg'}
           alt={vehicle.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -112,12 +56,14 @@ function VehicleCard({ vehicle }: { vehicle: typeof mockVehicles[0] }) {
         
         {/* Status badge */}
         <div className="absolute top-3 left-3">
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg ${
             vehicle.status === 'AVAILABLE' 
-              ? 'bg-green-600/20 text-green-400 backdrop-blur-sm' 
-              : 'bg-yellow-600/20 text-yellow-400 backdrop-blur-sm'
+              ? 'bg-green-500 text-white' 
+              : vehicle.status === 'RESERVED'
+              ? 'bg-yellow-500 text-white'
+              : 'bg-red-500 text-white'
           }`}>
-            {vehicle.status === 'AVAILABLE' ? 'Available' : 'Reserved'}
+            {vehicle.status === 'AVAILABLE' ? 'Available' : vehicle.status === 'RESERVED' ? 'Reserved' : vehicle.status}
           </span>
         </div>
 
@@ -183,59 +129,54 @@ function VehicleCard({ vehicle }: { vehicle: typeof mockVehicles[0] }) {
 
 export default function VehicleGrid() {
   const searchParams = useSearchParams()
-  const [filteredVehicles, setFilteredVehicles] = useState(mockVehicles)
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [sortBy, setSortBy] = useState('name')
   const [viewCount, setViewCount] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    let filtered = [...mockVehicles]
+    const fetchVehicles = async () => {
+      setIsLoading(true)
+      setError(null)
 
-    // Apply filters
-    const category = searchParams.get('category')?.split(',') || []
-    const status = searchParams.get('status')?.split(',') || []
-    const search = searchParams.get('search') || ''
-    const priceMin = searchParams.get('priceMin')
-    const priceMax = searchParams.get('priceMax')
+      try {
+        // Build query parameters
+        const params = new URLSearchParams()
+        
+        const category = searchParams.get('category')
+        const status = searchParams.get('status')
+        const search = searchParams.get('search')
+        const priceMin = searchParams.get('priceMin')
+        const priceMax = searchParams.get('priceMax')
 
-    if (category.length > 0) {
-      filtered = filtered.filter(v => category.includes(v.category))
+        if (category) params.set('category', category)
+        if (status) params.set('status', status)
+        if (search) params.set('search', search)
+        if (priceMin) params.set('priceMin', priceMin)
+        if (priceMax) params.set('priceMax', priceMax)
+        if (sortBy) params.set('sortBy', sortBy)
+
+        const response = await fetch(`/api/vehicles?${params.toString()}`)
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch vehicles')
+        }
+
+        const data: ApiResponse = await response.json()
+        setVehicles(data.vehicles)
+        setViewCount(data.pagination.total)
+      } catch (err) {
+        console.error('Error fetching vehicles:', err)
+        setError('Failed to load vehicles')
+        setVehicles([])
+        setViewCount(0)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
-    if (status.length > 0) {
-      filtered = filtered.filter(v => status.includes(v.status))
-    }
-
-    if (search) {
-      filtered = filtered.filter(v => 
-        v.name.toLowerCase().includes(search.toLowerCase())
-      )
-    }
-
-    if (priceMin) {
-      filtered = filtered.filter(v => v.price >= parseInt(priceMin))
-    }
-
-    if (priceMax) {
-      filtered = filtered.filter(v => v.price <= parseInt(priceMax))
-    }
-
-    // Apply sorting
-    switch (sortBy) {
-      case 'price-low':
-        filtered.sort((a, b) => a.price - b.price)
-        break
-      case 'price-high':
-        filtered.sort((a, b) => b.price - a.price)
-        break
-      case 'name':
-        filtered.sort((a, b) => a.name.localeCompare(b.name))
-        break
-      default:
-        break
-    }
-
-    setFilteredVehicles(filtered)
-    setViewCount(filtered.length)
+    fetchVehicles()
   }, [searchParams, sortBy])
 
   return (
@@ -263,9 +204,32 @@ export default function VehicleGrid() {
       </div>
 
       {/* Grid */}
-      {filteredVehicles.length > 0 ? (
+      {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredVehicles.map((vehicle) => (
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="animate-pulse">
+              <div className="bg-gray-200 aspect-[4/3] rounded-lg mb-4" />
+              <div className="space-y-2">
+                <div className="h-6 bg-gray-200 rounded w-3/4" />
+                <div className="h-8 bg-gray-200 rounded w-1/2" />
+                <div className="h-4 bg-gray-200 rounded w-full" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <div className="text-gray-400 mb-4">
+            <svg className="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Error loading vehicles</h3>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      ) : vehicles.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {vehicles.map((vehicle) => (
             <VehicleCard key={vehicle.id} vehicle={vehicle} />
           ))}
         </div>

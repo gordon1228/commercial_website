@@ -23,7 +23,9 @@ export async function GET(request: NextRequest) {
     
     if (category) {
       const categories = category.split(',')
-      where.category = { in: categories }
+      where.category = { 
+        slug: { in: categories } 
+      }
     }
     
     if (status) {

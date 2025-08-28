@@ -39,7 +39,7 @@ export default function VehicleCategories() {
     <section id="categories" className="py-24 bg-background">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-6">
+          <h2 className="text-4xl md:text-5xl font-display font-bold text-black mb-6">
             Vehicle Categories
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">

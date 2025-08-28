@@ -11,7 +11,7 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="relative h-screen flex items-center justify-center hero-gradient overflow-hidden">
+    <section id="PremiumCommercial" className="relative h-screen flex items-center justify-center hero-gradient overflow-hidden">
       {/* Background overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-100/30 to-gray-200/60 z-10" />
       

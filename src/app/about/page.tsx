@@ -194,7 +194,7 @@ export default function AboutPage() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-20 bg-gray-900/30">
+      <section className="py-20 bg-gray-400/30">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
@@ -261,7 +261,8 @@ export default function AboutPage() {
       </section>
 
       {/* Timeline */}
-      <section className="py-20 bg-gray-900/30">
+      {/* 
+      <section className="py-20 bg-gray-400/30">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
@@ -273,7 +274,6 @@ export default function AboutPage() {
           </div>
 
           <div className="relative">
-            {/* Timeline line */}
             <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-gray-300 transform md:-translate-x-1/2" />
 
             <div className="space-y-12">
@@ -287,7 +287,6 @@ export default function AboutPage() {
                     </div>
                   </div>
                   
-                  {/* Timeline dot */}
                   <div className="absolute left-4 md:left-1/2 w-8 h-8 bg-gray-600 rounded-full transform md:-translate-x-1/2 flex items-center justify-center">
                     <div className="w-3 h-3 bg-white rounded-full" />
                   </div>
@@ -297,6 +296,7 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+      */}
 
       {/* Team */}
       <section className="py-20">
@@ -331,7 +331,7 @@ export default function AboutPage() {
       </section>
 
       {/* Certifications */}
-      <section className="py-20 bg-gray-900/30">
+      <section className="py-20 bg-gray-400/30">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">

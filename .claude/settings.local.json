@@ -6,7 +6,9 @@
       "Bash(rmdir:*)",
       "Bash(npm install:*)",
       "Bash(npx prisma:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npm run:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
