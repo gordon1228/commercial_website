@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // For admin routes, the middleware handles auth, so we just need to show the layout
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gray-100">
+    <div className="min-h-screen flex overflow-hidden bg-gray-100">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -133,7 +133,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Page content */}
         <main className="flex-1 relative overflow-y-auto focus:outline-none">
-          <div className="py-6">
+          <div className="py-6 pb-20">
             {children}
           </div>
         </main>

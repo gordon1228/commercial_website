@@ -9,7 +9,9 @@
       "Bash(npm run dev:*)",
       "Bash(npm run:*)",
       "Bash(curl:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(set PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=YES)",
+      "Bash(set \"PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=YES\")"
     ],
     "deny": [],
     "ask": []

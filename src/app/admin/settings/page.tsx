@@ -11,7 +11,8 @@ import { Input } from '@/components/ui/input'
 export default function SettingsPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isSettingsLoading, setIsSettingsLoading] = useState(false)
+  const [isPasswordLoading, setIsPasswordLoading] = useState(false)
   const [settings, setSettings] = useState({
     siteName: 'EliteFleet',
     contactEmail: 'contact@elitefleet.com',
@@ -33,7 +34,30 @@ export default function SettingsPage() {
       router.push('/admin/login')
       return
     }
+    
+    // Load settings from API
+    loadSettings()
   }, [session, status, router])
+
+  const loadSettings = async () => {
+    try {
+      const response = await fetch('/api/admin/settings')
+      if (response.ok) {
+        const data = await response.json()
+        setSettings({
+          siteName: data.siteName || 'EliteFleet',
+          contactEmail: data.contactEmail || 'contact@elitefleet.com',
+          supportPhone: data.supportPhone || '+1 (555) 123-4567',
+          address: data.address || '123 Business Avenue, Commercial District, NY 10001',
+          emailNotifications: data.emailNotifications ?? true,
+          systemNotifications: data.systemNotifications ?? true,
+          maintenanceMode: data.maintenanceMode ?? false
+        })
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error)
+    }
+  }
 
   const handleSettingsChange = (field: string, value: string | boolean) => {
     setSettings(prev => ({ ...prev, [field]: value }))
@@ -41,16 +65,25 @@ export default function SettingsPage() {
 
   const saveSettings = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    setIsSettingsLoading(true)
     
-    // Simulate API call - in real app, you'd save to database
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      alert('Settings saved successfully!')
+      const response = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings)
+      })
+      
+      if (response.ok) {
+        alert('Settings saved successfully!')
+      } else {
+        const error = await response.json()
+        alert(`Failed to save settings: ${error.error}`)
+      }
     } catch (error) {
       alert('Failed to save settings')
     } finally {
-      setIsLoading(false)
+      setIsSettingsLoading(false)
     }
   }
 
@@ -67,7 +100,7 @@ export default function SettingsPage() {
       return
     }
 
-    setIsLoading(true)
+    setIsPasswordLoading(true)
     
     try {
       // In real app, you'd call API to change password
@@ -77,7 +110,7 @@ export default function SettingsPage() {
     } catch (error) {
       alert('Failed to change password')
     } finally {
-      setIsLoading(false)
+      setIsPasswordLoading(false)
     }
   }
 
@@ -162,9 +195,9 @@ export default function SettingsPage() {
                 />
               </div>
 
-              <Button type="submit" disabled={isLoading} className="w-full">
+              <Button type="submit" disabled={isSettingsLoading} className="w-full">
                 <Save className="h-4 w-4 mr-2" />
-                {isLoading ? 'Saving...' : 'Save Settings'}
+                {isSettingsLoading ? 'Saving...' : 'Save Settings'}
               </Button>
             </form>
           </CardContent>
@@ -238,8 +271,8 @@ export default function SettingsPage() {
                 />
               </div>
 
-              <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading ? 'Changing...' : 'Change Password'}
+              <Button type="submit" disabled={isPasswordLoading} className="w-full">
+                {isPasswordLoading ? 'Changing...' : 'Change Password'}
               </Button>
             </form>
           </CardContent>
@@ -253,32 +286,39 @@ export default function SettingsPage() {
               Notifications
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <label className="font-medium text-gray-900">Email Notifications</label>
-                <p className="text-sm text-gray-600">Receive notifications via email</p>
+          <CardContent>
+            <form onSubmit={saveSettings} className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="font-medium text-gray-900">Email Notifications</label>
+                  <p className="text-sm text-gray-600">Receive notifications via email</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.emailNotifications}
+                  onChange={(e) => handleSettingsChange('emailNotifications', e.target.checked)}
+                  className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                />
               </div>
-              <input
-                type="checkbox"
-                checked={settings.emailNotifications}
-                onChange={(e) => handleSettingsChange('emailNotifications', e.target.checked)}
-                className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <label className="font-medium text-gray-900">System Notifications</label>
-                <p className="text-sm text-gray-600">Receive system alerts and updates</p>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="font-medium text-gray-900">System Notifications</label>
+                  <p className="text-sm text-gray-600">Receive system alerts and updates</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.systemNotifications}
+                  onChange={(e) => handleSettingsChange('systemNotifications', e.target.checked)}
+                  className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                />
               </div>
-              <input
-                type="checkbox"
-                checked={settings.systemNotifications}
-                onChange={(e) => handleSettingsChange('systemNotifications', e.target.checked)}
-                className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-              />
-            </div>
+
+              <Button type="submit" disabled={isSettingsLoading} className="w-full">
+                <Save className="h-4 w-4 mr-2" />
+                {isSettingsLoading ? 'Saving...' : 'Save Notification Settings'}
+              </Button>
+            </form>
           </CardContent>
         </Card>
 
@@ -287,25 +327,32 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle>System Settings</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <label className="font-medium text-gray-900">Maintenance Mode</label>
-                <p className="text-sm text-gray-600">Put the site in maintenance mode</p>
+          <CardContent>
+            <form onSubmit={saveSettings} className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="font-medium text-gray-900">Maintenance Mode</label>
+                  <p className="text-sm text-gray-600">Put the site in maintenance mode</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.maintenanceMode}
+                  onChange={(e) => handleSettingsChange('maintenanceMode', e.target.checked)}
+                  className="h-4 w-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
+                />
               </div>
-              <input
-                type="checkbox"
-                checked={settings.maintenanceMode}
-                onChange={(e) => handleSettingsChange('maintenanceMode', e.target.checked)}
-                className="h-4 w-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
-              />
-            </div>
-            
-            {settings.maintenanceMode && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
-                Warning: Maintenance mode will make the site inaccessible to regular users.
-              </div>
-            )}
+              
+              {settings.maintenanceMode && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+                  Warning: Maintenance mode will make the site inaccessible to regular users.
+                </div>
+              )}
+
+              <Button type="submit" disabled={isSettingsLoading} className="w-full">
+                <Save className="h-4 w-4 mr-2" />
+                {isSettingsLoading ? 'Saving...' : 'Save System Settings'}
+              </Button>
+            </form>
           </CardContent>
         </Card>
       </div>

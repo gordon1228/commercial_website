@@ -1,3 +1,4 @@
+// src/app/api/vehicles/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit
 
     // Build where clause for filtering
-    const where: Record<string, unknown> = {}
+    const where: Record<string, any> = {}
     
     if (category) {
       const categories = category.split(',')
@@ -93,6 +94,8 @@ export async function GET(request: NextRequest) {
       { error: 'Failed to fetch vehicles' },
       { status: 500 }
     )
+  } finally {
+    await prisma.$disconnect()
   }
 }
 
@@ -111,7 +114,7 @@ export async function POST(request: NextRequest) {
       fuelType,
       transmission,
       categoryId,
-      specifications,
+      specifications, // This comes as specifications from frontend
       images,
       features,
       status = 'AVAILABLE'
@@ -156,9 +159,9 @@ export async function POST(request: NextRequest) {
         fuelType,
         transmission,
         categoryId,
-        specifications,
-        images,
-        features,
+        specs: specifications, // Map specifications to specs field
+        images: images || [],
+        features: features || [],
         status
       },
       include: {
@@ -175,5 +178,7 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to create vehicle' },
       { status: 500 }
     )
+  } finally {
+    await prisma.$disconnect()
   }
 }

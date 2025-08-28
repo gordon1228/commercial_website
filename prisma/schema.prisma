@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -26,28 +23,40 @@ model User {
 }
 
 model Category {
-  id       String    @id @default(cuid())
-  name     String
-  slug     String    @unique
-  vehicles Vehicle[]
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  vehicles    Vehicle[]
 
   @@map("categories")
 }
 
 model Vehicle {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String    @unique
-  description String?
-  price       Float
-  images      String[]
-  specs       Json?
-  status      Status    @default(AVAILABLE)
-  categoryId  String
-  category    Category  @relation(fields: [categoryId], references: [id])
-  inquiries   Inquiry[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  description   String?
+  price         Float
+  images        String[]
+  specs         Json?     // Changed from specifications
+  status        Status    @default(AVAILABLE)
+  categoryId    String
+  category      Category  @relation(fields: [categoryId], references: [id])
+  inquiries     Inquiry[]
+  
+  // Optional fields that exist in API but not in seed
+  year          Int?
+  make          String?
+  model         String?
+  mileage       Int?
+  fuelType      String?
+  transmission  String?
+  features      String[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@map("vehicles")
 }
@@ -70,6 +79,21 @@ model Inquiry {
   @@map("inquiries")
 }
 
+model Settings {
+  id                    String  @id @default(cuid())
+  siteName              String  @default("EliteFleet")
+  contactEmail          String  @default("contact@elitefleet.com")
+  supportPhone          String  @default("+1 (555) 123-4567")
+  address               String  @default("123 Business Avenue, Commercial District, NY 10001")
+  emailNotifications    Boolean @default(true)
+  systemNotifications   Boolean @default(true)
+  maintenanceMode       Boolean @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("settings")
+}
+
 enum Role {
   ADMIN
   MANAGER
@@ -85,6 +109,6 @@ enum Status {
 enum InquiryStatus {
   NEW
   CONTACTED
-  RESOLVED
+  RESOLVED  // Changed from RESPONDED
   CLOSED
 }
