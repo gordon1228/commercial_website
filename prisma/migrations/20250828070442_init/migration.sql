@@ -74,3 +74,17 @@ ALTER TABLE "public"."vehicles" ADD CONSTRAINT "vehicles_categoryId_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "public"."inquiries" ADD CONSTRAINT "inquiries_vehicleId_fkey" FOREIGN KEY ("vehicleId") REFERENCES "public"."vehicles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+-- AlterTable - Add missing columns to categories table
+ALTER TABLE "public"."categories" ADD COLUMN IF NOT EXISTS "description" TEXT;
+ALTER TABLE "public"."categories" ADD COLUMN IF NOT EXISTS "image" TEXT;
+
+-- AlterTable - Add missing columns to vehicles table
+ALTER TABLE "public"."vehicles" ADD COLUMN IF NOT EXISTS "year" INTEGER;
+ALTER TABLE "public"."vehicles" ADD COLUMN IF NOT EXISTS "make" TEXT;
+ALTER TABLE "public"."vehicles" ADD COLUMN IF NOT EXISTS "model" TEXT;
+ALTER TABLE "public"."vehicles" ADD COLUMN IF NOT EXISTS "mileage" INTEGER;
+ALTER TABLE "public"."vehicles" ADD COLUMN IF NOT EXISTS "fuelType" TEXT;
+ALTER TABLE "public"."vehicles" ADD COLUMN IF NOT EXISTS "transmission" TEXT;
+ALTER TABLE "public"."vehicles" ADD COLUMN IF NOT EXISTS "features" TEXT[];
