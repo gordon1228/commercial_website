@@ -56,7 +56,8 @@ export async function PUT(
       specifications,
       images,
       features,
-      status
+      status,
+      featured
     } = body
 
     // Check if vehicle exists
@@ -111,10 +112,11 @@ export async function PUT(
         fuelType,
         transmission,
         categoryId,
-        specifications,
+        specs: specifications,
         images,
         features,
-        status
+        status,
+        featured
       },
       include: {
         category: {

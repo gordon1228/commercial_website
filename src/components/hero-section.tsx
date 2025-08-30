@@ -41,14 +41,20 @@ export default function HeroSection() {
         </div>
       </div>
       
-      {/* Scroll indicator */}
-      <div 
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 cursor-pointer animate-bounce"
-        onClick={scrollToNext}
-      >
-        <div className="flex flex-col items-center text-gray-600 hover:text-gray-800 transition-colors">
-          <span className="text-sm mb-2">Scroll to explore</span>
-          <ChevronDown className="h-6 w-6" />
+      {/* Scroll indicator - Perfectly centered */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
+        <div 
+          className="cursor-pointer animate-bounce flex flex-col items-center"
+          onClick={scrollToNext}
+        >
+          <div className="text-center text-black hover:text-gray-900 transition-all duration-300">
+            <div className="text-sm sm:text-base mb-2 drop-shadow-lg font-medium tracking-wide">
+              Scroll to explore
+            </div>
+            <div className="flex justify-center">
+              <ChevronDown className="h-6 w-6 sm:h-7 sm:w-7 drop-shadow-lg" />
+            </div>
+          </div>
         </div>
       </div>
     </section>

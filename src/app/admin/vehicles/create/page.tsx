@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, X } from 'lucide-react'
+import { ArrowLeft, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ImageUpload } from '@/components/ui/image-upload'
 import Link from 'next/link'
 
 interface Category {
@@ -21,6 +22,7 @@ interface VehicleFormData {
   price: number
   categoryId: string
   status: string
+  featured: boolean
   images: string[]
   specs: {
     fuel: string
@@ -42,6 +44,7 @@ export default function CreateVehiclePage() {
     price: 0,
     categoryId: '',
     status: 'AVAILABLE',
+    featured: false,
     images: [''],
     specs: {
       fuel: '',
@@ -91,30 +94,11 @@ export default function CreateVehiclePage() {
     }))
   }
 
-  const handleImageChange = (index: number, value: string) => {
-    const newImages = [...formData.images]
-    newImages[index] = value
+  const handleImagesChange = (newImages: string[]) => {
     setFormData(prev => ({
       ...prev,
-      images: newImages
+      images: newImages.length > 0 ? newImages : ['']
     }))
-  }
-
-  const addImageField = () => {
-    setFormData(prev => ({
-      ...prev,
-      images: [...prev.images, '']
-    }))
-  }
-
-  const removeImageField = (index: number) => {
-    if (formData.images.length > 1) {
-      const newImages = formData.images.filter((_, i) => i !== index)
-      setFormData(prev => ({
-        ...prev,
-        images: newImages
-      }))
-    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -262,6 +246,22 @@ export default function CreateVehiclePage() {
                   <option value="SOLD">Sold</option>
                 </select>
               </div>
+
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="featured"
+                  checked={formData.featured}
+                  onChange={(e) => handleInputChange('featured', e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="featured" className="text-sm font-medium text-gray-700">
+                  Featured Vehicle
+                </label>
+                <div className="text-xs text-gray-500">
+                  Mark this vehicle to appear in the featured vehicles section on the homepage
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -332,39 +332,14 @@ export default function CreateVehiclePage() {
         {/* Images */}
         <Card>
           <CardHeader>
-            <CardTitle>Images</CardTitle>
+            <CardTitle>Vehicle Images</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {formData.images.map((image, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    value={image}
-                    onChange={(e) => handleImageChange(index, e.target.value)}
-                    placeholder="Image URL (e.g., /images/truck1.jpg)"
-                    className="flex-1"
-                  />
-                  {formData.images.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeImageField(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addImageField}
-                className="w-full"
-              >
-                Add Another Image
-              </Button>
-            </div>
+            <ImageUpload
+              images={formData.images}
+              onImagesChange={handleImagesChange}
+              maxImages={10}
+            />
           </CardContent>
         </Card>
 

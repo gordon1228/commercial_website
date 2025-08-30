@@ -26,57 +26,6 @@ interface Vehicle {
   }
 }
 
-// Mock data as fallback
-const mockFeaturedVehicles = [
-  {
-    id: '1',
-    name: 'Mercedes Sprinter 3500',
-    slug: 'mercedes-sprinter-3500',
-    price: 75000,
-    image: '/images/truck1.jpg',
-    specs: [
-      { icon: Fuel, label: 'MPG', value: '21' },
-      { icon: Users, label: 'Capacity', value: '15 seats' },
-      { icon: Weight, label: 'GVWR', value: '11,030 lbs' }
-    ]
-  },
-  {
-    id: '2',
-    name: 'Ford F-650 Box Truck',
-    slug: 'ford-f650-box-truck',
-    price: 89000,
-    image: '/images/truck2.jpg',
-    specs: [
-      { icon: Fuel, label: 'MPG', value: '12' },
-      { icon: Users, label: 'Cab', value: '2 seats' },
-      { icon: Weight, label: 'GVWR', value: '25,950 lbs' }
-    ]
-  },
-  {
-    id: '3',
-    name: 'Freightliner Cascadia',
-    slug: 'freightliner-cascadia',
-    price: 165000,
-    image: '/images/truck3.jpg',
-    specs: [
-      { icon: Fuel, label: 'MPG', value: '7.5' },
-      { icon: Users, label: 'Cab', value: '2 seats' },
-      { icon: Weight, label: 'GVWR', value: '80,000 lbs' }
-    ]
-  },
-  {
-    id: '4',
-    name: 'Blue Bird School Bus',
-    slug: 'blue-bird-school-bus',
-    price: 125000,
-    image: '/images/truck4.jpg',
-    specs: [
-      { icon: Fuel, label: 'MPG', value: '8' },
-      { icon: Users, label: 'Capacity', value: '72 seats' },
-      { icon: Weight, label: 'GVWR', value: '34,000 lbs' }
-    ]
-  }
-]
 
 export default function FeaturedVehicles() {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -87,17 +36,16 @@ export default function FeaturedVehicles() {
   useEffect(() => {
     const fetchFeaturedVehicles = async () => {
       try {
-        const response = await fetch('/api/vehicles?limit=4&sortBy=price-high')
+        const response = await fetch('/api/vehicles?featured=true&limit=4&sortBy=price-high')
         if (response.ok) {
           const data = await response.json()
-          setVehicles(data.vehicles)
+          setVehicles(data.vehicles || [])
         } else {
-          throw new Error('Failed to fetch')
+          throw new Error('Failed to fetch vehicles')
         }
       } catch (error) {
         console.error('Error fetching featured vehicles:', error)
-        // Fallback to mock data
-        setVehicles(mockFeaturedVehicles as any)
+        setVehicles([])
       } finally {
         setIsLoading(false)
       }
@@ -162,6 +110,11 @@ export default function FeaturedVehicles() {
                   </div>
                 </div>
               </div>
+            </div>
+          ) : vehicles.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-xl text-gray-600">No featured vehicles available at the moment.</p>
+              <p className="text-gray-500 mt-2">Check back soon for our latest inventory.</p>
             </div>
           ) : (
             <>

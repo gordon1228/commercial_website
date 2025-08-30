@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,21 +14,24 @@ interface FilterState {
   search: string
 }
 
-const categories = [
-  { id: 'trucks', label: 'Commercial Trucks' },
-  { id: 'vans', label: 'Delivery Vans' },
-  { id: 'buses', label: 'Passenger Buses' }
-]
+interface Category {
+  id: string
+  name: string
+  slug: string
+}
 
 const statusOptions = [
   { id: 'AVAILABLE', label: 'Available' },
-  { id: 'RESERVED', label: 'Reserved' }
+  { id: 'RESERVED', label: 'Reserved' },
+  { id: 'SOLD', label: 'Sold' }
 ]
 
 export default function VehicleFilters() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isOpen, setIsOpen] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true)
   
   const [filters, setFilters] = useState<FilterState>({
     category: searchParams.get('category')?.split(',') || [],
@@ -37,6 +40,38 @@ export default function VehicleFilters() {
     status: searchParams.get('status')?.split(',') || [],
     search: searchParams.get('search') || ''
   })
+
+  // Fetch categories from database
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories')
+        if (response.ok) {
+          const data = await response.json()
+          setCategories(data)
+        } else {
+          console.error('Failed to fetch categories')
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      } finally {
+        setIsLoadingCategories(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  // Update filters when URL search params change
+  useEffect(() => {
+    setFilters({
+      category: searchParams.get('category')?.split(',') || [],
+      priceMin: searchParams.get('priceMin') || '',
+      priceMax: searchParams.get('priceMax') || '',
+      status: searchParams.get('status')?.split(',') || [],
+      search: searchParams.get('search') || ''
+    })
+  }, [searchParams])
 
   const updateFilters = (newFilters: Partial<FilterState>) => {
     const updated = { ...filters, ...newFilters }
@@ -66,10 +101,10 @@ export default function VehicleFilters() {
     router.push('/vehicles', { scroll: false })
   }
 
-  const toggleCategory = (categoryId: string) => {
-    const newCategories = filters.category.includes(categoryId)
-      ? filters.category.filter(c => c !== categoryId)
-      : [...filters.category, categoryId]
+  const toggleCategory = (categorySlug: string) => {
+    const newCategories = filters.category.includes(categorySlug)
+      ? filters.category.filter(c => c !== categorySlug)
+      : [...filters.category, categorySlug]
     updateFilters({ category: newCategories })
   }
 
@@ -141,17 +176,28 @@ export default function VehicleFilters() {
         <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-700 mb-3">Category</h4>
           <div className="space-y-2">
-            {categories.map((category) => (
-              <label key={category.id} className="flex items-center space-x-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={filters.category.includes(category.id)}
-                  onChange={() => toggleCategory(category.id)}
-                  className="rounded border-gray-300 text-gray-600"
-                />
-                <span className="text-gray-700 text-sm">{category.label}</span>
-              </label>
-            ))}
+            {isLoadingCategories ? (
+              <div className="animate-pulse space-y-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="flex items-center space-x-3">
+                    <div className="w-4 h-4 bg-gray-200 rounded" />
+                    <div className="h-4 bg-gray-200 rounded w-24" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              categories.map((category) => (
+                <label key={category.slug} className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={filters.category.includes(category.slug)}
+                    onChange={() => toggleCategory(category.slug)}
+                    className="rounded border-gray-300 text-gray-600"
+                  />
+                  <span className="text-gray-700 text-sm">{category.name}</span>
+                </label>
+              ))
+            )}
           </div>
         </div>
 
@@ -201,16 +247,16 @@ export default function VehicleFilters() {
           <div className="border-t border-gray-200 pt-4">
             <h4 className="text-sm font-medium text-gray-700 mb-3">Active Filters</h4>
             <div className="flex flex-wrap gap-2">
-              {filters.category.map((cat) => {
-                const category = categories.find(c => c.id === cat)
+              {filters.category.map((categorySlug) => {
+                const category = categories.find(c => c.slug === categorySlug)
                 return (
                   <span
-                    key={cat}
+                    key={categorySlug}
                     className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700 border border-gray-200"
                   >
-                    {category?.label}
+                    {category?.name || categorySlug}
                     <button
-                      onClick={() => toggleCategory(cat)}
+                      onClick={() => toggleCategory(categorySlug)}
                       className="ml-1 hover:text-gray-900"
                     >
                       <X className="h-3 w-3" />

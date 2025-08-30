@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -21,90 +21,36 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { formatPrice } from '@/lib/utils'
 
-// Mock data - in real app this would come from API
-const mockVehicle = {
-  id: '1',
-  name: 'Mercedes Sprinter 3500',
-  slug: 'mercedes-sprinter-3500',
-  price: 75000,
-  category: 'Commercial Vans',
-  status: 'AVAILABLE',
-  images: [
-    '/images/truck1.jpg',
-    '/images/truck2.jpg',
-    '/images/truck3.jpg',
-    '/images/truck4.jpg'
-  ],
-  description: 'The Mercedes Sprinter 3500 is a versatile commercial van that combines efficiency, reliability, and comfort. Perfect for cargo transport, passenger service, or mobile business operations.',
-  keyHighlights: [
-    'Advanced safety systems',
-    'Fuel-efficient diesel engine',
-    'Spacious cargo area',
-    'Low maintenance costs',
-    'Excellent resale value'
-  ],
-  specifications: {
-    engine: '3.0L V6 Turbo Diesel',
-    power: '188 HP',
-    torque: '325 lb-ft',
-    transmission: '9-Speed Automatic',
-    fuelEconomy: '21 MPG Combined',
-    payload: '4,354 lbs',
-    towingCapacity: '7,500 lbs',
-    seatingCapacity: '15 passengers',
-    cargoVolume: '488 cubic feet',
-    wheelbase: '170 inches',
-    length: '273.4 inches',
-    width: '79.1 inches',
-    height: '109.4 inches'
-  },
-  features: [
-    'Crosswind Assist',
-    'Collision Prevention Assist',
-    'Blind Spot Assist',
-    'Lane Keeping Assist',
-    'Attention Assist',
-    'Electronic Stability Program',
-    'Load-Adaptive ESP',
-    'Hill Start Assist',
-    'Parktronic with Rear View Camera',
-    'MBUX Multimedia System',
-    'Bluetooth Connectivity',
-    'USB Ports',
-    'Climate Control',
-    'Power Windows & Locks',
-    'Remote Keyless Entry'
-  ]
+interface Vehicle {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  price: number
+  images: string[]
+  status: string
+  specifications?: Record<string, string>
+  features?: string[]
+  category: {
+    id: string
+    name: string
+    slug: string
+  }
 }
 
-const relatedVehicles = [
-  {
-    id: '2',
-    name: 'Ford Transit 350',
-    slug: 'ford-transit-350',
-    price: 42000,
-    image: '/images/truck2.jpg'
-  },
-  {
-    id: '3',
-    name: 'Ford F-650 Box Truck',
-    slug: 'ford-f650-box-truck',
-    price: 89000,
-    image: '/images/truck3.jpg'
-  },
-  {
-    id: '4',
-    name: 'Freightliner Cascadia',
-    slug: 'freightliner-cascadia',
-    price: 165000,
-    image: '/images/truck4.jpg'
-  }
-]
+interface VehicleResponse {
+  vehicle: Vehicle
+  relatedVehicles: Vehicle[]
+}
 
-export default function VehicleDetailPage({ params: _ }: { params: { slug: string } }) {
+export default function VehicleDetailPage({ params }: { params: { slug: string } }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [activeTab, setActiveTab] = useState('overview')
   const [isSaved, setIsSaved] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null)
+  const [relatedVehicles, setRelatedVehicles] = useState<Vehicle[]>([])
   const [inquiryForm, setInquiryForm] = useState({
     name: '',
     email: '',
@@ -112,28 +58,119 @@ export default function VehicleDetailPage({ params: _ }: { params: { slug: strin
     message: ''
   })
 
-  // In real app, fetch vehicle by slug
-  const vehicle = mockVehicle
+  useEffect(() => {
+    const fetchVehicle = async () => {
+      try {
+        const response = await fetch(`/api/vehicles/slug/${params.slug}`)
+        if (!response.ok) {
+          if (response.status === 404) {
+            notFound()
+          }
+          throw new Error('Failed to fetch vehicle')
+        }
+        
+        const data: VehicleResponse = await response.json()
+        setVehicle(data.vehicle)
+        setRelatedVehicles(data.relatedVehicles)
+      } catch (error) {
+        console.error('Error fetching vehicle:', error)
+        notFound()
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchVehicle()
+  }, [params.slug])
+
+  const nextImage = () => {
+    if (!vehicle) return
+    setCurrentImageIndex((prev) => (prev + 1) % vehicle.images.length)
+  }
+
+  const prevImage = () => {
+    if (!vehicle) return
+    setCurrentImageIndex((prev) => (prev - 1 + vehicle.images.length) % vehicle.images.length)
+  }
+
+  const handleInquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!vehicle) return
+
+    setIsSubmitting(true)
+    try {
+      const response = await fetch('/api/inquiries/vehicle', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...inquiryForm,
+          vehicleId: vehicle.id,
+          vehicleSlug: vehicle.slug,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to submit inquiry')
+      }
+
+      alert('Inquiry submitted successfully! We will contact you soon.')
+      setInquiryForm({ name: '', email: '', phone: '', message: '' })
+    } catch (error) {
+      console.error('Error submitting inquiry:', error)
+      alert('Failed to submit inquiry. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen pt-20 bg-background">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+          <div className="animate-pulse">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+              <div className="lg:col-span-2">
+                <div className="aspect-[4/3] bg-gray-200 rounded-lg mb-6" />
+                <div className="grid grid-cols-4 gap-3 mb-8">
+                  {[1,2,3,4].map(i => (
+                    <div key={i} className="aspect-square bg-gray-200 rounded-md" />
+                  ))}
+                </div>
+                <div className="space-y-4">
+                  <div className="h-8 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 rounded" />
+                  <div className="h-4 bg-gray-200 rounded w-5/6" />
+                </div>
+              </div>
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <div className="h-8 bg-gray-200 rounded w-1/2" />
+                  <div className="h-12 bg-gray-200 rounded w-3/4" />
+                  <div className="grid grid-cols-3 gap-4">
+                    {[1,2,3].map(i => (
+                      <div key={i} className="text-center">
+                        <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto mb-2" />
+                        <div className="h-4 bg-gray-200 rounded" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (!vehicle) {
     notFound()
   }
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % vehicle.images.length)
-  }
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + vehicle.images.length) % vehicle.images.length)
-  }
-
-  const handleInquirySubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Inquiry submitted:', inquiryForm)
-    // In real app, submit to API
-    alert('Inquiry submitted successfully!')
-    setInquiryForm({ name: '', email: '', phone: '', message: '' })
-  }
+  const specifications = vehicle.specifications || {}
+  const features = vehicle.features || []
 
   return (
     <div className="min-h-screen pt-20 bg-background">
@@ -144,7 +181,7 @@ export default function VehicleDetailPage({ params: _ }: { params: { slug: strin
           <ChevronRight className="h-4 w-4" />
           <Link href="/vehicles" className="hover:text-gray-600 transition-colors">Vehicles</Link>
           <ChevronRight className="h-4 w-4" />
-          <span className="text-white">{vehicle.name}</span>
+          <span className="hover:text-gray-600 transition-colors">{vehicle.name}</span>
         </nav>
       </div>
 
@@ -153,62 +190,70 @@ export default function VehicleDetailPage({ params: _ }: { params: { slug: strin
           {/* Left Column - Images */}
           <div className="lg:col-span-2">
             {/* Main Image */}
-            <div className="relative aspect-[4/3] mb-6 rounded-lg overflow-hidden">
-              <Image
-                src={vehicle.images[currentImageIndex]}
-                alt={vehicle.name}
-                fill
-                className="object-cover"
-              />
-              
-              {/* Navigation arrows */}
-              <button
-                onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
+            {vehicle.images.length > 0 && (
+              <div className="relative aspect-[4/3] mb-6 rounded-lg overflow-hidden">
+                <Image
+                  src={vehicle.images[currentImageIndex]}
+                  alt={vehicle.name}
+                  fill
+                  className="object-cover"
+                />
+                
+                {vehicle.images.length > 1 && (
+                  <>
+                    {/* Navigation arrows */}
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
 
-              {/* Image counter */}
-              <div className="absolute top-4 right-4 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm">
-                {currentImageIndex + 1} / {vehicle.images.length}
+                    {/* Image counter */}
+                    <div className="absolute top-4 right-4 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm">
+                      {currentImageIndex + 1} / {vehicle.images.length}
+                    </div>
+                  </>
+                )}
+
+                {/* Save button */}
+                <button
+                  onClick={() => setIsSaved(!isSaved)}
+                  className="absolute top-4 left-4 w-10 h-10 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
+                >
+                  <Heart className={`h-5 w-5 ${isSaved ? 'fill-red-600 text-red-600' : ''}`} />
+                </button>
               </div>
-
-              {/* Save button */}
-              <button
-                onClick={() => setIsSaved(!isSaved)}
-                className="absolute top-4 left-4 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
-              >
-                <Heart className={`h-5 w-5 ${isSaved ? 'fill-gray-600 text-gray-600' : ''}`} />
-              </button>
-            </div>
+            )}
 
             {/* Thumbnail Images */}
-            <div className="grid grid-cols-4 gap-3 mb-8">
-              {vehicle.images.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`aspect-square rounded-md overflow-hidden border-2 transition-colors ${
-                    currentImageIndex === index ? 'border-gray-900' : 'border-gray-700 hover:border-gray-600'
-                  }`}
-                >
-                  <Image
-                    src={image}
-                    alt={`${vehicle.name} ${index + 1}`}
-                    width={120}
-                    height={120}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
+            {vehicle.images.length > 1 && (
+              <div className="grid grid-cols-4 gap-3 mb-8">
+                {vehicle.images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`aspect-square rounded-md overflow-hidden border-2 transition-colors ${
+                      currentImageIndex === index ? 'border-gray-900' : 'border-gray-700 hover:border-gray-600'
+                    }`}
+                  >
+                    <Image
+                      src={image}
+                      alt={`${vehicle.name} ${index + 1}`}
+                      width={120}
+                      height={120}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Tabs */}
             <div className="border-b border-gray-700 mb-6">
@@ -239,42 +284,40 @@ export default function VehicleDetailPage({ params: _ }: { params: { slug: strin
                 <div>
                   <h3 className="text-xl font-semibold text-white mb-4">Description</h3>
                   <p className="text-muted-foreground mb-6 leading-relaxed">
-                    {vehicle.description}
+                    {vehicle.description || 'No description available.'}
                   </p>
-                  
-                  <h3 className="text-xl font-semibold text-white mb-4">Key Highlights</h3>
-                  <ul className="space-y-2">
-                    {vehicle.keyHighlights.map((highlight, index) => (
-                      <li key={index} className="flex items-center text-muted-foreground">
-                        <div className="w-2 h-2 bg-gray-900 rounded-full mr-3" />
-                        {highlight}
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               )}
 
               {activeTab === 'specs' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {Object.entries(vehicle.specifications).map(([key, value]) => (
-                    <div key={key} className="flex justify-between py-3 border-b border-gray-700">
-                      <span className="text-muted-foreground capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}:
-                      </span>
-                      <span className="text-white font-medium">{value}</span>
-                    </div>
-                  ))}
+                  {Object.keys(specifications).length > 0 ? (
+                    Object.entries(specifications).map(([key, value]) => (
+                      <div key={key} className="flex justify-between py-3 border-b border-gray-700">
+                        <span className="text-muted-foreground capitalize">
+                          {key.replace(/([A-Z])/g, ' $1').trim()}:
+                        </span>
+                        <span className="text-white font-medium">{value as string}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground col-span-2">No specifications available.</p>
+                  )}
                 </div>
               )}
 
               {activeTab === 'features' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {vehicle.features.map((feature, index) => (
-                    <div key={index} className="flex items-center text-muted-foreground">
-                      <Shield className="h-4 w-4 text-gray-600 mr-3" />
-                      {feature}
-                    </div>
-                  ))}
+                  {features.length > 0 ? (
+                    features.map((feature, index) => (
+                      <div key={index} className="flex items-center text-muted-foreground">
+                        <Shield className="h-4 w-4 text-gray-600 mr-3" />
+                        {feature}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground col-span-2">No features listed.</p>
+                  )}
                 </div>
               )}
             </div>
@@ -285,12 +328,19 @@ export default function VehicleDetailPage({ params: _ }: { params: { slug: strin
             {/* Vehicle Info */}
             <div>
               <div className="mb-2">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-600/20 text-green-400">
-                  {vehicle.status === 'AVAILABLE' ? 'Available' : 'Reserved'}
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  vehicle.status === 'AVAILABLE' 
+                    ? 'bg-green-600/20 text-green-600' 
+                    : vehicle.status === 'RESERVED'
+                    ? 'bg-yellow-600/20 text-yellow-600'
+                    : 'bg-red-600/20 text-red-600'
+                }`}>
+                  {vehicle.status === 'AVAILABLE' ? 'Available' : 
+                   vehicle.status === 'RESERVED' ? 'Reserved' : 'Sold'}
                 </span>
               </div>
-              <h1 className="text-3xl font-bold text-white mb-2">{vehicle.name}</h1>
-              <p className="text-muted-foreground mb-4">{vehicle.category}</p>
+              <h1 className="text-3xl font-bold text-black mb-2">{vehicle.name}</h1>
+              <p className="text-muted-foreground mb-4">{vehicle.category.name}</p>
               <p className="text-4xl font-bold text-gray-900 mb-6">{formatPrice(vehicle.price)}</p>
 
               {/* Key Specs */}
@@ -298,17 +348,23 @@ export default function VehicleDetailPage({ params: _ }: { params: { slug: strin
                 <div className="text-center">
                   <Fuel className="h-6 w-6 text-gray-600 mx-auto mb-2" />
                   <div className="text-sm text-muted-foreground mb-1">Fuel Economy</div>
-                  <div className="text-white font-semibold">{vehicle.specifications.fuelEconomy}</div>
+                  <div className="text-white font-semibold">
+                    {specifications.fuel || specifications.fuelEconomy || 'N/A'}
+                  </div>
                 </div>
                 <div className="text-center">
                   <Users className="h-6 w-6 text-gray-600 mx-auto mb-2" />
-                  <div className="text-sm text-muted-foreground mb-1">Seating</div>
-                  <div className="text-white font-semibold">{vehicle.specifications.seatingCapacity}</div>
+                  <div className="text-sm text-muted-foreground mb-1">Capacity</div>
+                  <div className="text-white font-semibold">
+                    {specifications.capacity || specifications.seatingCapacity || 'N/A'}
+                  </div>
                 </div>
                 <div className="text-center">
                   <Weight className="h-6 w-6 text-gray-600 mx-auto mb-2" />
-                  <div className="text-sm text-muted-foreground mb-1">Payload</div>
-                  <div className="text-white font-semibold">{vehicle.specifications.payload}</div>
+                  <div className="text-sm text-muted-foreground mb-1">Weight</div>
+                  <div className="text-white font-semibold">
+                    {specifications.weight || specifications.payload || 'N/A'}
+                  </div>
                 </div>
               </div>
 
@@ -337,6 +393,7 @@ export default function VehicleDetailPage({ params: _ }: { params: { slug: strin
                     value={inquiryForm.name}
                     onChange={(e) => setInquiryForm({ ...inquiryForm, name: e.target.value })}
                     required
+                    disabled={isSubmitting}
                   />
                   <Input
                     type="email"
@@ -344,12 +401,14 @@ export default function VehicleDetailPage({ params: _ }: { params: { slug: strin
                     value={inquiryForm.email}
                     onChange={(e) => setInquiryForm({ ...inquiryForm, email: e.target.value })}
                     required
+                    disabled={isSubmitting}
                   />
                   <Input
                     type="tel"
                     placeholder="Phone Number"
                     value={inquiryForm.phone}
                     onChange={(e) => setInquiryForm({ ...inquiryForm, phone: e.target.value })}
+                    disabled={isSubmitting}
                   />
                   <textarea
                     className="input min-h-[100px] resize-none"
@@ -357,10 +416,12 @@ export default function VehicleDetailPage({ params: _ }: { params: { slug: strin
                     value={inquiryForm.message}
                     onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })}
                     rows={4}
+                    required
+                    disabled={isSubmitting}
                   />
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
                     <Mail className="h-4 w-4 mr-2" />
-                    Send Inquiry
+                    {isSubmitting ? 'Sending...' : 'Send Inquiry'}
                   </Button>
                 </form>
               </CardContent>
@@ -391,31 +452,33 @@ export default function VehicleDetailPage({ params: _ }: { params: { slug: strin
         </div>
 
         {/* Related Vehicles */}
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold text-black mb-8">Related Vehicles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
-            {relatedVehicles.map((vehicle) => (
-              <Link key={vehicle.id} href={`/vehicles/${vehicle.slug}`} className="group">
-                <div className="card-hover bg-gray-300/50 border-gray-800 overflow-hidden">
-                  <div className="relative aspect-[4/3]">
-                    <Image
-                      src={vehicle.image}
-                      alt={vehicle.name}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
+        {relatedVehicles.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-3xl font-bold text-black mb-8">Related Vehicles</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedVehicles.map((relatedVehicle) => (
+                <Link key={relatedVehicle.id} href={`/vehicles/${relatedVehicle.slug}`} className="group">
+                  <div className="card-hover bg-gray-300/50 border-gray-800 overflow-hidden">
+                    <div className="relative aspect-[4/3]">
+                      <Image
+                        src={relatedVehicle.images[0] || '/images/truck1.jpg'}
+                        alt={relatedVehicle.name}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold text-black mb-2 group-hover:text-gray-600 transition-colors">
+                        {relatedVehicle.name}
+                      </h3>
+                      <p className="text-2xl font-bold text-gray-900">{formatPrice(relatedVehicle.price)}</p>
+                    </div>
                   </div>
-                  <div className="p-6 ">
-                    <h3 className="text-lg font-semibold text-black  mb-2 group-hover:text-gray-600 transition-colors">
-                      {vehicle.name}
-                    </h3>
-                    <p className="text-2xl font-bold text-gray-900">{formatPrice(vehicle.price)}</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

@@ -42,6 +42,7 @@ model Vehicle {
   images        String[]
   specs         Json?     // Changed from specifications
   status        Status    @default(AVAILABLE)
+  featured      Boolean   @default(false)
   categoryId    String
   category      Category  @relation(fields: [categoryId], references: [id])
   inquiries     Inquiry[]

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Plus, Edit, Trash2, Eye, Search, Filter } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, Search, Filter, ChevronUp, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,14 +24,26 @@ interface Vehicle {
   updatedAt: string
 }
 
+interface Category {
+  id: string
+  name: string
+  slug: string
+}
+
+type SortField = 'name' | 'category' | 'price' | 'status' | 'updatedAt'
+type SortDirection = 'asc' | 'desc'
+
 export default function AdminVehiclesPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
+  const [sortField, setSortField] = useState<SortField>('updatedAt')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   useEffect(() => {
     if (status === 'loading') return
@@ -40,8 +52,27 @@ export default function AdminVehiclesPage() {
       return
     }
 
+    fetchCategories()
     fetchVehicles()
   }, [session, status, router])
+
+  useEffect(() => {
+    if (vehicles.length > 0) {
+      sortVehicles()
+    }
+  }, [sortField, sortDirection])
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories')
+      if (response.ok) {
+        const data = await response.json()
+        setCategories(data)
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
 
   const fetchVehicles = async () => {
     try {
@@ -61,6 +92,71 @@ export default function AdminVehiclesPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const sortVehicles = () => {
+    const sorted = [...vehicles].sort((a, b) => {
+      let aValue: string | number | Date
+      let bValue: string | number | Date
+
+      switch (sortField) {
+        case 'name':
+          aValue = a.name.toLowerCase()
+          bValue = b.name.toLowerCase()
+          break
+        case 'category':
+          aValue = a.category.name.toLowerCase()
+          bValue = b.category.name.toLowerCase()
+          break
+        case 'price':
+          aValue = a.price
+          bValue = b.price
+          break
+        case 'status':
+          aValue = a.status
+          bValue = b.status
+          break
+        case 'updatedAt':
+          aValue = new Date(a.updatedAt)
+          bValue = new Date(b.updatedAt)
+          break
+        default:
+          aValue = a.name.toLowerCase()
+          bValue = b.name.toLowerCase()
+      }
+
+      if (aValue < bValue) {
+        return sortDirection === 'asc' ? -1 : 1
+      }
+      if (aValue > bValue) {
+        return sortDirection === 'asc' ? 1 : -1
+      }
+      return 0
+    })
+
+    setVehicles(sorted)
+  }
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      // Set new field with default ascending direction
+      setSortField(field)
+      setSortDirection('asc')
+    }
+  }
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return null
+    }
+    return sortDirection === 'asc' ? (
+      <ChevronUp className="h-4 w-4 inline ml-1" />
+    ) : (
+      <ChevronDown className="h-4 w-4 inline ml-1" />
+    )
   }
 
   const handleDeleteVehicle = async (vehicleId: string) => {
@@ -162,9 +258,11 @@ export default function AdminVehiclesPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Categories</option>
-                <option value="trucks">Commercial Trucks</option>
-                <option value="vans">Delivery Vans</option>
-                <option value="buses">Passenger Buses</option>
+                {categories.map((category) => (
+                  <option key={category.slug} value={category.slug}>
+                    {category.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="flex gap-2">
@@ -184,6 +282,11 @@ export default function AdminVehiclesPage() {
       <div className="mb-6">
         <p className="text-gray-600">
           Showing {vehicles.length} vehicle{vehicles.length !== 1 ? 's' : ''}
+          {sortField && (
+            <span className="ml-2 text-sm">
+              (sorted by {sortField} {sortDirection === 'asc' ? '↑' : '↓'})
+            </span>
+          )}
         </p>
       </div>
 
@@ -194,11 +297,36 @@ export default function AdminVehiclesPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Vehicle</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Category</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Price</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Status</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Updated</th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => handleSort('name')}
+                  >
+                    Vehicle {getSortIcon('name')}
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => handleSort('category')}
+                  >
+                    Category {getSortIcon('category')}
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => handleSort('price')}
+                  >
+                    Price {getSortIcon('price')}
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => handleSort('status')}
+                  >
+                    Status {getSortIcon('status')}
+                  </th>
+                  <th 
+                    className="text-left py-3 px-4 font-medium text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => handleSort('updatedAt')}
+                  >
+                    Updated {getSortIcon('updatedAt')}
+                  </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
                 </tr>
               </thead>

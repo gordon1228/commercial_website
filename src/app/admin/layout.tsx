@@ -12,12 +12,14 @@ import {
   Settings, 
   LogOut,
   Menu,
-  X
+  X,
+  FolderOpen
 } from 'lucide-react'
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Vehicles', href: '/admin/vehicles', icon: Car },
+  { name: 'Categories', href: '/admin/categories', icon: FolderOpen },
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Inquiries', href: '/admin/inquiries', icon: MessageSquare },
   { name: 'Settings', href: '/admin/settings', icon: Settings },

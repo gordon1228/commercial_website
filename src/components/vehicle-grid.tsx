@@ -183,6 +183,7 @@ export default function VehicleGrid() {
         if (priceMin) params.set('priceMin', priceMin)
         if (priceMax) params.set('priceMax', priceMax)
         if (sortBy) params.set('sortBy', sortBy)
+        params.set('limit', '100') // Show up to 100 vehicles on public page
 
         const response = await fetch(`/api/vehicles?${params.toString()}`)
         
@@ -272,6 +273,7 @@ export default function VehicleGrid() {
                 if (priceMin) params.set('priceMin', priceMin)
                 if (priceMax) params.set('priceMax', priceMax)
                 if (sortBy) params.set('sortBy', sortBy)
+                params.set('limit', '100') // Show up to 100 vehicles on public page
 
                 const response = await fetch(`/api/vehicles?${params.toString()}`)
                 

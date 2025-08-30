@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const priceMin = searchParams.get('priceMin')
     const priceMax = searchParams.get('priceMax')
     const sortBy = searchParams.get('sortBy') || 'name'
+    const featured = searchParams.get('featured')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
@@ -32,6 +33,10 @@ export async function GET(request: NextRequest) {
     if (status) {
       const statuses = status.split(',')
       where.status = { in: statuses }
+    }
+    
+    if (featured === 'true') {
+      where.featured = true
     }
     
     if (search) {
@@ -117,7 +122,8 @@ export async function POST(request: NextRequest) {
       specifications, // This comes as specifications from frontend
       images,
       features,
-      status = 'AVAILABLE'
+      status = 'AVAILABLE',
+      featured = false
     } = body
 
     // Validate required fields
@@ -162,7 +168,8 @@ export async function POST(request: NextRequest) {
         specs: specifications, // Map specifications to specs field
         images: images || [],
         features: features || [],
-        status
+        status,
+        featured
       },
       include: {
         category: {
