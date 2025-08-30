@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, X } from 'lucide-react'
+import { ArrowLeft, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ImageUpload } from '@/components/ui/image-upload'
 import Link from 'next/link'
 
 interface Category {
@@ -23,6 +24,7 @@ interface Vehicle {
   price: number
   categoryId: string
   status: string
+  featured: boolean
   images: string[]
   specs: {
     fuel: string
@@ -110,30 +112,10 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
     }) : null)
   }
 
-  const handleImageChange = (index: number, value: string) => {
-    if (!vehicle) return
-    const newImages = [...vehicle.images]
-    newImages[index] = value
+  const handleImagesChange = (newImages: string[]) => {
     setVehicle(prev => prev ? ({
       ...prev,
-      images: newImages
-    }) : null)
-  }
-
-  const addImageField = () => {
-    if (!vehicle) return
-    setVehicle(prev => prev ? ({
-      ...prev,
-      images: [...prev.images, '']
-    }) : null)
-  }
-
-  const removeImageField = (index: number) => {
-    if (!vehicle || vehicle.images.length <= 1) return
-    const newImages = vehicle.images.filter((_, i) => i !== index)
-    setVehicle(prev => prev ? ({
-      ...prev,
-      images: newImages
+      images: newImages.length > 0 ? newImages : ['']
     }) : null)
   }
 
@@ -300,6 +282,22 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
                   <option value="SOLD">Sold</option>
                 </select>
               </div>
+
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="featured"
+                  checked={vehicle.featured}
+                  onChange={(e) => handleInputChange('featured', e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="featured" className="text-sm font-medium text-gray-700">
+                  Featured Vehicle
+                </label>
+                <div className="text-xs text-gray-500">
+                  Mark this vehicle to appear in the featured vehicles section on the homepage
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -370,39 +368,14 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
         {/* Images */}
         <Card>
           <CardHeader>
-            <CardTitle>Images</CardTitle>
+            <CardTitle>Vehicle Images</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {vehicle.images.map((image, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    value={image}
-                    onChange={(e) => handleImageChange(index, e.target.value)}
-                    placeholder="Image URL (e.g., /images/truck1.jpg)"
-                    className="flex-1"
-                  />
-                  {vehicle.images.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeImageField(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addImageField}
-                className="w-full"
-              >
-                Add Another Image
-              </Button>
-            </div>
+            <ImageUpload
+              images={vehicle.images}
+              onImagesChange={handleImagesChange}
+              maxImages={10}
+            />
           </CardContent>
         </Card>
 

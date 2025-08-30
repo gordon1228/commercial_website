@@ -11,7 +11,10 @@
       "Bash(curl:*)",
       "Bash(npx tsx:*)",
       "Bash(set PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=YES)",
-      "Bash(set \"PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=YES\")"
+      "Bash(set \"PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=YES\")",
+      "Bash(npx tsc:*)",
+      "Bash(set PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=yes)",
+      "Bash(set \"PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=yes\")"
     ],
     "deny": [],
     "ask": []

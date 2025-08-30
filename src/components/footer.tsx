@@ -1,7 +1,36 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react'
 
+interface Category {
+  id: string
+  name: string
+  slug: string
+}
+
 export default function Footer() {
+  const [categories, setCategories] = useState<Category[]>([])
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories')
+        if (response.ok) {
+          const data = await response.json()
+          setCategories(data.slice(0, 3)) // Show only first 3 categories in footer
+        } else {
+          console.error('Failed to fetch categories')
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
   return (
     <footer className="bg-black border-t border-secondary/10">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -51,21 +80,37 @@ export default function Footer() {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-white">Categories</h4>
             <ul className="space-y-2">
-              <li>
-                <Link href="/vehicles?category=trucks" className="text-muted-foreground hover:text-accent transition-colors">
-                  Commercial Trucks
-                </Link>
-              </li>
-              <li>
-                <Link href="/vehicles?category=vans" className="text-muted-foreground hover:text-accent transition-colors">
-                  Delivery Vans
-                </Link>
-              </li>
-              <li>
-                <Link href="/vehicles?category=buses" className="text-muted-foreground hover:text-accent transition-colors">
-                  Passenger Buses
-                </Link>
-              </li>
+              {categories.length > 0 ? (
+                categories.map((category) => (
+                  <li key={category.id}>
+                    <Link 
+                      href={`/vehicles?category=${category.slug}`} 
+                      className="text-muted-foreground hover:text-accent transition-colors"
+                    >
+                      {category.name}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                // Fallback while loading or if no categories
+                <>
+                  <li>
+                    <Link href="/vehicles?category=trucks" className="text-muted-foreground hover:text-accent transition-colors">
+                      Commercial Trucks
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/vehicles?category=vans" className="text-muted-foreground hover:text-accent transition-colors">
+                      Delivery Vans
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/vehicles?category=buses" className="text-muted-foreground hover:text-accent transition-colors">
+                      Passenger Buses
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 
