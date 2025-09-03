@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { createApiHandler, apiResponse } from '@/lib/api-handler'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
 // GET /api/inquiries - Get all inquiries with optional filtering
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
+export const GET = createApiHandler(
+  async (req) => {
+    const { searchParams } = new URL(req.url)
     const status = searchParams.get('status')
     const type = searchParams.get('type')
     const vehicleId = searchParams.get('vehicleId')
+    const sort = searchParams.get('sort')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
@@ -32,10 +33,20 @@ export async function GET(request: NextRequest) {
       where.vehicleId = vehicleId
     }
 
+    // Build orderBy clause
+    let orderBy: Record<string, string> = { createdAt: 'desc' }
+    if (sort === 'recent') {
+      orderBy = { createdAt: 'desc' }
+    } else if (sort === 'oldest') {
+      orderBy = { createdAt: 'asc' }
+    } else if (sort === 'status') {
+      orderBy = { status: 'asc' }
+    }
+
     const [inquiries, totalCount] = await Promise.all([
       prisma.inquiry.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         skip,
         take: limit,
         include: {
@@ -47,7 +58,7 @@ export async function GET(request: NextRequest) {
       prisma.inquiry.count({ where })
     ])
 
-    return NextResponse.json({
+    const response = apiResponse({
       inquiries,
       pagination: {
         page,
@@ -56,42 +67,36 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(totalCount / limit)
       }
     })
-  } catch (error) {
-    console.error('Error fetching inquiries:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch inquiries' },
-      { status: 500 }
-    )
+    
+    // Add cache-control headers for admin endpoints
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
+    
+    return response
+  },
+  {
+    requireAuth: true,
+    requireAdmin: true,
+    rateLimit: 'api'
   }
-}
+)
 
-// POST /api/inquiries - Create a new inquiry
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
+// POST /api/inquiries - Create a new inquiry  
+export const POST = createApiHandler(
+  async (req, { body }) => {
     const {
       customerName,
       email,
       phone,
       message,
       vehicleId
-    } = body
-
-    // Validate required fields
-    if (!customerName || !email || !message) {
-      return NextResponse.json(
-        { error: 'Missing required fields: customerName, email, message' },
-        { status: 400 }
-      )
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      )
+    } = body as {
+      customerName: string;
+      email: string;
+      phone?: string;
+      message: string;
+      vehicleId?: string;
     }
 
     // If vehicleId is provided, verify it exists
@@ -101,10 +106,7 @@ export async function POST(request: NextRequest) {
       })
 
       if (!vehicle) {
-        return NextResponse.json(
-          { error: 'Vehicle not found' },
-          { status: 404 }
-        )
+        return apiResponse({ error: 'Vehicle not found' }, { status: 404 })
       }
     }
 
@@ -124,15 +126,9 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // TODO: Send email notification to admin
-    // TODO: Send confirmation email to customer
-
-    return NextResponse.json(inquiry, { status: 201 })
-  } catch (error) {
-    console.error('Error creating inquiry:', error)
-    return NextResponse.json(
-      { error: 'Failed to create inquiry' },
-      { status: 500 }
-    )
+    return apiResponse(inquiry, { status: 201 })
+  },
+  {
+    rateLimit: 'api'
   }
-}
+)

@@ -1,12 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server'
+// User management API routes
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
+import { validationSchemas } from '@/lib/security'
 
 const prisma = new PrismaClient()
 
 // GET /api/users - Get all users (admin only)
-export async function GET(request: NextRequest) {
-  try {
+export const GET = createApiHandler(
+  async () => {
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -21,46 +23,19 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' }
     })
 
-    return NextResponse.json(users)
-  } catch (error) {
-    console.error('Error fetching users:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch users' },
-      { status: 500 }
-    )
+    return apiResponse(users)
+  },
+  {
+    requireAuth: true,
+    requireAdmin: true,
+    rateLimit: 'api'
   }
-}
+)
 
 // POST /api/users - Create a new user (admin only)
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    const { email, password, role = 'USER' } = body
-
-    // Validate required fields
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      )
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      )
-    }
-
-    // Validate password length
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
-        { status: 400 }
-      )
-    }
+export const POST = createApiHandler(
+  async (req, { body }) => {
+    const { email, password, role = 'USER' } = body as { email: string; password: string; role?: 'ADMIN' | 'MANAGER' | 'USER' }
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -68,14 +43,11 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 409 }
-      )
+      return apiError('User with this email already exists', 409)
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(password, 12)
 
     // Create user
     const user = await prisma.user.create({
@@ -93,12 +65,12 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json(user, { status: 201 })
-  } catch (error) {
-    console.error('Error creating user:', error)
-    return NextResponse.json(
-      { error: 'Failed to create user' },
-      { status: 500 }
-    )
+    return apiResponse(user, { status: 201 })
+  },
+  {
+    requireAuth: true,
+    requireAdmin: true,
+    rateLimit: 'api',
+    validateBody: validationSchemas.createUser
   }
-}
+)

@@ -36,6 +36,8 @@ interface Vehicle {
     name: string
     slug: string
   }
+  isViewAll?: boolean
+  categorySlug?: string
 }
 
 interface VehicleResponse {
@@ -190,50 +192,57 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
           {/* Left Column - Images */}
           <div className="lg:col-span-2">
             {/* Main Image */}
-            {vehicle.images.length > 0 && (
-              <div className="relative aspect-[4/3] mb-6 rounded-lg overflow-hidden">
+            <div className="relative aspect-[4/3] mb-6 rounded-lg overflow-hidden bg-gray-100">
+              {vehicle.images.length > 0 && vehicle.images[0] && vehicle.images[0].trim() !== '' ? (
                 <Image
                   src={vehicle.images[currentImageIndex]}
                   alt={vehicle.name}
                   fill
                   className="object-cover"
                 />
-                
-                {vehicle.images.length > 1 && (
-                  <>
-                    {/* Navigation arrows */}
-                    <button
-                      onClick={prevImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
-                    >
-                      <ChevronLeft className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={nextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
-                    >
-                      <ChevronRight className="h-5 w-5" />
-                    </button>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-500">
+                  <div className="text-center">
+                    <div className="text-8xl mb-4">📷</div>
+                    <div className="text-xl font-medium">No Image Available</div>
+                  </div>
+                </div>
+              )}
+              
+              {vehicle.images.length > 1 && vehicle.images[0] && vehicle.images[0].trim() !== '' && (
+                <>
+                  {/* Navigation arrows */}
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
 
-                    {/* Image counter */}
-                    <div className="absolute top-4 right-4 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm">
-                      {currentImageIndex + 1} / {vehicle.images.length}
-                    </div>
-                  </>
-                )}
+                  {/* Image counter */}
+                  <div className="absolute top-4 right-4 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm">
+                    {currentImageIndex + 1} / {vehicle.images.length}
+                  </div>
+                </>
+              )}
 
-                {/* Save button */}
-                <button
-                  onClick={() => setIsSaved(!isSaved)}
-                  className="absolute top-4 left-4 w-10 h-10 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
-                >
-                  <Heart className={`h-5 w-5 ${isSaved ? 'fill-red-600 text-red-600' : ''}`} />
-                </button>
-              </div>
-            )}
+              {/* Save button */}
+              <button
+                onClick={() => setIsSaved(!isSaved)}
+                className="absolute top-4 left-4 w-10 h-10 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
+              >
+                <Heart className={`h-5 w-5 ${isSaved ? 'fill-red-600 text-red-600' : ''}`} />
+              </button>
+            </div>
 
             {/* Thumbnail Images */}
-            {vehicle.images.length > 1 && (
+            {vehicle.images.length > 1 && vehicle.images[0] && vehicle.images[0].trim() !== '' && (
               <div className="grid grid-cols-4 gap-3 mb-8">
                 {vehicle.images.map((image, index) => (
                   <button
@@ -456,26 +465,61 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
           <div className="mt-16">
             <h2 className="text-3xl font-bold text-black mb-8">Related Vehicles</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relatedVehicles.map((relatedVehicle) => (
-                <Link key={relatedVehicle.id} href={`/vehicles/${relatedVehicle.slug}`} className="group">
-                  <div className="card-hover bg-gray-300/50 border-gray-800 overflow-hidden">
-                    <div className="relative aspect-[4/3]">
-                      <Image
-                        src={relatedVehicle.images[0] || '/images/truck1.jpg'}
-                        alt={relatedVehicle.name}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
+              {relatedVehicles.map((relatedVehicle) => {
+                // Handle "View All" special item
+                if (relatedVehicle.isViewAll) {
+                  return (
+                    <Link key={relatedVehicle.id} href={`/vehicles?category=${relatedVehicle.categorySlug}`} className="group">
+                      <div className="card-hover bg-gray-300/50 border-gray-800 overflow-hidden">
+                        <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                          <div className="text-center text-gray-600">
+                            <div className="text-6xl mb-4">🔍</div>
+                            <div className="text-lg font-semibold">View All</div>
+                            <div className="text-sm opacity-75">{relatedVehicle.category.name}</div>
+                          </div>
+                        </div>
+                        <div className="p-6">
+                          <h3 className="text-lg font-semibold text-black mb-2 group-hover:text-gray-600 transition-colors line-clamp-1">
+                            Browse All {relatedVehicle.category.name}
+                          </h3>
+                          <p className="text-2xl font-bold text-gray-900">View All</p>
+                        </div>
+                      </div>
+                    </Link>
+                  )
+                }
+
+                // Handle regular vehicle items
+                return (
+                  <Link key={relatedVehicle.id} href={`/vehicles/${relatedVehicle.slug}`} className="group">
+                    <div className="card-hover bg-gray-300/50 border-gray-800 overflow-hidden">
+                      <div className="relative aspect-[4/3] bg-gray-100">
+                        {relatedVehicle.images[0] && relatedVehicle.images[0].trim() !== '' ? (
+                          <Image
+                            src={relatedVehicle.images[0]}
+                            alt={relatedVehicle.name}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-500">
+                            <div className="text-center">
+                              <div className="text-4xl mb-2">📷</div>
+                              <div className="text-sm font-medium">No Image</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-6">
+                        <h3 className="text-lg font-semibold text-black mb-2 group-hover:text-gray-600 transition-colors">
+                          {relatedVehicle.name}
+                        </h3>
+                        <p className="text-2xl font-bold text-gray-900">{formatPrice(relatedVehicle.price)}</p>
+                      </div>
                     </div>
-                    <div className="p-6">
-                      <h3 className="text-lg font-semibold text-black mb-2 group-hover:text-gray-600 transition-colors">
-                        {relatedVehicle.name}
-                      </h3>
-                      <p className="text-2xl font-bold text-gray-900">{formatPrice(relatedVehicle.price)}</p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                )
+              })}
             </div>
           </div>
         )}

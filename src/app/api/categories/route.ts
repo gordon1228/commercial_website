@@ -1,76 +1,87 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
 // GET /api/categories - Get all categories
-export async function GET() {
-  try {
-    const categories = await prisma.category.findMany({
-      include: {
-        _count: {
-          select: { vehicles: true }
+export const GET = createApiHandler(async (req, { session }) => {
+  // For non-admin users, only show active categories
+  const isAdmin = session?.user?.role === 'ADMIN'
+  const where = isAdmin ? {} : { active: true }
+
+  const categories = await prisma.category.findMany({
+    where,
+    include: {
+      _count: {
+        select: { 
+          vehicles: isAdmin ? true : { where: { active: true } }
         }
-      },
-      orderBy: { name: 'asc' }
-    })
+      }
+    },
+    orderBy: { name: 'asc' }
+  })
 
-    return NextResponse.json(categories)
-  } catch (error) {
-    console.error('Error fetching categories:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch categories' },
-      { status: 500 }
-    )
-  }
-}
-
-// POST /api/categories - Create a new category
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    const { name, description, image } = body
-
-    if (!name) {
-      return NextResponse.json(
-        { error: 'Category name is required' },
-        { status: 400 }
-      )
-    }
-
-    // Generate slug from name
-    const slug = name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '')
-
-    // Check if slug already exists
-    const existingCategory = await prisma.category.findUnique({
-      where: { slug }
-    })
-
-    if (existingCategory) {
-      return NextResponse.json(
-        { error: 'A category with this name already exists' },
-        { status: 409 }
-      )
-    }
-
-    const category = await prisma.category.create({
-      data: {
-        name,
-        slug,
-        description,
-        image
+  // For admin users, add active vehicle count for each category
+  const categoriesWithActiveCount = isAdmin ? await Promise.all(
+    categories.map(async (category) => {
+      const activeVehicleCount = await prisma.vehicle.count({
+        where: {
+          categoryId: category.id,
+          active: true
+        }
+      })
+      return {
+        ...category,
+        activeVehicleCount
       }
     })
+  ) : categories
 
-    return NextResponse.json(category, { status: 201 })
-  } catch (error) {
-    console.error('Error creating category:', error)
-    return NextResponse.json(
-      { error: 'Failed to create category' },
-      { status: 500 }
-    )
+  return apiResponse(categoriesWithActiveCount)
+}, {
+  rateLimit: 'api'
+})
+
+// POST /api/categories - Create a new category
+export const POST = createApiHandler(async (req, { body }) => {
+  const { name, description, image } = body as {
+    name: string;
+    description?: string;
+    image?: string;
   }
-}
+
+  if (!name) {
+    return apiError('Category name is required', 400)
+  }
+
+  // Generate slug from name
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+
+  // Check if slug already exists
+  const existingCategory = await prisma.category.findUnique({
+    where: { slug }
+  })
+
+  if (existingCategory) {
+    return apiError('A category with this name already exists', 409)
+  }
+
+  const category = await prisma.category.create({
+    data: {
+      name,
+      slug,
+      description,
+      image,
+      active: true // New categories are active by default
+    }
+  })
+
+  return apiResponse(category, { status: 201 })
+}, {
+  requireAuth: true,
+  requireAdmin: true,
+  rateLimit: 'api'
+})
