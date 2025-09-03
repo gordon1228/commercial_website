@@ -80,7 +80,7 @@ export default function SettingsPage() {
         const error = await response.json()
         alert(`Failed to save settings: ${error.error}`)
       }
-    } catch (error) {
+    } catch {
       alert('Failed to save settings')
     } finally {
       setIsSettingsLoading(false)
@@ -107,7 +107,7 @@ export default function SettingsPage() {
       await new Promise(resolve => setTimeout(resolve, 1000))
       alert('Password changed successfully!')
       setProfileForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
-    } catch (error) {
+    } catch {
       alert('Failed to change password')
     } finally {
       setIsPasswordLoading(false)

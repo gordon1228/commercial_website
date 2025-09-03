@@ -382,7 +382,7 @@ export default function FinancingPage() {
             </h3>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
               Complete our simple online application and receive a financing decision within 24 hours. 
-              No obligation and won't affect your credit score.
+              No obligation and won&apos;t affect your credit score.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg">

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Plus, Edit, Trash2, Eye, Search, Filter, ChevronUp, ChevronDown } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, Search, Filter, ChevronUp, ChevronDown, Power, PowerOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,6 +15,7 @@ interface Vehicle {
   slug: string
   price: number
   status: string
+  active: boolean
   category: {
     id: string
     name: string
@@ -177,6 +178,31 @@ export default function AdminVehiclesPage() {
     }
   }
 
+  const handleToggleActive = async (vehicleId: string, currentStatus: boolean) => {
+    const action = currentStatus ? 'deactivate' : 'activate'
+    if (!confirm(`Are you sure you want to ${action} this vehicle?`)) return
+
+    try {
+      const response = await fetch(`/api/vehicles/${vehicleId}/toggle-active`, {
+        method: 'PATCH',
+      })
+
+      if (!response.ok) throw new Error(`Failed to ${action} vehicle`)
+
+      const result = await response.json()
+      
+      // Update the vehicle in the list
+      setVehicles(prev => prev.map(v => 
+        v.id === vehicleId ? { ...v, active: result.vehicle.active } : v
+      ))
+      
+      alert(result.message)
+    } catch (error) {
+      console.error(`Error ${action}ing vehicle:`, error)
+      alert(`Failed to ${action} vehicle`)
+    }
+  }
+
   const handleSearch = () => {
     fetchVehicles()
   }
@@ -213,12 +239,20 @@ export default function AdminVehiclesPage() {
             Manage your vehicle inventory - add, edit, or remove vehicles from your fleet.
           </p>
         </div>
-        <Link href="/admin/vehicles/create">
-          <Button className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Add New Vehicle
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/admin/preview/vehicles">
+            <Button variant="outline" className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              Preview Listing
+            </Button>
+          </Link>
+          <Link href="/admin/vehicles/create">
+            <Button className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Add New Vehicle
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
@@ -321,6 +355,9 @@ export default function AdminVehiclesPage() {
                   >
                     Status {getSortIcon('status')}
                   </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">
+                    Active
+                  </th>
                   <th 
                     className="text-left py-3 px-4 font-medium text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
                     onClick={() => handleSort('updatedAt')}
@@ -333,20 +370,29 @@ export default function AdminVehiclesPage() {
               <tbody className="divide-y divide-gray-200">
                 {vehicles.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-12 text-gray-500">
+                    <td colSpan={7} className="text-center py-12 text-gray-500">
                       No vehicles found matching your criteria.
                     </td>
                   </tr>
                 ) : (
                   vehicles.map((vehicle) => (
-                    <tr key={vehicle.id} className="hover:bg-gray-50">
+                    <tr key={vehicle.id} className={`hover:bg-gray-50 ${!vehicle.active ? 'opacity-60 bg-gray-25' : ''}`}>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
-                          <img
-                            src={vehicle.images?.[0] || '/images/truck1.jpg'}
-                            alt={vehicle.name}
-                            className="w-12 h-12 object-cover rounded"
-                          />
+                          <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center overflow-hidden">
+                            {vehicle.images?.[0] && vehicle.images[0].trim() !== '' ? (
+                              <img
+                                src={vehicle.images[0]}
+                                alt={vehicle.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="text-gray-400 text-xs text-center">
+                                <div>📷</div>
+                                <div className="text-[8px]">No Image</div>
+                              </div>
+                            )}
+                          </div>
                           <div>
                             <div className="font-medium text-gray-900">{vehicle.name}</div>
                             <div className="text-sm text-gray-500">{vehicle.slug}</div>
@@ -370,26 +416,48 @@ export default function AdminVehiclesPage() {
                           {vehicle.status}
                         </span>
                       </td>
+                      <td className="py-4 px-4">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          vehicle.active 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {vehicle.active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
                       <td className="py-4 px-4 text-sm text-gray-500">
                         {new Date(vehicle.updatedAt).toLocaleDateString()}
                       </td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
-                          <Link href={`/vehicles/${vehicle.slug}`}>
-                            <Button variant="ghost" size="sm">
+                          <Link href={`/admin/preview/vehicles/${vehicle.slug}`}>
+                            <Button variant="ghost" size="sm" title="Admin Preview">
                               <Eye className="h-4 w-4" />
                             </Button>
                           </Link>
                           <Link href={`/admin/vehicles/edit/${vehicle.id}`}>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" title="Edit Vehicle">
                               <Edit className="h-4 w-4" />
                             </Button>
                           </Link>
                           <Button 
                             variant="ghost" 
                             size="sm"
+                            onClick={() => handleToggleActive(vehicle.id, vehicle.active)}
+                            className={vehicle.active 
+                              ? "text-orange-600 hover:text-orange-800 hover:bg-orange-50" 
+                              : "text-green-600 hover:text-green-800 hover:bg-green-50"
+                            }
+                            title={vehicle.active ? 'Deactivate vehicle' : 'Activate vehicle'}
+                          >
+                            {vehicle.active ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4" />}
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
                             onClick={() => handleDeleteVehicle(vehicle.id)}
                             className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                            title="Delete Vehicle"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

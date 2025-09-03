@@ -12,6 +12,7 @@ const buttonVariants = cva(
         default: 'btn-primary',
         secondary: 'btn-secondary',
         ghost: 'btn-ghost',
+        outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
         destructive: 'bg-red-600 text-white hover:bg-red-700',
       },
       size: {

@@ -45,12 +45,28 @@ interface ApiResponse {
 
 function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
   const [isSaved, setIsSaved] = useState(false)
+  const [imageError, setImageError] = useState(false)
+  const hasImage = vehicle.images?.[0] && vehicle.images[0].trim() !== ''
+  const [imageSrc, setImageSrc] = useState(hasImage ? vehicle.images[0] : '')
 
   useEffect(() => {
     // Check if vehicle is in favorites on component mount
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
     setIsSaved(favorites.includes(vehicle.id))
   }, [vehicle.id])
+
+  useEffect(() => {
+    // Reset image state when vehicle changes
+    setImageError(false)
+    const hasValidImage = vehicle.images?.[0] && vehicle.images[0].trim() !== ''
+    if (hasValidImage) {
+      // Add timestamp to bust cache for updated images
+      const cacheBustedSrc = `${vehicle.images[0]}?t=${new Date().getTime()}`
+      setImageSrc(cacheBustedSrc)
+    } else {
+      setImageSrc('')
+    }
+  }, [vehicle.images, vehicle.id])
 
   const toggleFavorite = () => {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
@@ -72,13 +88,26 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
   return (
     <div className="group card-hover bg-white border-gray-200 overflow-hidden">
       {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <Image
-          src={vehicle.images?.[0] || '/images/truck1.jpg'}
-          alt={vehicle.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
-        />
+      <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+        {imageSrc && !imageError ? (
+          <Image
+            src={imageSrc}
+            alt={vehicle.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+            onError={() => setImageError(true)}
+            onLoad={() => setImageError(false)}
+            priority={false}
+            unoptimized={true}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-500">
+            <div className="text-center">
+              <div className="text-4xl mb-2">📷</div>
+              <div className="text-sm font-medium">No Image</div>
+            </div>
+          </div>
+        )}
         
         {/* Status badge */}
         <div className="absolute top-3 left-3">
@@ -97,7 +126,7 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         <div className="absolute top-3 right-3 flex space-x-2">
           <button
             onClick={toggleFavorite}
-            className="w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+            className="w-8 h-8 bg-black/30 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
           >
             <Heart className={`h-4 w-4 ${isSaved ? 'fill-red-500 text-red-500' : 'text-white'}`} />
           </button>
@@ -184,8 +213,13 @@ export default function VehicleGrid() {
         if (priceMax) params.set('priceMax', priceMax)
         if (sortBy) params.set('sortBy', sortBy)
         params.set('limit', '100') // Show up to 100 vehicles on public page
+        
+        // Add cache-busting timestamp to ensure fresh data
+        params.set('_t', Date.now().toString())
 
-        const response = await fetch(`/api/vehicles?${params.toString()}`)
+        const response = await fetch(`/api/vehicles?${params.toString()}`, {
+          cache: 'no-store' // Disable Next.js caching for this request
+        })
         
         if (!response.ok) {
           throw new Error('Failed to fetch vehicles')

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Plus, Edit2, Trash2, Save, X } from 'lucide-react'
+import { Plus, Edit2, Trash2, Save, X, Power, PowerOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,9 +13,11 @@ interface Category {
   name: string
   slug: string
   description?: string
+  active: boolean
   _count?: {
     vehicles: number
   }
+  activeVehicleCount?: number
 }
 
 export default function CategoriesPage() {
@@ -128,6 +130,35 @@ export default function CategoriesPage() {
     }
   }
 
+  const handleToggleActive = async (id: string, name: string, currentStatus: boolean) => {
+    const action = currentStatus ? 'deactivate' : 'activate'
+    if (!confirm(`Are you sure you want to ${action} the category "${name}"?`)) return
+
+    try {
+      const response = await fetch(`/api/categories/${id}/toggle-active`, {
+        method: 'PATCH',
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        // Show the specific error message from the API
+        alert(result.error || `Failed to ${action} category`)
+        return
+      }
+      
+      // Update the category in the list
+      setCategories(prev => prev.map(c => 
+        c.id === id ? { ...c, active: result.category.active } : c
+      ))
+      
+      alert(result.message)
+    } catch (error) {
+      console.error(`Error ${action}ing category:`, error)
+      alert(`Failed to ${action} category`)
+    }
+  }
+
   const resetForm = () => {
     setFormData({ name: '', description: '' })
     setEditingId(null)
@@ -232,10 +263,19 @@ export default function CategoriesPage() {
               {categories.map((category) => (
                 <div
                   key={category.id}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+                  className={`flex items-center justify-between p-4 border border-gray-200 rounded-lg ${!category.active ? 'opacity-60 bg-gray-50' : ''}`}
                 >
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        category.active 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {category.active ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
                     <p className="text-sm text-gray-600 mt-1">
                       Slug: <code className="bg-gray-100 px-2 py-1 rounded">{category.slug}</code>
                     </p>
@@ -244,6 +284,11 @@ export default function CategoriesPage() {
                     )}
                     <p className="text-sm text-gray-500 mt-1">
                       {category._count?.vehicles || 0} vehicle(s)
+                      {category.activeVehicleCount !== undefined && (
+                        <span className="ml-1">
+                          ({category.activeVehicleCount} active)
+                        </span>
+                      )}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -254,6 +299,23 @@ export default function CategoriesPage() {
                       disabled={isCreating}
                     >
                       <Edit2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleToggleActive(category.id, category.name, category.active)}
+                      disabled={isCreating || (category.active && (category.activeVehicleCount || 0) > 0)}
+                      className={category.active 
+                        ? "text-orange-600 hover:text-orange-800 hover:bg-orange-50" 
+                        : "text-green-600 hover:text-green-800 hover:bg-green-50"
+                      }
+                      title={
+                        category.active && (category.activeVehicleCount || 0) > 0
+                          ? `Cannot deactivate: ${category.activeVehicleCount} active vehicle(s) in this category`
+                          : category.active ? 'Deactivate category' : 'Activate category'
+                      }
+                    >
+                      {category.active ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4" />}
                     </Button>
                     <Button
                       variant="destructive"

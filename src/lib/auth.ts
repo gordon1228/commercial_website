@@ -1,8 +1,8 @@
+// src/lib/auth.ts
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-
 const prisma = new PrismaClient()
 
 export const authOptions: NextAuthOptions = {
@@ -15,18 +15,18 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null
+          throw new Error('Invalid credentials')
         }
 
         try {
           const user = await prisma.user.findUnique({
             where: {
-              email: credentials.email
+              email: credentials.email.toLowerCase().trim()
             }
           })
 
           if (!user) {
-            return null
+            throw new Error('Invalid email or password')
           }
 
           const isPasswordValid = await bcrypt.compare(
@@ -35,7 +35,7 @@ export const authOptions: NextAuthOptions = {
           )
 
           if (!isPasswordValid) {
-            return null
+            throw new Error('Invalid email or password')
           }
 
           return {
@@ -45,31 +45,59 @@ export const authOptions: NextAuthOptions = {
           }
         } catch (error) {
           console.error('Auth error:', error)
-          return null
+          throw new Error('Authentication failed')
         }
       }
     })
   ],
   session: {
     strategy: 'jwt',
+    // No maxAge specified - makes it a browser session
+  },
+  jwt: {
+    maxAge: 8 * 60 * 60, // 8 hours
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        // DO NOT set maxAge or expires - this makes it a session cookie
+      }
+    },
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role
+    async jwt({ token, user, account }) {
+      if (account && user) {
+        return {
+          ...token,
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        }
       }
+
       return token
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.sub
-        session.user.role = token.role as string
+      if (token && token.email) {
+        session.user = {
+          ...session.user,
+          id: token.id as string,
+          email: token.email as string,
+          role: token.role as string,
+        }
       }
       return session
     },
   },
   pages: {
     signIn: '/admin/login',
+    error: '/admin/login',
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
 }

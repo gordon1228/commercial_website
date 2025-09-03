@@ -1,30 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { createApiHandler, apiResponse } from '@/lib/api-handler'
+import { validationSchemas } from '@/lib/security'
+import { z } from 'zod'
 
 const prisma = new PrismaClient()
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    const { name, email, phone, message, vehicleId, vehicleSlug } = body
+const inquirySchema = z.object({
+  name: z.string().min(1).max(100),
+  email: validationSchemas.email,
+  phone: validationSchemas.phone,
+  message: validationSchemas.message,
+  vehicleId: z.string().optional(),
+  vehicleSlug: z.string().optional()
+})
 
-    if (!name || !email || !message) {
-      return NextResponse.json(
-        { error: 'Name, email, and message are required' },
-        { status: 400 }
-      )
-    }
+export const POST = createApiHandler(
+  async (req, { body }) => {
+    const { name, email, phone, message, vehicleId } = body as z.infer<typeof inquirySchema>
 
     // Create the inquiry
     const inquiry = await prisma.inquiry.create({
       data: {
-        name,
+        customerName: name,
         email,
         phone: phone || null,
         message,
         vehicleId: vehicleId || null,
-        subject: vehicleSlug ? `Vehicle Inquiry: ${vehicleSlug}` : 'General Inquiry',
-        status: 'PENDING'
+        status: 'NEW'
       },
       include: {
         vehicle: {
@@ -37,15 +39,13 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({ 
+    return apiResponse({ 
       message: 'Inquiry submitted successfully',
       inquiry 
     })
-  } catch (error) {
-    console.error('Error creating inquiry:', error)
-    return NextResponse.json(
-      { error: 'Failed to submit inquiry' },
-      { status: 500 }
-    )
+  },
+  {
+    rateLimit: 'api',
+    validateBody: inquirySchema
   }
-}
+)

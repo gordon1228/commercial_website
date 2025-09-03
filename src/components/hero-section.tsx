@@ -1,14 +1,47 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
+interface HomepageContent {
+  heroTitle: string
+  heroSubtitle: string
+  heroDescription: string
+  heroButtonPrimary: string
+  heroButtonSecondary: string
+}
+
 export default function HeroSection() {
+  const [content, setContent] = useState<HomepageContent | null>(null)
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const response = await fetch('/api/homepage-content')
+        if (response.ok) {
+          const data = await response.json()
+          setContent(data)
+        }
+      } catch (error) {
+        console.error('Error fetching homepage content:', error)
+      }
+    }
+    fetchContent()
+  }, [])
+
   const scrollToNext = () => {
     const nextSection = document.getElementById('categories')
     nextSection?.scrollIntoView({ behavior: 'smooth' })
   }
+
+  // Default content while loading or if fetch fails
+  const heroTitle = content?.heroTitle || 'Premium Commercial'
+  const heroSubtitle = content?.heroSubtitle || 'Vehicles'
+  const heroDescription = content?.heroDescription || 'Discover elite fleet solutions built for businesses that demand excellence, reliability, and uncompromising quality.'
+  const heroButtonPrimary = content?.heroButtonPrimary || 'Explore Fleet'
+  const heroButtonSecondary = content?.heroButtonSecondary || 'Get Quote'
 
   return (
     <section id="PremiumCommercial" className="relative h-screen flex items-center justify-center hero-gradient overflow-hidden">
@@ -22,20 +55,20 @@ export default function HeroSection() {
       <div className="relative z-20 text-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="animate-fade-in">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl font-display font-bold text-gray-900 mb-6 leading-tight">
-            Premium Commercial
-            <span className="block text-gradient">Vehicles</span>
+            {heroTitle}
+            <span className="block text-gradient">{heroSubtitle}</span>
           </h1>
           
           <p className="text-xl sm:text-2xl text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Discover elite fleet solutions built for businesses that demand excellence, reliability, and uncompromising quality.
+            {heroDescription}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Button size="lg" asChild className="text-lg px-8 py-4 h-14">
-              <Link href="/vehicles">Explore Fleet</Link>
+              <Link href="/vehicles">{heroButtonPrimary}</Link>
             </Button>
             <Button variant="secondary" size="lg" asChild className="text-lg px-8 py-4 h-14">
-              <Link href="/contact">Get Quote</Link>
+              <Link href="/contact">{heroButtonSecondary}</Link>
             </Button>
           </div>
         </div>

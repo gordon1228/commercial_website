@@ -1,19 +1,19 @@
 // src/app/api/vehicles/route.ts
-import { NextRequest, NextResponse } from 'next/server'
+// Vehicle management API routes
 import { PrismaClient } from '@prisma/client'
+import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 
 const prisma = new PrismaClient()
 
 // GET /api/vehicles - Get all vehicles with optional filtering
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
+export const GET = createApiHandler(async (req, { session }) => {
+    const { searchParams } = new URL(req.url)
     const category = searchParams.get('category')
     const status = searchParams.get('status')
     const search = searchParams.get('search')
     const priceMin = searchParams.get('priceMin')
     const priceMax = searchParams.get('priceMax')
-    const sortBy = searchParams.get('sortBy') || 'name'
+    const sortBy = searchParams.get('sortBy') || searchParams.get('sort') || 'name'
     const featured = searchParams.get('featured')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
@@ -21,12 +21,32 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit
 
     // Build where clause for filtering
-    const where: Record<string, any> = {}
+    const where: Record<string, unknown> = {}
+    
+    // For non-admin users, only show active vehicles
+    // For admin users, show all vehicles (they can manage inactive ones)
+    const isAdmin = session?.user?.role === 'ADMIN'
+    
+    if (!isAdmin) {
+      where.active = true
+      // Also filter by active categories for public users
+      where.category = { active: true }
+    }
     
     if (category) {
       const categories = category.split(',')
-      where.category = { 
-        slug: { in: categories } 
+      const categoryFilter = { 
+        slug: { in: categories }
+      }
+      
+      // If already filtering by category active status, merge the conditions
+      if (where.category) {
+        where.category = {
+          ...where.category,
+          ...categoryFilter
+        }
+      } else {
+        where.category = categoryFilter
       }
     }
     
@@ -47,9 +67,10 @@ export async function GET(request: NextRequest) {
     }
     
     if (priceMin || priceMax) {
-      where.price = {}
-      if (priceMin) where.price.gte = parseFloat(priceMin)
-      if (priceMax) where.price.lte = parseFloat(priceMax)
+      const priceFilter: { gte?: number; lte?: number } = {}
+      if (priceMin) priceFilter.gte = parseFloat(priceMin)
+      if (priceMax) priceFilter.lte = parseFloat(priceMax)
+      where.price = priceFilter
     }
 
     // Build orderBy clause
@@ -62,6 +83,7 @@ export async function GET(request: NextRequest) {
         orderBy = { price: 'desc' }
         break
       case 'newest':
+      case 'recent':
         orderBy = { createdAt: 'desc' }
         break
       case 'oldest':
@@ -78,13 +100,16 @@ export async function GET(request: NextRequest) {
         include: {
           category: {
             select: { id: true, name: true }
+          },
+          _count: {
+            select: { inquiries: true }
           }
         }
       }),
       prisma.vehicle.count({ where })
     ])
 
-    return NextResponse.json({
+    const response = apiResponse({
       vehicles,
       pagination: {
         page,
@@ -93,21 +118,39 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(totalCount / limit)
       }
     })
-  } catch (error) {
-    console.error('Error fetching vehicles:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch vehicles' },
-      { status: 500 }
-    )
-  } finally {
-    await prisma.$disconnect()
-  }
+    
+    // Add cache-control headers for admin endpoints
+    if (process.env.NODE_ENV === 'development') {
+      response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+      response.headers.set('Pragma', 'no-cache')
+      response.headers.set('Expires', '0')
+    }
+    
+    return response
+}, {
+  rateLimit: 'api'
+})
+
+interface VehicleCreateBody {
+  name: string;
+  description: string;
+  price: number;
+  year?: number;
+  make?: string;
+  model?: string;
+  mileage?: number;
+  fuelType?: string;
+  transmission?: string;
+  categoryId: string;
+  specifications?: Record<string, unknown>;
+  images?: string[];
+  features?: string[];
+  status?: 'AVAILABLE' | 'SOLD' | 'RESERVED';
+  featured?: boolean;
 }
 
-// POST /api/vehicles - Create a new vehicle
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
+// POST /api/vehicles - Create a new vehicle  
+export const POST = createApiHandler(async (req, { body }) => {
     const {
       name,
       description,
@@ -124,14 +167,11 @@ export async function POST(request: NextRequest) {
       features,
       status = 'AVAILABLE',
       featured = false
-    } = body
+    } = body as VehicleCreateBody
 
     // Validate required fields
     if (!name || !price || !categoryId) {
-      return NextResponse.json(
-        { error: 'Missing required fields: name, price, categoryId' },
-        { status: 400 }
-      )
+      return apiError('Missing required fields: name, price, categoryId', 400)
     }
 
     // Generate slug from name
@@ -146,10 +186,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingVehicle) {
-      return NextResponse.json(
-        { error: 'A vehicle with this name already exists' },
-        { status: 409 }
-      )
+      return apiError('A vehicle with this name already exists', 409)
     }
 
     const vehicle = await prisma.vehicle.create({
@@ -165,7 +202,8 @@ export async function POST(request: NextRequest) {
         fuelType,
         transmission,
         categoryId,
-        specs: specifications, // Map specifications to specs field
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        specs: specifications as any, // Map specifications to specs field
         images: images || [],
         features: features || [],
         status,
@@ -178,14 +216,9 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json(vehicle, { status: 201 })
-  } catch (error) {
-    console.error('Error creating vehicle:', error)
-    return NextResponse.json(
-      { error: 'Failed to create vehicle' },
-      { status: 500 }
-    )
-  } finally {
-    await prisma.$disconnect()
-  }
-}
+    return apiResponse(vehicle, { status: 201 })
+}, {
+  requireAuth: true,
+  requireAdmin: true,
+  rateLimit: 'api'
+})

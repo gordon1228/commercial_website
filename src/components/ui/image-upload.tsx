@@ -30,11 +30,26 @@ export function ImageUpload({
     for (const file of files) {
       if (file.type.startsWith('image/')) {
         try {
-          // Create object URL for preview
-          const objectUrl = URL.createObjectURL(file)
-          newImages.push(objectUrl)
+          // Upload file to server
+          const formData = new FormData()
+          formData.append('file', file)
+
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          })
+
+          if (response.ok) {
+            const result = await response.json()
+            newImages.push(result.url)
+          } else {
+            const error = await response.json()
+            console.error('Upload error:', error)
+            alert(`Failed to upload ${file.name}: ${error.error}`)
+          }
         } catch (error) {
-          console.error('Error processing file:', error)
+          console.error('Error uploading file:', error)
+          alert(`Failed to upload ${file.name}: ${error}`)
         }
       }
     }
@@ -42,9 +57,6 @@ export function ImageUpload({
     if (newImages.length > 0) {
       const updatedImages = [...images, ...newImages].slice(0, maxImages)
       onImagesChange(updatedImages)
-      
-      // Show warning about temporary images
-      alert('Note: Uploaded images are for preview only. In a production environment, these would need to be uploaded to a server or cloud storage service.')
     }
 
     setUploading(false)

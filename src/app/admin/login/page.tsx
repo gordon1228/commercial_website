@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { signIn, getSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { signIn, useSession } from 'next-auth/react'
 import { Car, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,6 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function AdminLoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const { data: session, status } = useSession()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -17,6 +19,24 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Get callback URL from query params or default to /admin
+  const callbackUrl = searchParams?.get('callbackUrl') || '/admin'
+
+  // If already logged in as admin, redirect
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user?.role === 'ADMIN') {
+      router.push(callbackUrl)
+    }
+  }, [status, session, router, callbackUrl])
+
+  // Show error messages from URL params
+  useEffect(() => {
+    const error = searchParams?.get('error')
+    if (error === 'SessionExpired') {
+      setError('Your session has expired. Please login again.')
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,22 +48,26 @@ export default function AdminLoginPage() {
         email: formData.email,
         password: formData.password,
         redirect: false,
+        callbackUrl: callbackUrl
       })
 
       if (result?.error) {
         setError('Invalid email or password')
+        setIsLoading(false)
       } else if (result?.ok) {
-        // Successful login - redirect to admin dashboard
-        // Use a small delay to ensure session is fully set
-        setTimeout(() => {
-          window.location.href = '/admin'
-        }, 100)
+        // Wait a moment for session to be established
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        // Use router.push instead of window.location for better handling
+        router.push(callbackUrl)
+        router.refresh() // Force a refresh to update the session
       } else {
         setError('Login failed. Please try again.')
+        setIsLoading(false)
       }
     } catch (error) {
-      setError('Login failed. Please try again.')
-    } finally {
+      console.error('Login error:', error)
+      setError('An unexpected error occurred. Please try again.')
       setIsLoading(false)
     }
   }
@@ -51,6 +75,27 @@ export default function AdminLoginPage() {
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     if (error) setError('') // Clear error when user starts typing
+  }
+
+  // Show loading state while checking session
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    )
+  }
+
+  // Don't show login form if already authenticated as admin
+  if (status === 'authenticated' && session?.user?.role === 'ADMIN') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting to admin dashboard...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -105,6 +150,7 @@ export default function AdminLoginPage() {
                   placeholder="admin@elitefleet.com"
                   required
                   disabled={isLoading}
+                  autoComplete="email"
                 />
               </div>
 
@@ -122,6 +168,7 @@ export default function AdminLoginPage() {
                     required
                     disabled={isLoading}
                     className="pr-10"
+                    autoComplete="current-password"
                   />
                   <button
                     type="button"

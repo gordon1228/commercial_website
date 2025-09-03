@@ -18,8 +18,23 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   inquiries Inquiry[]
+  sessions  Session[]
 
   @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String   @unique
+  userAgent String?
+  ipAddress String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("sessions")
 }
 
 model Category {
@@ -28,7 +43,10 @@ model Category {
   slug        String    @unique
   description String?
   image       String?
+  active      Boolean   @default(true)
   vehicles    Vehicle[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@map("categories")
 }
@@ -43,6 +61,7 @@ model Vehicle {
   specs         Json?     // Changed from specifications
   status        Status    @default(AVAILABLE)
   featured      Boolean   @default(false)
+  active        Boolean   @default(true)
   categoryId    String
   category      Category  @relation(fields: [categoryId], references: [id])
   inquiries     Inquiry[]
@@ -93,6 +112,57 @@ model Settings {
   updatedAt             DateTime @updatedAt
 
   @@map("settings")
+}
+
+model HomepageContent {
+  id                    String   @id @default(cuid())
+  
+  // Hero Section
+  heroTitle             String   @default("Premium Commercial")
+  heroSubtitle          String   @default("Vehicles")
+  heroDescription       String   @default("Discover elite fleet solutions built for businesses that demand excellence, reliability, and uncompromising quality.")
+  heroButtonPrimary     String   @default("Explore Fleet")
+  heroButtonSecondary   String   @default("Get Quote")
+  
+  // Trust Section Stats
+  vehiclesSold          Int      @default(50)
+  happyClients          Int      @default(25)
+  yearsExperience       Int      @default(10)
+  satisfactionRate      Int      @default(95)
+  
+  // Trust Section Content
+  partnersTitle         String   @default("Trusted by Industry Leaders")
+  partnersDescription   String   @default("We partner with the world's most respected commercial vehicle manufacturers to bring you unparalleled quality and reliability.")
+  
+  // Trust Features
+  feature1Title         String   @default("Quality Guarantee")
+  feature1Description   String   @default("Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.")
+  feature2Title         String   @default("Fast Delivery")
+  feature2Description   String   @default("Quick processing and delivery to get your business moving without unnecessary delays.")
+  feature3Title         String   @default("24/7 Support")
+  feature3Description   String   @default("Round-the-clock customer support to assist you with any questions or concerns.")
+  
+  // Coming Soon Section
+  comingSoonImage       String   @default("/images/comming soon.jpg")
+  comingSoonImageAlt    String   @default("Coming Soon")
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("homepage_content")
+}
+
+model Partner {
+  id        String   @id @default(cuid())
+  name      String
+  logo      String
+  website   String?
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("partners")
 }
 
 enum Role {

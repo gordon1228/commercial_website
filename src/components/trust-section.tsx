@@ -3,21 +3,36 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 
-const stats = [
-  { label: 'Vehicles Sold', value: 2500, suffix: '+' },
-  { label: 'Happy Clients', value: 850, suffix: '+' },
-  { label: 'Years Experience', value: 25, suffix: '' },
-  { label: 'Satisfaction Rate', value: 98, suffix: '%' }
-]
+interface TrustStats {
+  vehiclesSold: number;
+  happyClients: number;
+  yearsExperience: number;
+  satisfactionRate: number;
+}
 
-const partners = [
-  { name: 'Mercedes', logo: '/images/truck1.jpg' },
-  { name: 'Ford', logo: '/images/truck2.jpg' },
-  { name: 'Freightliner', logo: '/images/truck3.jpg' },
-  { name: 'Volvo', logo: '/images/truck4.jpg' },
-  { name: 'Peterbilt', logo: '/images/truck1.jpg' },
-  { name: 'Kenworth', logo: '/images/truck2.jpg' }
-]
+interface HomepageContent {
+  vehiclesSold: number;
+  happyClients: number;
+  yearsExperience: number;
+  satisfactionRate: number;
+  partnersTitle: string;
+  partnersDescription: string;
+  feature1Title: string;
+  feature1Description: string;
+  feature2Title: string;
+  feature2Description: string;
+  feature3Title: string;
+  feature3Description: string;
+}
+
+interface Partner {
+  id: string;
+  name: string;
+  logo: string;
+  website?: string;
+  active: boolean;
+  order: number;
+}
 
 function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: string }) {
   const [count, setCount] = useState(0)
@@ -50,12 +65,116 @@ function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: strin
 }
 
 export default function TrustSection() {
+  const [content, setContent] = useState<HomepageContent | null>(null)
+  const [partners, setPartners] = useState<Partner[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch both homepage content and partners in parallel
+        const [contentResponse, partnersResponse] = await Promise.all([
+          fetch('/api/homepage-content'),
+          fetch('/api/partners')
+        ])
+
+        if (contentResponse.ok) {
+          const contentData = await contentResponse.json()
+          setContent(contentData)
+        } else {
+          // Fallback data if API fails
+          setContent({
+            vehiclesSold: 50,
+            happyClients: 25,
+            yearsExperience: 10,
+            satisfactionRate: 95,
+            partnersTitle: 'Trusted by Industry Leaders',
+            partnersDescription: "We partner with the world's most respected commercial vehicle manufacturers to bring you unparalleled quality and reliability.",
+            feature1Title: 'Quality Guarantee',
+            feature1Description: 'Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.',
+            feature2Title: 'Fast Delivery',
+            feature2Description: 'Quick processing and delivery to get your business moving without unnecessary delays.',
+            feature3Title: '24/7 Support',
+            feature3Description: 'Round-the-clock customer support to assist you with any questions or concerns.'
+          })
+        }
+
+        if (partnersResponse.ok) {
+          const partnersData = await partnersResponse.json()
+          setPartners(partnersData.partners || [])
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+        // Set fallback content as above
+        setContent({
+          vehiclesSold: 50,
+          happyClients: 25,
+          yearsExperience: 10,
+          satisfactionRate: 95,
+          partnersTitle: 'Trusted by Industry Leaders',
+          partnersDescription: "We partner with the world's most respected commercial vehicle manufacturers to bring you unparalleled quality and reliability.",
+          feature1Title: 'Quality Guarantee',
+          feature1Description: 'Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.',
+          feature2Title: 'Fast Delivery',
+          feature2Description: 'Quick processing and delivery to get your business moving without unnecessary delays.',
+          feature3Title: '24/7 Support',
+          feature3Description: 'Round-the-clock customer support to assist you with any questions or concerns.'
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Auto-slide carousel every 3 seconds
+  useEffect(() => {
+    if (!isAutoPlaying || partners.length <= 4) return // Don't auto-play if 4 or fewer partners
+    
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => {
+        const nextIndex = prev + 1
+        // Reset to 0 when we reach the end to create seamless loop
+        if (nextIndex >= partners.length) {
+          // Use setTimeout to reset without animation
+          setTimeout(() => setCurrentIndex(0), 0)
+          return partners.length - 1
+        }
+        return nextIndex
+      })
+    }, 3000) // Change every 3 seconds
+
+    return () => clearInterval(interval)
+  }, [isAutoPlaying, partners.length])
+
+  if (isLoading || !content) {
+    return (
+      <section className="py-24 bg-gray-950">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white"></div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  const displayStats = [
+    { label: 'Vehicles Available', value: content.vehiclesSold, suffix: '+' },
+    { label: 'Happy Clients', value: content.happyClients, suffix: '+' },
+    { label: 'Years Experience', value: content.yearsExperience, suffix: '' },
+    { label: 'Satisfaction Rate', value: content.satisfactionRate, suffix: '%' }
+  ]
+
   return (
     <section className="py-24 bg-gray-950">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20">
-          {stats.map((stat, index) => (
+          {displayStats.map((stat, index) => (
             <div key={index} className="text-center">
               <div className="mb-2">
                 <AnimatedCounter value={stat.value} suffix={stat.suffix} />
@@ -68,29 +187,110 @@ export default function TrustSection() {
         {/* Partners */}
         <div className="text-center mb-12">
           <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            Trusted by Industry Leaders
+            {content.partnersTitle}
           </h3>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            We partner with the world&apos;s most respected commercial vehicle manufacturers to bring you unparalleled quality and reliability.
+            {content.partnersDescription}
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
-          {partners.map((partner, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-center p-4 grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all duration-300"
+        {partners.length === 0 ? (
+          <div className="text-center py-8 text-gray-400">
+            No partners configured
+          </div>
+        ) : partners.length <= 4 ? (
+          // Static display for 4 or fewer partners
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 justify-items-center">
+            {partners.map((partner) => {
+              const content = (
+                <div className="text-center px-2">
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="w-32 h-32 flex items-center justify-center">
+                      <Image
+                        src={partner.logo}
+                        alt={partner.name}
+                        width={128}
+                        height={128}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white">
+                    {partner.name}
+                  </h3>
+                </div>
+              )
+
+              return (
+                <div key={partner.id}>
+                  {partner.website ? (
+                    <a 
+                      href={partner.website} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    content
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          // Carousel for more than 4 partners - shows 4 at a time with sliding window
+          <div className="relative overflow-hidden">
+            <div 
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ 
+                transform: `translateX(-${currentIndex * (100 / 4)}%)`
+              }}
+              onMouseEnter={() => setIsAutoPlaying(false)}
+              onMouseLeave={() => setIsAutoPlaying(true)}
             >
-              <Image
-                src={partner.logo}
-                alt={partner.name}
-                width={120}
-                height={60}
-                className="max-h-12 w-auto object-contain"
-              />
+              {/* Create an extended array for seamless infinite scroll */}
+              {[...partners, ...partners.slice(0, 4)].map((partner, index) => {
+                const content = (
+                  <div className="text-center px-2">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="w-32 h-32 flex items-center justify-center">
+                        <Image
+                          src={partner.logo}
+                          alt={partner.name}
+                          width={128}
+                          height={128}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-semibold text-white">
+                      {partner.name}
+                    </h3>
+                  </div>
+                )
+
+                return (
+                  <div key={`${partner.id}-${index}`} className="flex-shrink-0" style={{ width: '25%' }}>
+                    {partner.website ? (
+                      <a 
+                        href={partner.website} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        {content}
+                      </a>
+                    ) : (
+                      content
+                    )}
+                  </div>
+                )
+              })}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
 
         {/* Trust indicators */}
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -100,9 +300,9 @@ export default function TrustSection() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h4 className="text-xl font-semibold text-white mb-2">Quality Guarantee</h4>
+            <h4 className="text-xl font-semibold text-white mb-2">{content.feature1Title}</h4>
             <p className="text-muted-foreground">
-              Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.
+              {content.feature1Description}
             </p>
           </div>
           
@@ -112,9 +312,9 @@ export default function TrustSection() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h4 className="text-xl font-semibold text-white mb-2">Fast Delivery</h4>
+            <h4 className="text-xl font-semibold text-white mb-2">{content.feature2Title}</h4>
             <p className="text-muted-foreground">
-              Quick processing and delivery to get your business moving without unnecessary delays.
+              {content.feature2Description}
             </p>
           </div>
           
@@ -124,9 +324,9 @@ export default function TrustSection() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 11-9.75 9.75A9.75 9.75 0 0112 2.25z" />
               </svg>
             </div>
-            <h4 className="text-xl font-semibold text-white mb-2">24/7 Support</h4>
+            <h4 className="text-xl font-semibold text-white mb-2">{content.feature3Title}</h4>
             <p className="text-muted-foreground">
-              Round-the-clock customer support to assist you with any questions or concerns.
+              {content.feature3Description}
             </p>
           </div>
         </div>

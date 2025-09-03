@@ -95,7 +95,7 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
     }
   }
 
-  const handleInputChange = (field: string, value: string | number) => {
+  const handleInputChange = (field: string, value: string | number | boolean) => {
     setVehicle(prev => prev ? ({
       ...prev,
       [field]: value
