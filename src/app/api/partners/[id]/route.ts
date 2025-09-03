@@ -4,7 +4,14 @@ import { createApiHandler } from '@/lib/api-handler'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
-export const DELETE = createApiHandler(async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const DELETE = createApiHandler(async (req: NextRequest, context: { params?: Record<string, string | string[]> }) => {
+  const { params } = context
+  if (!params?.id) {
+    return NextResponse.json(
+      { error: 'Partner ID is required' },
+      { status: 400 }
+    )
+  }
   const session = await getServerSession(authOptions)
   if (!session || session.user?.role !== 'ADMIN') {
     return NextResponse.json(
@@ -13,7 +20,7 @@ export const DELETE = createApiHandler(async (req: NextRequest, { params }: { pa
     )
   }
 
-  const { id } = params
+  const id = params.id as string
 
   await prisma.partner.delete({
     where: { id }

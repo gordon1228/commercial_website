@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Save, Eye, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import ImageSelector from '@/components/ui/image-selector'
 import PartnersManager from '@/components/ui/partners-manager'
 
@@ -40,7 +39,6 @@ export default function AdminHomepagePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
-  const router = useRouter()
 
   useEffect(() => {
     fetchContent()

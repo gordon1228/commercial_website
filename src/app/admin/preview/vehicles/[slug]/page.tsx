@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
-import { Eye, Edit, ExternalLink, Power, PowerOff, Settings, AlertTriangle } from 'lucide-react'
+import { Eye, Edit, ExternalLink, Settings, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
@@ -26,7 +26,7 @@ interface Vehicle {
   fuelType?: string
   transmission?: string
   features?: string[]
-  specs?: any
+  specs?: Record<string, unknown>
   category: {
     id: string
     name: string

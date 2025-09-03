@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Eye, Edit, ExternalLink, Power, PowerOff, Settings } from 'lucide-react'
+import { Eye, Edit, ExternalLink, PowerOff, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
@@ -118,7 +118,7 @@ export default function AdminPreviewVehiclesPage() {
                   <div className="bg-white p-4 rounded-lg border">
                     <h4 className="font-medium text-gray-900">Categories</h4>
                     <p className="text-2xl font-bold text-purple-600">
-                      {[...new Set(vehicles.map(v => v.category.name))].length}
+                      {Array.from(new Set(vehicles.map(v => v.category.name))).length}
                     </p>
                   </div>
                 </div>

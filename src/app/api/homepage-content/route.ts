@@ -17,7 +17,7 @@ async function getHomepageContent() {
   return content
 }
 
-export const GET = createApiHandler(async (req: NextRequest) => {
+export const GET = createApiHandler(async () => {
   const content = await getHomepageContent()
   return NextResponse.json(content)
 })

@@ -2,7 +2,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useSession, signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { usePathname, useRouter } from 'next/navigation'
 
 const SESSION_CHECK_KEY = 'elitefleet_session_check'
