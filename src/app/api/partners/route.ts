@@ -61,7 +61,7 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
   const partners = await req.json()
   
   // Update all partners with new data
-  const updatePromises = partners.map((partner: any) => 
+  const updatePromises = partners.map((partner: { id?: string; name: string; logo: string; website?: string; active?: boolean; order: number }) => 
     prisma.partner.upsert({
       where: { id: partner.id || 'new' },
       update: {

@@ -3,12 +3,6 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 
-interface TrustStats {
-  vehiclesSold: number;
-  happyClients: number;
-  yearsExperience: number;
-  satisfactionRate: number;
-}
 
 interface HomepageContent {
   vehiclesSold: number;

@@ -56,7 +56,7 @@ export default function PartnersManager({ onChange }: PartnersManagerProps) {
     setPartners([...partners, newPartner])
   }
 
-  const updatePartner = (index: number, field: keyof Partner, value: any) => {
+  const updatePartner = (index: number, field: keyof Partner, value: string | boolean | number) => {
     const updatedPartners = partners.map((partner, i) => 
       i === index ? { ...partner, [field]: value } : partner
     )
