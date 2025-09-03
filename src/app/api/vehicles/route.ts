@@ -1,9 +1,7 @@
 // src/app/api/vehicles/route.ts
 // Vehicle management API routes
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
-
-const prisma = new PrismaClient()
 
 // GET /api/vehicles - Get all vehicles with optional filtering
 export const GET = createApiHandler(async (req, { session }) => {
@@ -150,7 +148,10 @@ interface VehicleCreateBody {
 }
 
 // POST /api/vehicles - Create a new vehicle  
-export const POST = createApiHandler(async (req, { body }) => {
+export const POST = createApiHandler(async (req) => {
+    // Parse request body manually since no validation schema provided
+    const body = await req.json() as VehicleCreateBody
+    
     const {
       name,
       description,
@@ -167,7 +168,7 @@ export const POST = createApiHandler(async (req, { body }) => {
       features,
       status = 'AVAILABLE',
       featured = false
-    } = body as VehicleCreateBody
+    } = body
 
     // Validate required fields
     if (!name || !price || !categoryId) {

@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { Loader2, Upload, X } from 'lucide-react'
+import { Loader2, Upload, X, ImageIcon } from 'lucide-react'
 
 interface ImageOption {
   name: string
@@ -33,6 +33,8 @@ export default function ImageSelector({
   const [images, setImages] = useState<ImageOption[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [showSelector, setShowSelector] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (showSelector) {
@@ -58,6 +60,44 @@ export default function ImageSelector({
   const handleImageSelect = (imagePath: string) => {
     onChange(imagePath)
     setShowSelector(false)
+  }
+
+  const handleFileUpload = async (file: File) => {
+    if (!file) return
+
+    setIsUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        onChange(data.url)
+        setShowSelector(false)
+        // Refresh images list to show the new upload
+        fetchImages()
+      } else {
+        const error = await response.json()
+        alert(`Upload failed: ${error.error}`)
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error)
+      alert('Error uploading file. Please try again.')
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleFileUpload(file)
+    }
   }
 
   const currentImage = images.find(img => img.path === value)
@@ -102,15 +142,35 @@ export default function ImageSelector({
           </div>
         ) : (
           <div className="text-center py-4">
-            <div className="text-gray-500 mb-2">{placeholder}</div>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowSelector(true)}
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Select Image
-            </Button>
+            <div className="text-gray-500 mb-4">{placeholder}</div>
+            <div className="flex justify-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowSelector(true)}
+              >
+                <ImageIcon className="h-4 w-4 mr-2" />
+                Select from Gallery
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload from Device
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         )}
       </div>
@@ -133,14 +193,35 @@ export default function ImageSelector({
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Select an Image</h3>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowSelector(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload New
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowSelector(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               {isLoading ? (
@@ -199,6 +280,15 @@ export default function ImageSelector({
           </Card>
         </div>
       )}
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileInputChange}
+        className="hidden"
+      />
     </div>
   )
 }

@@ -37,7 +37,7 @@ export default function ComingSoonSection() {
   const comingSoonImageAlt = content?.comingSoonImageAlt || "Coming Soon"
 
   return (
-    <section id="commingSoon" className="relative w-full h-[100vh] h-[100dvh] bg-black overflow-hidden">
+    <section id="commingSoon" className="relative w-full h-[100vh] h-[100dvh] overflow-hidden">
       {/* Solution 1: Object-contain to show full image (recommended for your case) */}
       <div className="absolute inset-0 w-full h-full">
         <Image

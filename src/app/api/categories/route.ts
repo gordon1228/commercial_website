@@ -1,7 +1,5 @@
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 // GET /api/categories - Get all categories
 export const GET = createApiHandler(async (req, { session }) => {
