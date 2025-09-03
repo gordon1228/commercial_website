@@ -4,6 +4,8 @@ import { createApiHandler } from '@/lib/api-handler'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 async function getHomepageContent() {
   let content = await prisma.homepageContent.findFirst()
   
