@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { Loader2, Upload, X } from 'lucide-react'
+import { Loader2, Upload, X, Plus } from 'lucide-react'
 
 interface ImageOption {
   name: string
@@ -33,6 +33,7 @@ export default function ImageSelector({
   const [images, setImages] = useState<ImageOption[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [showSelector, setShowSelector] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
 
   useEffect(() => {
     if (showSelector) {
@@ -58,6 +59,37 @@ export default function ImageSelector({
   const handleImageSelect = (imagePath: string) => {
     onChange(imagePath)
     setShowSelector(false)
+  }
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        onChange(data.url) // Set the newly uploaded image as selected
+        await fetchImages() // Refresh the images list
+        setShowSelector(false) // Close the selector
+      } else {
+        console.error('Failed to upload image')
+        alert('Failed to upload image. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      alert('Error uploading image. Please try again.')
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   const currentImage = images.find(img => img.path === value)
@@ -121,7 +153,7 @@ export default function ImageSelector({
         <Input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="/images/your-image.jpg"
+          placeholder="Enter image URL..."
           className="mt-1"
         />
       </div>
@@ -133,14 +165,43 @@ export default function ImageSelector({
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Select an Image</h3>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowSelector(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    id="image-upload"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    disabled={isUploading}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Upload New
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowSelector(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               {isLoading ? (

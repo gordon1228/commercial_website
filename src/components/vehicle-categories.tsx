@@ -30,20 +30,7 @@ const getIconForCategory = (categorySlug: string) => {
   }
 }
 
-const getImageForCategory = (categorySlug: string) => {
-  switch (categorySlug.toLowerCase()) {
-    case 'trucks':
-    case 'commercial-trucks':
-      return '/images/truck2.jpg'
-    case 'buses':
-    case 'passenger-buses':
-      return '/images/truck4.jpg'
-    case 'vans':
-    case 'delivery-vans':
-    default:
-      return '/images/truck1.jpg'
-  }
-}
+// Remove hardcoded image mapping - use database images only
 
 export default function VehicleCategories() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -112,13 +99,24 @@ export default function VehicleCategories() {
                   className="group card-hover bg-gray-900/50 border-gray-800 overflow-hidden"
                 >
                   <div className="relative aspect-[16/10] overflow-hidden">
-                    <Image
-                      src={getImageForCategory(category.slug)}
-                      alt={category.name}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    {category.image ? (
+                      <>
+                        <Image
+                          src={category.image}
+                          alt={category.name}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                        <div className="text-center text-gray-500">
+                          <div className="text-4xl mb-2">📷</div>
+                          <div className="text-sm font-medium">No Image</div>
+                        </div>
+                      </div>
+                    )}
                     
                     <div className="absolute top-4 left-4">
                       <div className="w-12 h-12 bg-accent/20 backdrop-blur-sm rounded-full flex items-center justify-center">

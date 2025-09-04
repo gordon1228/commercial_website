@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { 
   Phone, 
@@ -21,44 +21,20 @@ import { useFormSubmit } from '@/hooks/use-api'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { InlineError } from '@/components/ui/error-display'
 
-const contactMethods = [
-  {
-    icon: Phone,
-    title: 'Phone',
-    details: [
-      { label: 'Sales', value: '+1 (555) 123-4567' },
-      { label: 'Service', value: '+1 (555) 123-4568' },
-      { label: 'Finance', value: '+1 (555) 123-4569' }
-    ]
-  },
-  {
-    icon: Mail,
-    title: 'Email',
-    details: [
-      { label: 'Sales', value: 'sales@elitefleet.com' },
-      { label: 'Service', value: 'service@elitefleet.com' },
-      { label: 'Support', value: 'support@elitefleet.com' }
-    ]
-  },
-  {
-    icon: MapPin,
-    title: 'Location',
-    details: [
-      { label: 'Address', value: '123 Business Avenue' },
-      { label: 'City', value: 'Commercial District, NY 10001' },
-      { label: 'Directions', value: 'Near Metro Station' }
-    ]
-  },
-  {
-    icon: Clock,
-    title: 'Hours',
-    details: [
-      { label: 'Mon - Fri', value: '8:00 AM - 6:00 PM' },
-      { label: 'Saturday', value: '9:00 AM - 4:00 PM' },
-      { label: 'Sunday', value: 'Closed' }
-    ]
-  }
-]
+interface ContactInfo {
+  salesPhone: string
+  servicePhone: string
+  financePhone: string
+  salesEmail: string
+  serviceEmail: string
+  supportEmail: string
+  address: string
+  city: string
+  directions: string
+  mondayToFriday: string
+  saturday: string
+  sunday: string
+}
 
 const services = [
   {
@@ -92,6 +68,8 @@ export default function ContactPage() {
   const vehicleSlug = searchParams?.get('vehicle')
   const { showSuccess, showError } = useToast()
   const { submit, error, clearError, isSubmitting } = useFormSubmit()
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -104,6 +82,39 @@ export default function ContactPage() {
     message: '',
     preferredContact: 'email'
   })
+
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      try {
+        const response = await fetch('/api/contact-info')
+        if (response.ok) {
+          const data = await response.json()
+          setContactInfo(data)
+        }
+      } catch (error) {
+        console.error('Error fetching contact info:', error)
+        // Provide fallback data
+        setContactInfo({
+          salesPhone: '+1 (555) 123-4567',
+          servicePhone: '+1 (555) 123-4568',
+          financePhone: '+1 (555) 123-4569',
+          salesEmail: 'sales@elitefleet.com',
+          serviceEmail: 'service@elitefleet.com',
+          supportEmail: 'support@elitefleet.com',
+          address: '123 Business Avenue',
+          city: 'Commercial District, NY 10001',
+          directions: 'Near Metro Station',
+          mondayToFriday: '8:00 AM - 6:00 PM',
+          saturday: '9:00 AM - 4:00 PM',
+          sunday: 'Closed'
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchContactInfo()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -366,29 +377,119 @@ export default function ContactPage() {
 
           {/* Contact Information */}
           <div className="space-y-6">
-            {contactMethods.map((method, index) => {
-              const IconComponent = method.icon
-              return (
-                <Card key={index} className="bg-gray-100 border-gray-300">
+            {isLoading ? (
+              <div className="animate-pulse space-y-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="bg-gray-200 h-32 rounded-lg" />
+                ))}
+              </div>
+            ) : contactInfo ? (
+              <>
+                <Card className="bg-gray-100 border-gray-300">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
                       <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
-                        <IconComponent className="h-5 w-5 text-gray-600" />
+                        <Phone className="h-5 w-5 text-gray-600" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900">{method.title}</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">Phone</h3>
                     </div>
                     <div className="space-y-2">
-                      {method.details.map((detail, idx) => (
-                        <div key={idx} className="flex justify-between">
-                          <span className="text-gray-600 text-sm">{detail.label}:</span>
-                          <span className="text-gray-900 text-sm font-medium">{detail.value}</span>
-                        </div>
-                      ))}
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Sales:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.salesPhone}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Service:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.servicePhone}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Finance:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.financePhone}</span>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
-              )
-            })}
+
+                <Card className="bg-gray-100 border-gray-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                        <Mail className="h-5 w-5 text-gray-600" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900">Email</h3>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Sales:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.salesEmail}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Service:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.serviceEmail}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Support:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.supportEmail}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-100 border-gray-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                        <MapPin className="h-5 w-5 text-gray-600" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900">Location</h3>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Address:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.address}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">City:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.city}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Directions:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.directions}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gray-100 border-gray-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                        <Clock className="h-5 w-5 text-gray-600" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900">Hours</h3>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Mon - Fri:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.mondayToFriday}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Saturday:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.saturday}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Sunday:</span>
+                        <span className="text-gray-900 text-sm font-medium">{contactInfo.sunday}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              <div className="text-center py-8 text-gray-600">
+                Unable to load contact information
+              </div>
+            )}
 
             {/* Quick Response Promise */}
             <Card className="bg-gray-100 border-gray-300">
@@ -414,7 +515,7 @@ export default function ContactPage() {
                   <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-2">Visit Our Showroom</h3>
                   <p className="text-muted-foreground">
-                    123 Business Avenue, Commercial District, NY 10001
+                    {contactInfo ? `${contactInfo.address}, ${contactInfo.city}` : '123 Business Avenue, Commercial District, NY 10001'}
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
                     Interactive map would be embedded here

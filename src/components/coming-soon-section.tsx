@@ -33,50 +33,56 @@ export default function ComingSoonSection() {
   }
 
   // Default values if content not loaded
-  const comingSoonImage = content?.comingSoonImage || "/images/comming soon.jpg"
+  const comingSoonImage = content?.comingSoonImage
   const comingSoonImageAlt = content?.comingSoonImageAlt || "Coming Soon"
 
   return (
-    <section id="commingSoon" className="relative w-full h-[100vh] h-[100dvh] bg-black overflow-hidden">
-      {/* Solution 1: Object-contain to show full image (recommended for your case) */}
-      <div className="absolute inset-0 w-full h-full">
+    <section id="commingSoon" className="relative w-full h-screen overflow-hidden bg-black">
+      {/* Image always shows full image without cropping - accounting for header */}
+      {comingSoonImage ? (
+        <div className="absolute top-20 left-0 right-0 bottom-0 w-full">
+          <Image
+            src={comingSoonImage}
+            alt={comingSoonImageAlt}
+            fill
+            className="object-contain object-center"
+            priority
+            sizes="100vw"
+            quality={90}
+          />
+        </div>
+      ) : (
+        <div className="absolute top-20 left-0 right-0 bottom-0 w-full flex items-center justify-center bg-gray-100">
+          <div className="text-center text-gray-500">
+            <div className="text-6xl mb-4">📷</div>
+            <div className="text-xl font-medium">No Image Available</div>
+          </div>
+        </div>
+      )}
+
+      {/* Alternative Solution 2: Background image approach - also shows full image */}
+      {/* Replace the Image component above with this if you prefer background-image approach */}
+      {/*
+      <div 
+        className="absolute top-20 left-0 right-0 bottom-0 w-full bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url("${comingSoonImage}")`,
+          backgroundSize: 'contain', // Always shows full image without cropping
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+      */}
+
+      {/* Alternative Solution 3: If you want different behavior on mobile vs desktop */}
+      {/* This shows full image on mobile, but can crop on larger screens if needed */}
+      {/*
+      <div className="absolute top-20 left-0 right-0 bottom-0 w-full">
         <Image
           src={comingSoonImage}
           alt={comingSoonImageAlt}
           fill
-          className="object-contain"
-          priority
-          sizes="100vw"
-          quality={90}
-        />
-        {/* Enhanced responsive overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/50 z-10" />
-      </div>
-
-      {/* Solution 2: Background with safe areas (alternative approach) */}
-      {/* Uncomment this and comment out Solution 1 if you prefer this approach */}
-      {/*
-      <div 
-        className="absolute inset-0 w-full h-full bg-center bg-no-repeat bg-cover"
-        style={{
-          backgroundImage: 'url("/images/comming soon.jpg")',
-          backgroundSize: 'cover',
-          backgroundPosition: '50% 40%', // Adjust this to focus on the important part
-        }}
-      >
-        <div className="absolute inset-0 bg-black/20" />
-      </div>
-      */}
-
-      {/* Solution 3: Responsive object positioning (if you must use object-cover) */}
-      {/* This adjusts the focal point based on screen size */}
-      {/*
-      <div className="absolute inset-0 w-full h-full">
-        <Image
-          src="/images/comming soon.jpg"
-          alt="Coming Soon"
-          fill
-          className="object-cover object-[50%_40%] sm:object-[50%_45%] md:object-center"
+          className="object-contain object-center"
           priority
           sizes="100vw"
           quality={90}

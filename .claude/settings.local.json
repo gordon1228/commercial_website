@@ -22,7 +22,8 @@
       "Bash(fuser:*)",
       "mcp__ide__getDiagnostics",
       "Bash(npm audit:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "WebFetch(domain:www.tesla.com)"
     ],
     "deny": [],
     "ask": []
