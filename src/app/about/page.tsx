@@ -1,3 +1,6 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { 
   Award, 
@@ -12,111 +15,177 @@ import {
   Handshake
 } from 'lucide-react'
 
-export const metadata = {
-  title: 'About Us | EliteFleet',
-  description: 'Learn about EliteFleet\'s commitment to providing premium commercial vehicles and exceptional service since 1998.',
+// Note: metadata moved to layout.tsx since this is now a client component
+
+// Icon mapping for dynamic rendering
+const iconMap = {
+  Shield,
+  Handshake,
+  Clock,
+  Heart
 }
 
-const stats = [
-  { icon: Truck, label: 'Vehicles Sold', value: '2,500+' },
-  { icon: Users, label: 'Happy Customers', value: '850+' },
-  { icon: Award, label: 'Years Experience', value: '25+' },
-  { icon: Star, label: 'Satisfaction Rate', value: '98%' }
-]
+interface CompanyInfo {
+  companyName: string
+  companyDescription: string
+  totalVehiclesSold: number
+  totalHappyCustomers: number
+  totalYearsExp: number
+  satisfactionRate: number
+  storyTitle: string
+  storyParagraph1: string
+  storyParagraph2: string
+  storyParagraph3: string
+  missionTitle: string
+  missionText: string
+  visionTitle: string
+  visionText: string
+}
 
-const values = [
-  {
-    icon: Shield,
-    title: 'Quality Assurance',
-    description: 'Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage to ensure your peace of mind.'
-  },
-  {
-    icon: Handshake,
-    title: 'Trust & Integrity',
-    description: 'We build lasting relationships through honest dealings, transparent pricing, and reliable service that you can count on.'
-  },
-  {
-    icon: Clock,
-    title: 'Timely Service',
-    description: 'We understand your business needs. Our quick processing and delivery services keep your operations running smoothly.'
-  },
-  {
-    icon: Heart,
-    title: 'Customer First',
-    description: '24/7 customer support and personalized service ensure that your experience with us exceeds expectations every time.'
-  }
-]
+interface CompanyValue {
+  id: string
+  title: string
+  description: string
+  iconName: string
+  order: number
+}
 
-// const milestones = [
-//   {
-//     year: '1998',
-//     title: 'Founded',
-//     description: 'EliteFleet was established with a vision to provide premium commercial vehicles to growing businesses.'
-//   },
-//   {
-//     year: '2005',
-//     title: 'Expanded Operations',
-//     description: 'Opened our second location and expanded our fleet to include specialty commercial vehicles.'
-//   },
-//   {
-//     year: '2012',
-//     title: 'Digital Innovation',
-//     description: 'Launched our first online platform, making it easier for customers to browse and purchase vehicles.'
-//   },
-//   {
-//     year: '2018',
-//     title: '1000+ Vehicles',
-//     description: 'Reached the milestone of 1000+ vehicles sold, establishing ourselves as industry leaders.'
-//   },
-//   {
-//     year: '2020',
-//     title: 'Green Initiative',
-//     description: 'Introduced eco-friendly vehicle options and sustainable business practices.'
-//   },
-//   {
-//     year: '2024',
-//     title: 'Modern Platform',
-//     description: 'Launched our state-of-the-art digital platform for enhanced customer experience.'
-//   }
-// ]
+interface TeamMember {
+  id: string
+  name: string
+  position: string
+  description: string
+  image: string | null
+  order: number
+}
 
-const team = [
-  {
-    name: 'Michael Chen',
-    position: 'Founder & CEO',
-    image: '/images/truck1.jpg',
-    description: '25+ years in commercial vehicle industry'
-  },
-  {
-    name: 'Sarah Johnson',
-    position: 'Head of Sales',
-    image: '/images/truck2.jpg',
-    description: 'Expert in fleet management solutions'
-  },
-  {
-    name: 'David Rodriguez',
-    position: 'Service Director',
-    image: '/images/truck3.jpg',
-    description: 'Certified mechanical engineer & service expert'
-  },
-  {
-    name: 'Emily Zhang',
-    position: 'Finance Manager',
-    image: '/images/truck4.jpg',
-    description: 'Specializes in commercial vehicle financing'
-  }
-]
+interface Certification {
+  id: string
+  name: string
+  order: number
+}
 
-const certifications = [
-  'Better Business Bureau A+ Rating',
-  'Commercial Vehicle Dealer License',
-  'ISO 9001:2015 Quality Management',
-  'Green Business Certification',
-  'Industry Association Member',
-  'Customer Excellence Award 2023'
-]
+
+
 
 export default function AboutPage() {
+  const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
+  const [values, setValues] = useState<CompanyValue[]>([])
+  const [team, setTeam] = useState<TeamMember[]>([])
+  const [certifications, setCertifications] = useState<Certification[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [companyRes, valuesRes, teamRes, certsRes] = await Promise.all([
+          fetch('/api/company-info'),
+          fetch('/api/company-values'),
+          fetch('/api/team-members'),
+          fetch('/api/certifications')
+        ])
+
+        if (companyRes.ok) {
+          const companyData = await companyRes.json()
+          setCompanyInfo(companyData)
+        }
+
+        if (valuesRes.ok) {
+          const valuesData = await valuesRes.json()
+          setValues(valuesData)
+        }
+
+        if (teamRes.ok) {
+          const teamData = await teamRes.json()
+          setTeam(teamData)
+        }
+
+        if (certsRes.ok) {
+          const certsData = await certsRes.json()
+          setCertifications(certsData)
+        }
+      } catch (error) {
+        console.error('Error fetching about page data:', error)
+        // Provide fallback data if API fails
+        setCompanyInfo({
+          companyName: 'EliteFleet',
+          companyDescription: 'For over 25 years, we\'ve been the trusted partner for businesses seeking premium commercial vehicles. Our commitment to excellence drives everything we do.',
+          totalVehiclesSold: 2500,
+          totalHappyCustomers: 850,
+          totalYearsExp: 25,
+          satisfactionRate: 98,
+          storyTitle: 'Our Story',
+          storyParagraph1: 'Founded in 1998, EliteFleet began as a small family business with a simple mission: to provide high-quality commercial vehicles to businesses that demand excellence. What started as a modest dealership has grown into one of the region\'s most trusted commercial vehicle providers.',
+          storyParagraph2: 'Over the years, we\'ve built our reputation on three core principles: quality vehicles, exceptional service, and honest business practices. Our experienced team understands that choosing the right commercial vehicle is crucial for your business success.',
+          storyParagraph3: 'Today, we continue to evolve with the industry, embracing new technologies and sustainable practices while maintaining the personal touch and attention to detail that our customers have come to expect.',
+          missionTitle: 'Our Mission',
+          missionText: 'To empower businesses with premium commercial vehicles and exceptional service, enabling them to achieve their goals while building long-lasting partnerships based on trust and mutual success.',
+          visionTitle: 'Our Vision',
+          visionText: 'To be the leading commercial vehicle provider, recognized for our commitment to quality, innovation, and customer satisfaction, while contributing to sustainable transportation solutions for future generations.'
+        })
+        
+        setValues([
+          { id: '1', title: 'Quality Assurance', description: 'Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage to ensure your peace of mind.', iconName: 'Shield', order: 1 },
+          { id: '2', title: 'Trust & Integrity', description: 'We build lasting relationships through honest dealings, transparent pricing, and reliable service that you can count on.', iconName: 'Handshake', order: 2 },
+          { id: '3', title: 'Timely Service', description: 'We understand your business needs. Our quick processing and delivery services keep your operations running smoothly.', iconName: 'Clock', order: 3 },
+          { id: '4', title: 'Customer First', description: '24/7 customer support and personalized service ensure that your experience with us exceeds expectations every time.', iconName: 'Heart', order: 4 }
+        ])
+        
+        setTeam([
+          { id: '1', name: 'Michael Chen', position: 'Founder & CEO', description: '25+ years in commercial vehicle industry', image: null, order: 1 },
+          { id: '2', name: 'Sarah Johnson', position: 'Head of Sales', description: 'Expert in fleet management solutions', image: null, order: 2 },
+          { id: '3', name: 'David Rodriguez', position: 'Service Director', description: 'Certified mechanical engineer & service expert', image: null, order: 3 },
+          { id: '4', name: 'Emily Zhang', position: 'Finance Manager', description: 'Specializes in commercial vehicle financing', image: null, order: 4 }
+        ])
+        
+        setCertifications([
+          { id: '1', name: 'Better Business Bureau A+ Rating', order: 1 },
+          { id: '2', name: 'Commercial Vehicle Dealer License', order: 2 },
+          { id: '3', name: 'ISO 9001:2015 Quality Management', order: 3 },
+          { id: '4', name: 'Green Business Certification', order: 4 },
+          { id: '5', name: 'Industry Association Member', order: 5 },
+          { id: '6', name: 'Customer Excellence Award 2023', order: 6 }
+        ])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen pt-20 bg-background">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-gray-900"></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!companyInfo) {
+    return (
+      <div className="min-h-screen pt-20 bg-background">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center">
+            <p className="text-xl text-gray-600">Unable to load company information.</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Dynamic stats based on database data
+  const stats = [
+    { icon: Truck, label: 'Vehicles Sold', value: `${companyInfo.totalVehiclesSold.toLocaleString()}+` },
+    { icon: Users, label: 'Happy Customers', value: `${companyInfo.totalHappyCustomers.toLocaleString()}+` },
+    { icon: Award, label: 'Years Experience', value: `${companyInfo.totalYearsExp}+` },
+    { icon: Star, label: 'Satisfaction Rate', value: `${companyInfo.satisfactionRate}%` }
+  ]
+
   return (
     <div className="min-h-screen pt-20 bg-background">
       {/* Hero Section */}
@@ -124,11 +193,10 @@ export default function AboutPage() {
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-6xl font-display font-bold text-gray-900 mb-6">
-              About EliteFleet
+              About {companyInfo.companyName}
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              For over 25 years, we&apos;ve been the trusted partner for businesses seeking premium commercial vehicles. 
-              Our commitment to excellence drives everything we do.
+              {companyInfo.companyDescription}
             </p>
           </div>
 
@@ -156,35 +224,28 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Our Story
+                {companyInfo.storyTitle}
               </h2>
               <div className="space-y-6 text-gray-600 leading-relaxed">
                 <p>
-                  Founded in 1998, EliteFleet began as a small family business with a simple mission: 
-                  to provide high-quality commercial vehicles to businesses that demand excellence. 
-                  What started as a modest dealership has grown into one of the region&apos;s most trusted 
-                  commercial vehicle providers.
+                  {companyInfo.storyParagraph1}
                 </p>
                 <p>
-                  Over the years, we&apos;ve built our reputation on three core principles: quality vehicles, 
-                  exceptional service, and honest business practices. Our experienced team understands 
-                  that choosing the right commercial vehicle is crucial for your business success.
+                  {companyInfo.storyParagraph2}
                 </p>
                 <p>
-                  Today, we continue to evolve with the industry, embracing new technologies and 
-                  sustainable practices while maintaining the personal touch and attention to detail 
-                  that our customers have come to expect.
+                  {companyInfo.storyParagraph3}
                 </p>
               </div>
             </div>
             <div className="relative">
               <div className="aspect-square rounded-lg overflow-hidden">
-                <Image
-                  src="/images/truck1.jpg"
-                  alt="EliteFleet facility"
-                  fill
-                  className="object-cover"
-                />
+                <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                  <div className="text-center text-gray-500">
+                    <div className="text-6xl mb-4">🏢</div>
+                    <div className="text-lg font-medium">No Facility Image</div>
+                  </div>
+                </div>
               </div>
               {/* Decorative element */}
               <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-accent/20 rounded-lg -z-10" />
@@ -207,22 +268,18 @@ export default function AboutPage() {
               <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Target className="h-8 w-8 text-accent" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{companyInfo.missionTitle}</h3>
               <p className="text-gray-600 leading-relaxed">
-                To empower businesses with premium commercial vehicles and exceptional service, 
-                enabling them to achieve their goals while building long-lasting partnerships 
-                based on trust and mutual success.
+                {companyInfo.missionText}
               </p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Star className="h-8 w-8 text-accent" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Vision</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{companyInfo.visionTitle}</h3>
               <p className="text-gray-600 leading-relaxed">
-                To be the leading commercial vehicle provider, recognized for our commitment to 
-                quality, innovation, and customer satisfaction, while contributing to sustainable 
-                transportation solutions for future generations.
+                {companyInfo.visionText}
               </p>
             </div>
           </div>
@@ -243,9 +300,9 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {values.map((value, index) => {
-              const IconComponent = value.icon
+              const IconComponent = iconMap[value.iconName as keyof typeof iconMap] || Shield
               return (
-                <div key={index} className="flex items-start space-x-4">
+                <div key={value.id} className="flex items-start space-x-4">
                   <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center flex-shrink-0">
                     <IconComponent className="h-6 w-6 text-accent" />
                   </div>
@@ -311,15 +368,24 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, index) => (
-              <div key={index} className="text-center">
+            {team.map((member) => (
+              <div key={member.id} className="text-center">
                 <div className="relative aspect-square mb-6 rounded-lg overflow-hidden">
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    fill
-                    className="object-cover"
-                  />
+                  {member.image ? (
+                    <Image
+                      src={member.image}
+                      alt={member.name}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                      <div className="text-center text-gray-500">
+                        <div className="text-4xl mb-2">👤</div>
+                        <div className="text-sm font-medium">No Photo</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
                 <p className="text-gray-900 font-medium mb-3">{member.position}</p>
@@ -343,10 +409,10 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {certifications.map((cert, index) => (
-              <div key={index} className="flex items-center space-x-3 bg-gray-200/50 border border-gray-500 rounded-lg p-4">
+            {certifications.map((cert) => (
+              <div key={cert.id} className="flex items-center space-x-3 bg-gray-200/50 border border-gray-500 rounded-lg p-4">
                 <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-                <span className="text-gray-900">{cert}</span>
+                <span className="text-gray-900">{cert.name}</span>
               </div>
             ))}
           </div>

@@ -36,11 +36,12 @@ export default function ComingSoonSection() {
     nextSection?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  // Only use content values when loaded, otherwise show loading state
+
   const comingSoonImage = content?.comingSoonImage
   const comingSoonImageAlt = content?.comingSoonImageAlt || "Coming Soon"
 
   return (
+
     <section id="commingSoon" className="relative w-full h-screen overflow-hidden">
       {/* Solution 1: Object-contain to show full image - Account for fixed header */}
       <div className="absolute top-20 left-0 right-0 bottom-0 w-full">

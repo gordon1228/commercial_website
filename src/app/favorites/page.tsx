@@ -117,11 +117,20 @@ export default function FavoritesPage() {
             {favoriteVehicles.map((vehicle) => (
               <div key={vehicle.id} className="group card-hover bg-white border-gray-200 overflow-hidden">
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                    src={vehicle.images?.[0] || '/images/truck1.jpg'}
-                    alt={vehicle.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
+                  {vehicle.images?.[0] ? (
+                    <img
+                      src={vehicle.images[0]}
+                      alt={vehicle.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                      <div className="text-center text-gray-500">
+                        <div className="text-4xl mb-2">📷</div>
+                        <div className="text-sm font-medium">No Image</div>
+                      </div>
+                    </div>
+                  )}
                   
                   <div className="absolute top-3 right-3">
                     <button

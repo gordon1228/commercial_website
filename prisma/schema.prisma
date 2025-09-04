@@ -172,6 +172,133 @@ model Partner {
   @@map("partners")
 }
 
+model CompanyInfo {
+  id                  String   @id @default(cuid())
+  
+  // About Section
+  companyName         String   @default("EliteFleet")
+  companyDescription  String   @default("For over 25 years, we've been the trusted partner for businesses seeking premium commercial vehicles. Our commitment to excellence drives everything we do.")
+  foundedYear         Int      @default(1998)
+  
+  // Stats
+  totalVehiclesSold   Int      @default(2500)
+  totalHappyCustomers Int      @default(850)
+  totalYearsExp       Int      @default(25)
+  satisfactionRate    Int      @default(98)
+  
+  // Story
+  storyTitle          String   @default("Our Story")
+  storyParagraph1     String   @default("Founded in 1998, EliteFleet began as a small family business with a simple mission: to provide high-quality commercial vehicles to businesses that demand excellence. What started as a modest dealership has grown into one of the region's most trusted commercial vehicle providers.")
+  storyParagraph2     String   @default("Over the years, we've built our reputation on three core principles: quality vehicles, exceptional service, and honest business practices. Our experienced team understands that choosing the right commercial vehicle is crucial for your business success.")
+  storyParagraph3     String   @default("Today, we continue to evolve with the industry, embracing new technologies and sustainable practices while maintaining the personal touch and attention to detail that our customers have come to expect.")
+  
+  // Mission & Vision
+  missionTitle        String   @default("Our Mission")
+  missionText         String   @default("To empower businesses with premium commercial vehicles and exceptional service, enabling them to achieve their goals while building long-lasting partnerships based on trust and mutual success.")
+  visionTitle         String   @default("Our Vision") 
+  visionText          String   @default("To be the leading commercial vehicle provider, recognized for our commitment to quality, innovation, and customer satisfaction, while contributing to sustainable transportation solutions for future generations.")
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("company_info")
+}
+
+model CompanyValue {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  iconName    String   // Store icon name as string (Shield, Handshake, Clock, Heart)
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("company_values")
+}
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  position    String
+  description String
+  image       String?
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("team_members")
+}
+
+model Certification {
+  id          String   @id @default(cuid())
+  name        String
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("certifications")
+}
+
+model FinancingOption {
+  id              String   @id @default(cuid())
+  title           String
+  interestRate    String   // e.g., "5.5% - 8.5%"
+  loanTerm        String   // e.g., "3-7 years"
+  downPayment     String   // e.g., "10-20%"
+  description     String
+  features        String[] // Array of feature strings
+  iconName        String   // Store icon name as string (DollarSign, TrendingUp, Calendar)
+  order           Int      @default(0)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("financing_options")
+}
+
+model FinancingBenefit {
+  id          String   @id @default(cuid())
+  benefit     String
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("financing_benefits")
+}
+
+model ContactInfo {
+  id              String   @id @default(cuid())
+  
+  // Phone Numbers
+  salesPhone      String   @default("+1 (555) 123-4567")
+  servicePhone    String   @default("+1 (555) 123-4568")
+  financePhone    String   @default("+1 (555) 123-4569")
+  
+  // Email Addresses
+  salesEmail      String   @default("sales@elitefleet.com")
+  serviceEmail    String   @default("service@elitefleet.com")
+  supportEmail    String   @default("support@elitefleet.com")
+  
+  // Address
+  address         String   @default("123 Business Avenue")
+  city            String   @default("Commercial District, NY 10001")
+  directions      String   @default("Near Metro Station")
+  
+  // Business Hours
+  mondayToFriday  String   @default("8:00 AM - 6:00 PM")
+  saturday        String   @default("9:00 AM - 4:00 PM")
+  sunday          String   @default("Closed")
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("contact_info")
+}
+
 enum Role {
   ADMIN
   MANAGER

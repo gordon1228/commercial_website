@@ -27,10 +27,10 @@ interface Vehicle {
   transmission?: string
   features?: string[]
   specs?: Record<string, unknown>
-  category: {
+  category?: {
     id: string
     name: string
-    active: boolean
+    active?: boolean
   }
   _count?: {
     inquiries: number
@@ -59,7 +59,7 @@ export default function AdminPreviewVehicleDetailPage() {
       const response = await fetch(`/api/vehicles/slug/${slug}`)
       if (response.ok) {
         const data = await response.json()
-        setVehicle(data)
+        setVehicle(data.vehicle)
       } else {
         console.error('Vehicle not found')
       }
@@ -163,9 +163,9 @@ export default function AdminPreviewVehicleDetailPage() {
                   </div>
                   <div className="bg-white p-4 rounded-lg border">
                     <h4 className="font-medium text-gray-900">Category</h4>
-                    <p className={`text-sm font-medium ${vehicle.category.active ? 'text-gray-900' : 'text-orange-600'}`}>
-                      {vehicle.category.name}
-                      {!vehicle.category.active && ' (Inactive)'}
+                    <p className={`text-sm font-medium ${vehicle.category?.active !== false ? 'text-gray-900' : 'text-orange-600'}`}>
+                      {vehicle.category?.name || 'Unknown Category'}
+                      {vehicle.category?.active === false && ' (Inactive)'}
                     </p>
                   </div>
                 </div>

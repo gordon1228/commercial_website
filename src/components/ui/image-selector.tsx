@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { Loader2, Upload, X, ImageIcon } from 'lucide-react'
+import { Loader2, Upload, X, Plus } from 'lucide-react'
+
 
 interface ImageOption {
   name: string
@@ -34,7 +35,6 @@ export default function ImageSelector({
   const [isLoading, setIsLoading] = useState(false)
   const [showSelector, setShowSelector] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (showSelector) {
@@ -62,7 +62,10 @@ export default function ImageSelector({
     setShowSelector(false)
   }
 
-  const handleFileUpload = async (file: File) => {
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+
     if (!file) return
 
     setIsUploading(true)
@@ -77,26 +80,20 @@ export default function ImageSelector({
 
       if (response.ok) {
         const data = await response.json()
-        onChange(data.url)
-        setShowSelector(false)
-        // Refresh images list to show the new upload
-        fetchImages()
+
+        onChange(data.url) // Set the newly uploaded image as selected
+        await fetchImages() // Refresh the images list
+        setShowSelector(false) // Close the selector
       } else {
-        const error = await response.json()
-        alert(`Upload failed: ${error.error}`)
+        console.error('Failed to upload image')
+        alert('Failed to upload image. Please try again.')
       }
     } catch (error) {
-      console.error('Error uploading file:', error)
-      alert('Error uploading file. Please try again.')
+      console.error('Error uploading image:', error)
+      alert('Error uploading image. Please try again.')
+
     } finally {
       setIsUploading(false)
-    }
-  }
-
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      handleFileUpload(file)
     }
   }
 
@@ -181,7 +178,7 @@ export default function ImageSelector({
         <Input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="/images/your-image.jpg"
+          placeholder="Enter image URL..."
           className="mt-1"
         />
       </div>
@@ -194,11 +191,23 @@ export default function ImageSelector({
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Select an Image</h3>
                 <div className="flex items-center gap-2">
+
+                  <input
+                    type="file"
+                    id="image-upload"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    disabled={isUploading}
+                  />
+
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => fileInputRef.current?.click()}
+
+                    onClick={() => document.getElementById('image-upload')?.click()}
+
                     disabled={isUploading}
                   >
                     {isUploading ? (
@@ -208,7 +217,9 @@ export default function ImageSelector({
                       </>
                     ) : (
                       <>
-                        <Upload className="h-4 w-4 mr-2" />
+
+                        <Plus className="h-4 w-4 mr-2" />
+
                         Upload New
                       </>
                     )}

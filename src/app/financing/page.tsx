@@ -6,48 +6,35 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-const financingOptions = [
-  {
-    title: 'Traditional Bank Loan',
-    rate: '5.5% - 8.5%',
-    term: '3-7 years',
-    downPayment: '10-20%',
-    description: 'Competitive rates from our partner banks with flexible terms.',
-    features: ['Fixed interest rates', 'No prepayment penalties', 'Quick approval process'],
-    icon: DollarSign
-  },
-  {
-    title: 'Equipment Financing',
-    rate: '4.5% - 7.5%',
-    term: '2-5 years',
-    downPayment: '0-15%',
-    description: 'Specialized financing where the vehicle serves as collateral.',
-    features: ['Lower down payments', 'Tax advantages', 'Preserve working capital'],
-    icon: TrendingUp
-  },
-  {
-    title: 'Lease to Own',
-    rate: '6.0% - 9.0%',
-    term: '2-4 years',
-    downPayment: '5-10%',
-    description: 'Lease with option to purchase at the end of the term.',
-    features: ['Lower monthly payments', 'Ownership option', 'Maintenance packages available'],
-    icon: Calendar
-  }
-]
+// Icon mapping for dynamic rendering
+const iconMap = {
+  DollarSign,
+  TrendingUp,
+  Calendar
+}
 
-const benefits = [
-  'Competitive interest rates starting at 4.5%',
-  'Flexible down payment options',
-  'Quick approval process (24-48 hours)',
-  'Multiple financing partners',
-  'Bad credit financing available',
-  'Business and personal financing',
-  'Online application process',
-  'Dedicated financing specialists'
-]
+interface FinancingOption {
+  id: string
+  title: string
+  interestRate: string
+  loanTerm: string
+  downPayment: string
+  description: string
+  features: string[]
+  iconName: string
+  order: number
+}
+
+interface FinancingBenefit {
+  id: string
+  benefit: string
+  order: number
+}
 
 export default function FinancingPage() {
+  const [financingOptions, setFinancingOptions] = useState<FinancingOption[]>([])
+  const [benefits, setBenefits] = useState<FinancingBenefit[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [calculatorData, setCalculatorData] = useState({
     vehiclePrice: '',
     downPayment: '',
@@ -58,6 +45,80 @@ export default function FinancingPage() {
   const [monthlyPayment, setMonthlyPayment] = useState(0)
   const [totalInterest, setTotalInterest] = useState(0)
   const [totalPayment, setTotalPayment] = useState(0)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [optionsRes, benefitsRes] = await Promise.all([
+          fetch('/api/financing-options'),
+          fetch('/api/financing-benefits')
+        ])
+
+        if (optionsRes.ok) {
+          const optionsData = await optionsRes.json()
+          setFinancingOptions(optionsData)
+        }
+
+        if (benefitsRes.ok) {
+          const benefitsData = await benefitsRes.json()
+          setBenefits(benefitsData)
+        }
+      } catch (error) {
+        console.error('Error fetching financing data:', error)
+        // Provide fallback data
+        setFinancingOptions([
+          {
+            id: '1',
+            title: 'Traditional Bank Loan',
+            interestRate: '5.5% - 8.5%',
+            loanTerm: '3-7 years',
+            downPayment: '10-20%',
+            description: 'Competitive rates from our partner banks with flexible terms.',
+            features: ['Fixed interest rates', 'No prepayment penalties', 'Quick approval process'],
+            iconName: 'DollarSign',
+            order: 1
+          },
+          {
+            id: '2',
+            title: 'Equipment Financing',
+            interestRate: '4.5% - 7.5%',
+            loanTerm: '2-5 years',
+            downPayment: '0-15%',
+            description: 'Specialized financing where the vehicle serves as collateral.',
+            features: ['Lower down payments', 'Tax advantages', 'Preserve working capital'],
+            iconName: 'TrendingUp',
+            order: 2
+          },
+          {
+            id: '3',
+            title: 'Lease to Own',
+            interestRate: '6.0% - 9.0%',
+            loanTerm: '2-4 years',
+            downPayment: '5-10%',
+            description: 'Lease with option to purchase at the end of the term.',
+            features: ['Lower monthly payments', 'Ownership option', 'Maintenance packages available'],
+            iconName: 'Calendar',
+            order: 3
+          }
+        ])
+        
+        setBenefits([
+          { id: '1', benefit: 'Competitive interest rates starting at 4.5%', order: 1 },
+          { id: '2', benefit: 'Flexible down payment options', order: 2 },
+          { id: '3', benefit: 'Quick approval process (24-48 hours)', order: 3 },
+          { id: '4', benefit: 'Multiple financing partners', order: 4 },
+          { id: '5', benefit: 'Bad credit financing available', order: 5 },
+          { id: '6', benefit: 'Business and personal financing', order: 6 },
+          { id: '7', benefit: 'Online application process', order: 7 },
+          { id: '8', benefit: 'Dedicated financing specialists', order: 8 }
+        ])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   const calculatePayment = () => {
     const price = parseFloat(calculatorData.vehiclePrice) || 0
@@ -275,56 +336,66 @@ export default function FinancingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {financingOptions.map((option, index) => {
-              const Icon = option.icon
-              return (
-                <Card key={index} className="bg-white border border-gray-200 hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                      <Icon className="h-6 w-6 text-gray-600" />
-                    </div>
-                    <CardTitle className="text-xl text-gray-900">{option.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <p className="text-gray-600">{option.description}</p>
-                      
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Interest Rate:</span>
-                          <span className="text-sm font-medium text-gray-900">{option.rate}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Loan Term:</span>
-                          <span className="text-sm font-medium text-gray-900">{option.term}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Down Payment:</span>
-                          <span className="text-sm font-medium text-gray-900">{option.downPayment}</span>
-                        </div>
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 h-64 rounded-lg" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {financingOptions.map((option) => {
+                const Icon = iconMap[option.iconName as keyof typeof iconMap] || DollarSign
+                return (
+                  <Card key={option.id} className="bg-white border border-gray-200 hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <Icon className="h-6 w-6 text-gray-600" />
                       </div>
-
-                      <div className="pt-4 border-t border-gray-200">
+                      <CardTitle className="text-xl text-gray-900">{option.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <p className="text-gray-600">{option.description}</p>
+                        
                         <div className="space-y-2">
-                          {option.features.map((feature, idx) => (
-                            <div key={idx} className="flex items-center">
-                              <Check className="h-4 w-4 text-green-600 mr-2" />
-                              <span className="text-sm text-gray-600">{feature}</span>
-                            </div>
-                          ))}
+                          <div className="flex justify-between">
+                            <span className="text-sm text-gray-600">Interest Rate:</span>
+                            <span className="text-sm font-medium text-gray-900">{option.interestRate}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-gray-600">Loan Term:</span>
+                            <span className="text-sm font-medium text-gray-900">{option.loanTerm}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-gray-600">Down Payment:</span>
+                            <span className="text-sm font-medium text-gray-900">{option.downPayment}</span>
+                          </div>
                         </div>
-                      </div>
 
-                      <Button variant="secondary" className="w-full">
-                        Learn More
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
+                        <div className="pt-4 border-t border-gray-200">
+                          <div className="space-y-2">
+                            {option.features.map((feature, idx) => (
+                              <div key={idx} className="flex items-center">
+                                <Check className="h-4 w-4 text-green-600 mr-2" />
+                                <span className="text-sm text-gray-600">{feature}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <Button variant="secondary" className="w-full">
+                          Learn More
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {/* Benefits Section */}
@@ -332,10 +403,10 @@ export default function FinancingPage() {
           <div>
             <h3 className="text-2xl font-bold text-gray-900 mb-6">Why Choose Our Financing?</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {benefits.map((benefit, index) => (
-                <div key={index} className="flex items-start">
+              {benefits.map((benefit) => (
+                <div key={benefit.id} className="flex items-start">
                   <Check className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-600">{benefit}</span>
+                  <span className="text-gray-600">{benefit.benefit}</span>
                 </div>
               ))}
             </div>

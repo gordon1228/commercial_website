@@ -61,7 +61,8 @@ export const GET = createApiHandler(async (req: NextRequest) => {
         
         images.unshift(...defaultImages)
       } catch (error) {
-        console.log('Could not read default images folder:', error)
+        // Images folder doesn't exist anymore, that's okay
+        console.log('No default images folder found - using uploads only')
       }
     }
 

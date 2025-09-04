@@ -32,6 +32,7 @@
       "Read(C:\\Users\\User\\Desktop\\school-website\\backend/**)",
       "Bash(psql:*)",
       "Bash(find:*)"
+
     ],
     "deny": [],
     "ask": []
