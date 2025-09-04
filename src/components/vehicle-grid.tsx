@@ -99,9 +99,10 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
             onLoad={() => setImageError(false)}
             priority={false}
             unoptimized={true}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-500">
+          <div className="w-full h-full flex items-center justify-center text-gray-500 bg-gray-100">
             <div className="text-center">
               <div className="text-4xl mb-2">📷</div>
               <div className="text-sm font-medium">No Image</div>

@@ -10,6 +10,7 @@ interface Category {
   name: string
   slug: string
   description?: string
+  image?: string
   _count?: {
     vehicles: number
   }
@@ -30,7 +31,23 @@ const getIconForCategory = (categorySlug: string) => {
   }
 }
 
-// Remove hardcoded image mapping - use database images only
+
+// Fallback images for categories without database images
+const getFallbackImageForCategory = (categorySlug: string) => {
+  switch (categorySlug.toLowerCase()) {
+    case 'trucks':
+    case 'commercial-trucks':
+      return '/images/truck2.jpg'
+    case 'buses':
+    case 'passenger-buses':
+      return '/images/truck4.jpg'
+    case 'vans':
+    case 'delivery-vans':
+    default:
+      return '/images/truck1.jpg'
+  }
+}
+
 
 export default function VehicleCategories() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -110,12 +127,17 @@ export default function VehicleCategories() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                       </>
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                        <div className="text-center text-gray-500">
-                          <div className="text-4xl mb-2">📷</div>
-                          <div className="text-sm font-medium">No Image</div>
-                        </div>
-                      </div>
+
+                      <>
+                        <Image
+                          src={getFallbackImageForCategory(category.slug)}
+                          alt={category.name}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      </>
+
                     )}
                     
                     <div className="absolute top-4 left-4">

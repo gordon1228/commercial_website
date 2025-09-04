@@ -117,6 +117,13 @@ model Settings {
 model HomepageContent {
   id                    String   @id @default(cuid())
   
+  // Section Visibility Controls
+  showComingSoonSection Boolean  @default(true)
+  showHeroSection       Boolean  @default(true)
+  showVehicleCategories Boolean  @default(true)
+  showFeaturedVehicles  Boolean  @default(true)
+  showTrustSection      Boolean  @default(true)
+  
   // Hero Section
   heroTitle             String   @default("Premium Commercial")
   heroSubtitle          String   @default("Vehicles")
