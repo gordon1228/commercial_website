@@ -79,22 +79,6 @@ export default function TrustSection() {
         if (contentResponse.ok) {
           const contentData = await contentResponse.json()
           setContent(contentData)
-        } else {
-          // Fallback data if API fails
-          setContent({
-            vehiclesSold: 50,
-            happyClients: 25,
-            yearsExperience: 10,
-            satisfactionRate: 95,
-            partnersTitle: 'Trusted by Industry Leaders',
-            partnersDescription: "We partner with the world's most respected commercial vehicle manufacturers to bring you unparalleled quality and reliability.",
-            feature1Title: 'Quality Guarantee',
-            feature1Description: 'Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.',
-            feature2Title: 'Fast Delivery',
-            feature2Description: 'Quick processing and delivery to get your business moving without unnecessary delays.',
-            feature3Title: '24/7 Support',
-            feature3Description: 'Round-the-clock customer support to assist you with any questions or concerns.'
-          })
         }
 
         if (partnersResponse.ok) {
@@ -103,21 +87,6 @@ export default function TrustSection() {
         }
       } catch (error) {
         console.error('Error fetching data:', error)
-        // Set fallback content as above
-        setContent({
-          vehiclesSold: 50,
-          happyClients: 25,
-          yearsExperience: 10,
-          satisfactionRate: 95,
-          partnersTitle: 'Trusted by Industry Leaders',
-          partnersDescription: "We partner with the world's most respected commercial vehicle manufacturers to bring you unparalleled quality and reliability.",
-          feature1Title: 'Quality Guarantee',
-          feature1Description: 'Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.',
-          feature2Title: 'Fast Delivery',
-          feature2Description: 'Quick processing and delivery to get your business moving without unnecessary delays.',
-          feature3Title: '24/7 Support',
-          feature3Description: 'Round-the-clock customer support to assist you with any questions or concerns.'
-        })
       } finally {
         setIsLoading(false)
       }

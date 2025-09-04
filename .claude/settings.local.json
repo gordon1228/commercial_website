@@ -35,6 +35,8 @@
       "Read(/C:\\Users\\User\\Desktop\\commercial_website\\src\\components/**)",
       "Read(/C:\\Users\\User\\Desktop\\commercial_website\\src\\app\\api\\homepage-content/**)",
       "Read(/C:\\Users\\User\\Desktop\\commercial_website\\prisma/**)"
+
+
     ],
     "deny": [],
     "ask": []

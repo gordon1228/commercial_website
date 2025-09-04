@@ -41,6 +41,7 @@ export default function ComingSoonSection() {
   const comingSoonImageAlt = content?.comingSoonImageAlt
 
   return (
+
     <section id="commingSoon" className="relative w-full h-screen overflow-hidden">
       {/* Solution 1: Object-contain to show full image - Account for fixed header */}
       <div className="absolute top-20 left-0 right-0 bottom-0 w-full">

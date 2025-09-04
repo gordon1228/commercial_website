@@ -31,6 +31,7 @@ const getIconForCategory = (categorySlug: string) => {
   }
 }
 
+
 // Fallback images for categories without database images
 const getFallbackImageForCategory = (categorySlug: string) => {
   switch (categorySlug.toLowerCase()) {
@@ -46,6 +47,7 @@ const getFallbackImageForCategory = (categorySlug: string) => {
       return '/images/truck1.jpg'
   }
 }
+
 
 export default function VehicleCategories() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -125,6 +127,7 @@ export default function VehicleCategories() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                       </>
                     ) : (
+
                       <>
                         <Image
                           src={getFallbackImageForCategory(category.slug)}
@@ -134,6 +137,7 @@ export default function VehicleCategories() {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                       </>
+
                     )}
                     
                     <div className="absolute top-4 left-4">

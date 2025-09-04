@@ -92,24 +92,9 @@ export default function Footer() {
                   </li>
                 ))
               ) : (
-                // Fallback while loading or if no categories
-                <>
-                  <li>
-                    <Link href="/vehicles?category=trucks" className="text-muted-foreground hover:text-accent transition-colors">
-                      Commercial Trucks
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/vehicles?category=vans" className="text-muted-foreground hover:text-accent transition-colors">
-                      Delivery Vans
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/vehicles?category=buses" className="text-muted-foreground hover:text-accent transition-colors">
-                      Passenger Buses
-                    </Link>
-                  </li>
-                </>
+                <li className="text-muted-foreground text-sm">
+                  No categories available
+                </li>
               )}
             </ul>
           </div>
