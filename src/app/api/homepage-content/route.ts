@@ -47,6 +47,13 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
   const updatedContent = await prisma.homepageContent.update({
     where: { id: existingContent.id },
     data: {
+      // Section visibility
+      showComingSoonSection: data.showComingSoonSection,
+      showHeroSection: data.showHeroSection,
+      showVehicleCategories: data.showVehicleCategories,
+      showFeaturedVehicles: data.showFeaturedVehicles,
+      showTrustSection: data.showTrustSection,
+      // Content fields
       heroTitle: data.heroTitle,
       heroSubtitle: data.heroSubtitle,
       heroDescription: data.heroDescription,

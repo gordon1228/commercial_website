@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 
 interface HomepageContent {
@@ -64,6 +65,7 @@ export default function TrustSection() {
   const [isLoading, setIsLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [isTransitioning, setIsTransitioning] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -124,25 +126,70 @@ export default function TrustSection() {
     fetchData()
   }, [])
 
+  // Get responsive slides per view
+  const getSlidesPerView = () => {
+    if (typeof window === 'undefined') return 4
+    if (window.innerWidth < 768) return 1 // mobile
+    if (window.innerWidth < 1024) return 2 // tablet
+    return 4 // desktop
+  }
+
+  const [slidesPerView, setSlidesPerView] = useState(4)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSlidesPerView(getSlidesPerView())
+    }
+    
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   // Auto-slide carousel every 3 seconds
   useEffect(() => {
-    if (!isAutoPlaying || partners.length <= 4) return // Don't auto-play if 4 or fewer partners
+    if (!isAutoPlaying || partners.length === 0) return
     
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => {
-        const nextIndex = prev + 1
-        // Reset to 0 when we reach the end to create seamless loop
-        if (nextIndex >= partners.length) {
-          // Use setTimeout to reset without animation
-          setTimeout(() => setCurrentIndex(0), 0)
-          return partners.length - 1
-        }
-        return nextIndex
-      })
-    }, 3000) // Change every 3 seconds
+      goToNext()
+    }, 3000)
 
     return () => clearInterval(interval)
   }, [isAutoPlaying, partners.length])
+
+  // Navigation functions
+  const goToNext = () => {
+    setCurrentIndex((prev) => {
+      const nextIndex = prev + 1
+      // For seamless infinite loop, when we reach the end of first duplicate set,
+      // jump back to the beginning without animation
+      if (nextIndex >= partners.length) {
+        setTimeout(() => {
+          setIsTransitioning(false)
+          setCurrentIndex(0)
+          setTimeout(() => setIsTransitioning(true), 50)
+        }, 500)
+      }
+      return nextIndex
+    })
+  }
+
+  const goToPrev = () => {
+    setCurrentIndex((prev) => {
+      if (prev <= 0) {
+        // Jump to the end of original items for seamless loop
+        setIsTransitioning(false)
+        const lastIndex = partners.length - 1
+        setCurrentIndex(partners.length + lastIndex)
+        setTimeout(() => {
+          setIsTransitioning(true)
+          setCurrentIndex(lastIndex)
+        }, 50)
+        return lastIndex
+      }
+      return prev - 1
+    })
+  }
 
   if (isLoading || !content) {
     return (
@@ -192,96 +239,103 @@ export default function TrustSection() {
           <div className="text-center py-8 text-gray-400">
             No partners configured
           </div>
-        ) : partners.length <= 4 ? (
-          // Static display for 4 or fewer partners
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 justify-items-center">
-            {partners.map((partner) => {
-              const content = (
-                <div className="text-center px-2">
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="w-32 h-32 flex items-center justify-center">
-                      <Image
-                        src={partner.logo}
-                        alt={partner.name}
-                        width={128}
-                        height={128}
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-semibold text-white">
-                    {partner.name}
-                  </h3>
-                </div>
-              )
-
-              return (
-                <div key={partner.id}>
-                  {partner.website ? (
-                    <a 
-                      href={partner.website} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="block"
-                    >
-                      {content}
-                    </a>
-                  ) : (
-                    content
-                  )}
-                </div>
-              )
-            })}
-          </div>
         ) : (
-          // Carousel for more than 4 partners - shows 4 at a time with sliding window
-          <div className="relative overflow-hidden">
-            <div 
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ 
-                transform: `translateX(-${currentIndex * (100 / 4)}%)`
-              }}
-              onMouseEnter={() => setIsAutoPlaying(false)}
-              onMouseLeave={() => setIsAutoPlaying(true)}
-            >
-              {/* Create an extended array for seamless infinite scroll */}
-              {[...partners, ...partners.slice(0, 4)].map((partner, index) => {
-                const content = (
-                  <div className="text-center px-2">
-                    <div className="flex items-center justify-center mb-4">
-                      <div className="w-32 h-32 flex items-center justify-center">
-                        <Image
-                          src={partner.logo}
-                          alt={partner.name}
-                          width={128}
-                          height={128}
-                          className="w-full h-full object-contain"
-                        />
+          // Responsive carousel with navigation
+          <div className="relative max-w-6xl mx-auto">
+            {/* Carousel container */}
+            <div className="overflow-hidden">
+              <div 
+                className={`flex ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
+                style={{ 
+                  transform: `translateX(-${currentIndex * (100 / slidesPerView)}%)`
+                }}
+                onMouseEnter={() => setIsAutoPlaying(false)}
+                onMouseLeave={() => setIsAutoPlaying(true)}
+              >
+                {/* Create extended array for seamless infinite loop */}
+                {[...partners, ...partners, ...partners].map((partner, index) => {
+                  const content = (
+                    <div className="text-center px-4">
+                      <div className="flex items-center justify-center mb-4">
+                        <div className="w-24 h-24 md:w-32 md:h-32 bg-white/10 rounded-lg p-3 backdrop-blur-sm flex items-center justify-center">
+                          <div className="w-full h-full relative">
+                            <Image
+                              src={partner.logo}
+                              alt={partner.name}
+                              fill
+                              sizes="(max-width: 768px) 96px, 128px"
+                              className="object-contain"
+                            />
+                          </div>
+                        </div>
                       </div>
+                      <h3 className="text-sm md:text-lg font-semibold text-white">
+                        {partner.name}
+                      </h3>
                     </div>
-                    <h3 className="text-xl font-semibold text-white">
-                      {partner.name}
-                    </h3>
-                  </div>
-                )
+                  )
 
-                return (
-                  <div key={`${partner.id}-${index}`} className="flex-shrink-0" style={{ width: '25%' }}>
-                    {partner.website ? (
-                      <a 
-                        href={partner.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="block"
-                      >
-                        {content}
-                      </a>
-                    ) : (
-                      content
-                    )}
-                  </div>
-                )
-              })}
+                  return (
+                    <div 
+                      key={`${partner.id}-${index}`} 
+                      className="flex-shrink-0 flex justify-center items-center"
+                      style={{ width: `${100 / slidesPerView}%` }}
+                    >
+                      {partner.website ? (
+                        <a 
+                          href={partner.website} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block hover:transform hover:scale-105 transition-transform duration-200"
+                        >
+                          {content}
+                        </a>
+                      ) : (
+                        <div className="hover:transform hover:scale-105 transition-transform duration-200">
+                          {content}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Navigation buttons */}
+            <button
+              onClick={goToPrev}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-110"
+              aria-label="Previous partners"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            
+            <button
+              onClick={goToNext}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-110"
+              aria-label="Next partners"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+            {/* Dots indicator */}
+            <div className="flex justify-center mt-6 space-x-2">
+              {Array.from({ length: partners.length }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setCurrentIndex(i)
+                    setIsAutoPlaying(false)
+                    setTimeout(() => setIsAutoPlaying(true), 5000)
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                    i === currentIndex % partners.length
+                      ? 'bg-white scale-125' 
+                      : 'bg-white/30 hover:bg-white/60'
+                  }`}
+                  aria-label={`Go to partner ${i + 1}`}
+                />
+              ))}
             </div>
           </div>
         )}

@@ -7,6 +7,7 @@ import { Plus, Edit, Trash2, Eye, Search, Filter, ChevronUp, ChevronDown, Power,
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Image from 'next/image'
 import Link from 'next/link'
 
 interface Vehicle {
@@ -379,12 +380,14 @@ export default function AdminVehiclesPage() {
                     <tr key={vehicle.id} className={`hover:bg-gray-50 ${!vehicle.active ? 'opacity-60 bg-gray-25' : ''}`}>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center overflow-hidden">
+                          <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center overflow-hidden relative">
                             {vehicle.images?.[0] && vehicle.images[0].trim() !== '' ? (
-                              <img
+                              <Image
                                 src={vehicle.images[0]}
                                 alt={vehicle.name}
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
+                                sizes="48px"
                               />
                             ) : (
                               <div className="text-gray-400 text-xs text-center">

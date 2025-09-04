@@ -10,6 +10,7 @@ interface Category {
   name: string
   slug: string
   description?: string
+  image?: string
   _count?: {
     vehicles: number
   }
@@ -30,7 +31,8 @@ const getIconForCategory = (categorySlug: string) => {
   }
 }
 
-const getImageForCategory = (categorySlug: string) => {
+// Fallback images for categories without database images
+const getFallbackImageForCategory = (categorySlug: string) => {
   switch (categorySlug.toLowerCase()) {
     case 'trucks':
     case 'commercial-trucks':
@@ -112,13 +114,27 @@ export default function VehicleCategories() {
                   className="group card-hover bg-gray-900/50 border-gray-800 overflow-hidden"
                 >
                   <div className="relative aspect-[16/10] overflow-hidden">
-                    <Image
-                      src={getImageForCategory(category.slug)}
-                      alt={category.name}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    {category.image ? (
+                      <>
+                        <Image
+                          src={category.image}
+                          alt={category.name}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      </>
+                    ) : (
+                      <>
+                        <Image
+                          src={getFallbackImageForCategory(category.slug)}
+                          alt={category.name}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      </>
+                    )}
                     
                     <div className="absolute top-4 left-4">
                       <div className="w-12 h-12 bg-accent/20 backdrop-blur-sm rounded-full flex items-center justify-center">

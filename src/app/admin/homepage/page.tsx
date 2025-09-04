@@ -13,6 +13,13 @@ import PartnersManager from '@/components/ui/partners-manager'
 
 interface HomepageContent {
   id: string
+  // Section Visibility
+  showComingSoonSection: boolean
+  showHeroSection: boolean
+  showVehicleCategories: boolean
+  showFeaturedVehicles: boolean
+  showTrustSection: boolean
+  // Content
   heroTitle: string
   heroSubtitle: string
   heroDescription: string
@@ -87,7 +94,7 @@ export default function AdminHomepagePage() {
     }
   }
 
-  const updateContent = (field: keyof HomepageContent, value: string | number) => {
+  const updateContent = (field: keyof HomepageContent, value: string | number | boolean) => {
     if (!content) return
     setContent({
       ...content,
@@ -152,6 +159,78 @@ export default function AdminHomepagePage() {
           {saveMessage}
         </div>
       )}
+
+      {/* Section Visibility Controls */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Section Visibility</CardTitle>
+          <p className="text-sm text-gray-600">Control which sections appear on the homepage</p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="showComingSoonSection"
+                checked={content.showComingSoonSection}
+                onChange={(e) => updateContent('showComingSoonSection', e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <Label htmlFor="showComingSoonSection" className="text-sm font-medium">
+                Coming Soon Section
+              </Label>
+            </div>
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="showHeroSection"
+                checked={content.showHeroSection}
+                onChange={(e) => updateContent('showHeroSection', e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <Label htmlFor="showHeroSection" className="text-sm font-medium">
+                Hero Section
+              </Label>
+            </div>
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="showVehicleCategories"
+                checked={content.showVehicleCategories}
+                onChange={(e) => updateContent('showVehicleCategories', e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <Label htmlFor="showVehicleCategories" className="text-sm font-medium">
+                Vehicle Categories
+              </Label>
+            </div>
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="showFeaturedVehicles"
+                checked={content.showFeaturedVehicles}
+                onChange={(e) => updateContent('showFeaturedVehicles', e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <Label htmlFor="showFeaturedVehicles" className="text-sm font-medium">
+                Featured Vehicles
+              </Label>
+            </div>
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="showTrustSection"
+                checked={content.showTrustSection}
+                onChange={(e) => updateContent('showTrustSection', e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <Label htmlFor="showTrustSection" className="text-sm font-medium">
+                Trust Section
+              </Label>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Hero Section */}

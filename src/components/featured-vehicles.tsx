@@ -131,12 +131,21 @@ export default function FeaturedVehicles() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                     {/* Image */}
                     <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                      <Image
-                        src={vehicle.images?.[0] || '/images/truck1.jpg'}
-                        alt={vehicle.name}
-                        fill
-                        className="object-cover"
-                      />
+                      {vehicle.images?.[0] ? (
+                        <Image
+                          src={vehicle.images[0]}
+                          alt={vehicle.name}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                          <div className="text-center text-gray-500">
+                            <div className="text-4xl mb-2">📷</div>
+                            <div className="text-sm font-medium">No Image</div>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Content */}
