@@ -5,6 +5,8 @@ import { createApiHandler } from '@/lib/api-handler'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 export const GET = createApiHandler(async (req: NextRequest) => {
   const session = await getServerSession(authOptions)
   if (!session || session.user?.role !== 'ADMIN') {

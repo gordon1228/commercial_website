@@ -1,6 +1,8 @@
 'use client'
 
+
 import { useState, useEffect } from 'react'
+
 import { useSearchParams } from 'next/navigation'
 import { 
   Phone, 
@@ -63,7 +65,7 @@ const services = [
   }
 ]
 
-export default function ContactPage() {
+function ContactForm() {
   const searchParams = useSearchParams()
   const vehicleSlug = searchParams?.get('vehicle')
   const { showSuccess, showError } = useToast()
@@ -158,36 +160,6 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20 bg-background">
-      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-6">
-            Contact Us
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Ready to find your perfect commercial vehicle? Get in touch with our expert team for personalized assistance and competitive quotes.
-          </p>
-        </div>
-
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {services.map((service, index) => {
-            const IconComponent = service.icon
-            return (
-              <Card key={index} className="bg-gray-900/50 bg-gray-100 border-gray-300 transition-colors">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                    <IconComponent className="h-6 w-6 text-gray-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{service.title}</h3>
-                  <p className="text-sm text-gray-600">{service.description}</p>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Contact Form */}
           <div className="lg:col-span-2">
@@ -505,6 +477,44 @@ export default function ContactPage() {
             </Card>
           </div>
         </div>
+  )
+}
+
+export default function ContactPage() {
+  return (
+    <div className="min-h-screen pt-20 bg-background">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-6">
+            Contact Us
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Ready to find your perfect commercial vehicle? Get in touch with our expert team for personalized assistance and competitive quotes.
+          </p>
+        </div>
+
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {services.map((service, index) => {
+            const IconComponent = service.icon
+            return (
+              <Card key={index} className="bg-gray-900/50 bg-gray-100 border-gray-300 transition-colors">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                    <IconComponent className="h-6 w-6 text-gray-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{service.title}</h3>
+                  <p className="text-sm text-gray-600">{service.description}</p>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+
+        <Suspense fallback={<div className="text-center py-8">Loading...</div>}>
+          <ContactForm />
+        </Suspense>
 
         {/* Map Placeholder */}
         <div className="mt-16">

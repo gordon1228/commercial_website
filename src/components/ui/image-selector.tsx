@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Loader2, Upload, X, Plus } from 'lucide-react'
+
 
 interface ImageOption {
   name: string
@@ -61,8 +62,10 @@ export default function ImageSelector({
     setShowSelector(false)
   }
 
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+
     if (!file) return
 
     setIsUploading(true)
@@ -77,6 +80,7 @@ export default function ImageSelector({
 
       if (response.ok) {
         const data = await response.json()
+
         onChange(data.url) // Set the newly uploaded image as selected
         await fetchImages() // Refresh the images list
         setShowSelector(false) // Close the selector
@@ -87,6 +91,7 @@ export default function ImageSelector({
     } catch (error) {
       console.error('Error uploading image:', error)
       alert('Error uploading image. Please try again.')
+
     } finally {
       setIsUploading(false)
     }
@@ -134,15 +139,35 @@ export default function ImageSelector({
           </div>
         ) : (
           <div className="text-center py-4">
-            <div className="text-gray-500 mb-2">{placeholder}</div>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowSelector(true)}
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Select Image
-            </Button>
+            <div className="text-gray-500 mb-4">{placeholder}</div>
+            <div className="flex justify-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowSelector(true)}
+              >
+                <ImageIcon className="h-4 w-4 mr-2" />
+                Select from Gallery
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload from Device
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         )}
       </div>
@@ -166,6 +191,7 @@ export default function ImageSelector({
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Select an Image</h3>
                 <div className="flex items-center gap-2">
+
                   <input
                     type="file"
                     id="image-upload"
@@ -174,11 +200,14 @@ export default function ImageSelector({
                     className="hidden"
                     disabled={isUploading}
                   />
+
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
+
                     onClick={() => document.getElementById('image-upload')?.click()}
+
                     disabled={isUploading}
                   >
                     {isUploading ? (
@@ -188,7 +217,9 @@ export default function ImageSelector({
                       </>
                     ) : (
                       <>
+
                         <Plus className="h-4 w-4 mr-2" />
+
                         Upload New
                       </>
                     )}
@@ -260,6 +291,15 @@ export default function ImageSelector({
           </Card>
         </div>
       )}
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileInputChange}
+        className="hidden"
+      />
     </div>
   )
 }

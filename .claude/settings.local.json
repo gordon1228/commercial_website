@@ -23,7 +23,16 @@
       "mcp__ide__getDiagnostics",
       "Bash(npm audit:*)",
       "Bash(dir:*)",
-      "WebFetch(domain:www.tesla.com)"
+      "Bash(taskkill:*)",
+      "Bash(powershell:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(del test-db.js)",
+      "Read(C:\\Users\\User\\Desktop\\school-website\\backend/**)",
+      "Bash(psql:*)",
+      "Bash(find:*)"
+
     ],
     "deny": [],
     "ask": []
