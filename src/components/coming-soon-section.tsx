@@ -36,29 +36,29 @@ export default function ComingSoonSection() {
     nextSection?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  // Only use content values when loaded, otherwise show loading state
+  // Only use content values when loaded from database
   const comingSoonImage = content?.comingSoonImage
-  const comingSoonImageAlt = content?.comingSoonImageAlt || "Coming Soon"
+  const comingSoonImageAlt = content?.comingSoonImageAlt
 
   return (
     <section id="commingSoon" className="relative w-full h-screen overflow-hidden">
       {/* Solution 1: Object-contain to show full image - Account for fixed header */}
       <div className="absolute top-20 left-0 right-0 bottom-0 w-full">
-        {isLoading ? (
-          /* Loading state - show neutral background */
+        {isLoading || !comingSoonImage ? (
+          /* Loading state */
           <div className="w-full h-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center">
             <div className="text-center text-gray-600">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mx-auto mb-4"></div>
               <p className="text-lg font-medium">Loading...</p>
             </div>
           </div>
-        ) : comingSoonImage ? (
+        ) : (
           /* Show database image when loaded */
           <>
             <div className={`transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
               <Image
                 src={comingSoonImage}
-                alt={comingSoonImageAlt}
+                alt={comingSoonImageAlt || 'Coming Soon'}
                 fill
                 className="object-contain"
                 priority
@@ -70,21 +70,12 @@ export default function ComingSoonSection() {
             {/* Enhanced responsive overlay */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/50 z-10" />
           </>
-        ) : (
-          /* Fallback when no image is set */
-          <div className="w-full h-full bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center">
-            <div className="text-center text-white">
-              <div className="text-6xl mb-4">🚗</div>
-              <h2 className="text-4xl md:text-6xl font-bold mb-4">Coming Soon</h2>
-              <p className="text-xl md:text-2xl opacity-80">Exciting new vehicles on the way</p>
-            </div>
-          </div>
         )}
       </div>
 
 
-      {/* Content Container - Only show when not loading */}
-      {!isLoading && (
+      {/* Content Container - Only show when database data is loaded */}
+      {!isLoading && comingSoonImage && (
         <div className="relative z-20 w-full h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20">
           <div className="text-center text-white max-w-4xl mx-auto">
             {/* The COMING SOON text is in your image, so we don't add it here */}
@@ -92,8 +83,8 @@ export default function ComingSoonSection() {
         </div>
       )}
 
-      {/* Scroll indicator - Only show when content is loaded */}
-      {!isLoading && (
+      {/* Scroll indicator - Only show when database data is loaded */}
+      {!isLoading && comingSoonImage && (
         <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-1/2 transform -translate-x-1/2 z-30">
           <button 
             className="cursor-pointer animate-bounce flex flex-col items-center group"
