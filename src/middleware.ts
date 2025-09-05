@@ -99,6 +99,8 @@ export default withAuth(
           '/api/team-members',
           '/api/certifications',
           '/api/contact-info',
+          '/api/categories', // Allow categories for vehicle filters
+          '/api/vehicles', // Allow vehicles listing for public
           '/api/vehicles/slug/',
           '/api/inquiries/vehicle',
           '/api/auth/'
