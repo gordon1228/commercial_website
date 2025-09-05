@@ -37,12 +37,6 @@ export default function ImageSelector({
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (showSelector) {
-      fetchImages()
-    }
-  }, [showSelector, folder, fetchImages])
-
   const fetchImages = useCallback(async () => {
     setIsLoading(true)
     try {
@@ -57,6 +51,12 @@ export default function ImageSelector({
       setIsLoading(false)
     }
   }, [folder])
+
+  useEffect(() => {
+    if (showSelector) {
+      fetchImages()
+    }
+  }, [showSelector, folder, fetchImages])
 
   const handleImageSelect = (imagePath: string) => {
     onChange(imagePath)

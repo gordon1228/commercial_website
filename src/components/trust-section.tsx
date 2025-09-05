@@ -115,17 +115,6 @@ export default function TrustSection() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Auto-slide carousel every 3 seconds
-  useEffect(() => {
-    if (!isAutoPlaying || partners.length === 0) return
-    
-    const interval = setInterval(() => {
-      goToNext()
-    }, 3000)
-
-    return () => clearInterval(interval)
-  }, [isAutoPlaying, partners.length, goToNext])
-
   // Navigation functions
   const goToNext = useCallback(() => {
     setCurrentIndex((prev) => {
@@ -142,6 +131,17 @@ export default function TrustSection() {
       return nextIndex
     })
   }, [partners.length])
+
+  // Auto-slide carousel every 3 seconds
+  useEffect(() => {
+    if (!isAutoPlaying || partners.length === 0) return
+    
+    const interval = setInterval(() => {
+      goToNext()
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [isAutoPlaying, partners.length, goToNext])
 
   const goToPrev = () => {
     setCurrentIndex((prev) => {

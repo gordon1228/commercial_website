@@ -63,7 +63,7 @@ export async function GET(
         },
         include: {
           category: {
-            select: { id: true, name: true, slug: true }
+            select: { id: true, name: true, slug: true, active: true }
           }
         },
         orderBy: [
@@ -88,7 +88,7 @@ export async function GET(
         },
         include: {
           category: {
-            select: { id: true, name: true, slug: true }
+            select: { id: true, name: true, slug: true, active: true }
           }
         },
         orderBy: [

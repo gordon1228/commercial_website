@@ -89,7 +89,7 @@ export default function VehicleSpecsTable({ specs, vehicleName }: VehicleSpecsPr
   // Filter out empty categories
   const populatedCategories = specCategories.map(category => ({
     ...category,
-    fields: category.fields.filter(field => specs[field.key] && specs[field.key].toString().trim() !== '')
+    fields: category.fields.filter(field => specs[field.key] && String(specs[field.key]).trim() !== '')
   })).filter(category => category.fields.length > 0)
 
   if (populatedCategories.length === 0) {
@@ -154,7 +154,7 @@ export default function VehicleSpecsTable({ specs, vehicleName }: VehicleSpecsPr
                       </td>
                       <td className="px-6 py-4 text-black">
                         <div className="bg-white border border-gray-200 px-4 py-2 rounded-lg shadow-sm">
-                          {specs[field.key]}
+                          {String(specs[field.key])}
                         </div>
                       </td>
                     </tr>

@@ -22,6 +22,11 @@ export const PUT = createApiHandler(
       return apiError('New password must contain uppercase, lowercase, number and special character', 400)
     }
 
+    // Ensure session and user exist
+    if (!session?.user?.id) {
+      return apiError('Unauthorized', 401)
+    }
+
     // Get current user from database
     const user = await prisma.user.findUnique({
       where: { id: session.user.id }

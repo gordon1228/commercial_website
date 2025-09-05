@@ -21,7 +21,7 @@ export const GET = createApiHandler(async () => {
 
     return apiResponse(teamMembers)
   } catch (error) {
-    console.error('Error fetching team members, using fallback:', error.message)
+    console.error('Error fetching team members, using fallback:', error instanceof Error ? error.message : 'Unknown error')
     return apiResponse(fallbackTeamMembers)
   }
 })

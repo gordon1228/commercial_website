@@ -4,8 +4,14 @@ import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 
 // GET /api/vehicles/[id] - Get a specific vehicle by ID
 export const GET = createApiHandler(async (req, { params }) => {
+  if (!params?.id) {
+    return apiError('Vehicle ID is required', 400)
+  }
+  
+  const id = Array.isArray(params.id) ? params.id[0] : params.id
+  
   const vehicle = await prisma.vehicle.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       category: {
         select: { id: true, name: true }
@@ -24,6 +30,11 @@ export const GET = createApiHandler(async (req, { params }) => {
 
 // PUT /api/vehicles/[id] - Update a vehicle
 export const PUT = createApiHandler(async (req, { params }) => {
+  if (!params?.id) {
+    return apiError('Vehicle ID is required', 400)
+  }
+  
+  const id = Array.isArray(params.id) ? params.id[0] : params.id
   const body = await req.json()
   
   const {
@@ -45,7 +56,7 @@ export const PUT = createApiHandler(async (req, { params }) => {
 
   // Check if vehicle exists
   const existingVehicle = await prisma.vehicle.findUnique({
-    where: { id: params.id }
+    where: { id }
   })
 
   if (!existingVehicle) {
@@ -64,7 +75,7 @@ export const PUT = createApiHandler(async (req, { params }) => {
     const slugExists = await prisma.vehicle.findFirst({
       where: { 
         slug: newSlug,
-        id: { not: params.id }
+        id: { not: id }
       }
     })
 
@@ -95,7 +106,7 @@ export const PUT = createApiHandler(async (req, { params }) => {
   }
   
   const vehicle = await prisma.vehicle.update({
-    where: { id: params.id },
+    where: { id },
     data: updateData,
     include: {
       category: {
@@ -113,9 +124,15 @@ export const PUT = createApiHandler(async (req, { params }) => {
 
 // DELETE /api/vehicles/[id] - Delete a vehicle
 export const DELETE = createApiHandler(async (req, { params }) => {
+  if (!params?.id) {
+    return apiError('Vehicle ID is required', 400)
+  }
+  
+  const id = Array.isArray(params.id) ? params.id[0] : params.id
+  
   // Check if vehicle exists
   const existingVehicle = await prisma.vehicle.findUnique({
-    where: { id: params.id }
+    where: { id }
   })
 
   if (!existingVehicle) {
@@ -124,7 +141,7 @@ export const DELETE = createApiHandler(async (req, { params }) => {
 
   // Delete the vehicle
   await prisma.vehicle.delete({
-    where: { id: params.id }
+    where: { id }
   })
 
   return apiResponse({ message: 'Vehicle deleted successfully' })
