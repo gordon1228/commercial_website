@@ -21,6 +21,11 @@ interface Inquiry {
     name: string
     slug: string
   }
+  user?: {
+    id: string
+    email: string
+    role: string
+  }
 }
 
 const statusColors = {
@@ -30,28 +35,57 @@ const statusColors = {
   'CLOSED': 'bg-gray-100 text-gray-800'
 }
 
+interface StaffUser {
+  id: string
+  email: string
+  role: string
+}
+
 export default function InquiriesPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [inquiries, setInquiries] = useState<Inquiry[]>([])
+  const [staffUsers, setStaffUsers] = useState<StaffUser[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState('')
 
   useEffect(() => {
     if (status === 'loading') return
-    if (!session || session.user?.role !== 'ADMIN') {
+    if (!session || !['ADMIN', 'MANAGER', 'USER'].includes(session.user?.role)) {
       router.push('/admin/login')
       return
     }
 
     fetchInquiries()
+    
+    // Fetch staff users for assignment (only for ADMIN/MANAGER)
+    if (session?.user?.role === 'ADMIN' || session?.user?.role === 'MANAGER') {
+      fetchStaffUsers()
+    }
   }, [session, status, router])
+
+  const fetchStaffUsers = async () => {
+    try {
+      const response = await fetch('/api/users')
+      if (!response.ok) throw new Error('Failed to fetch staff users')
+      
+      const users = await response.json()
+      setStaffUsers(users)
+    } catch (error) {
+      console.error('Error fetching staff users:', error)
+    }
+  }
 
   const fetchInquiries = async () => {
     try {
       setIsLoading(true)
       const params = new URLSearchParams()
       if (statusFilter) params.set('status', statusFilter)
+      
+      // For USER role, only fetch their own inquiries
+      if (session?.user?.role === 'USER') {
+        params.set('userId', session.user.id)
+      }
 
       const response = await fetch(`/api/inquiries?${params.toString()}`)
       if (!response.ok) throw new Error('Failed to fetch inquiries')
@@ -81,6 +115,28 @@ export default function InquiriesPage() {
     } catch (error) {
       console.error('Error updating status:', error)
       alert('Failed to update status')
+    }
+  }
+
+  const assignUser = async (id: string, userId: string) => {
+    try {
+      const response = await fetch(`/api/inquiries/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: userId === 'unassigned' ? null : userId })
+      })
+      
+      if (!response.ok) throw new Error('Failed to assign user')
+      
+      setInquiries(prev => prev.map(inquiry => 
+        inquiry.id === id ? { 
+          ...inquiry, 
+          user: userId === 'unassigned' ? null : staffUsers.find(u => u.id === userId) || null 
+        } : inquiry
+      ))
+    } catch (error) {
+      console.error('Error assigning user:', error)
+      alert('Failed to assign user')
     }
   }
 
@@ -121,9 +177,14 @@ export default function InquiriesPage() {
       {/* Page Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Customer Inquiries</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {session?.user?.role === 'USER' ? 'My Assigned Inquiries' : 'Customer Inquiries'}
+          </h1>
           <p className="text-gray-600 mt-2">
-            Manage customer inquiries and support requests.
+            {session?.user?.role === 'USER' 
+              ? 'View customer inquiries assigned to you for follow-up.' 
+              : 'Manage customer inquiries and support requests.'
+            }
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -177,6 +238,15 @@ export default function InquiriesPage() {
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[inquiry.status as keyof typeof statusColors] || statusColors.NEW}`}>
                       {inquiry.status}
                     </span>
+                    {inquiry.user ? (
+                      <span className="px-2 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                        Assigned: {inquiry.user.email}
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                        Unassigned
+                      </span>
+                    )}
                   </div>
                 </div>
               </CardHeader>
@@ -190,18 +260,34 @@ export default function InquiriesPage() {
                 <p className="text-gray-700 mb-4">{inquiry.message}</p>
                 
                 <div className="flex justify-between items-center">
-                  <div className="flex gap-2">
-                    <select
-                      value={inquiry.status}
-                      onChange={(e) => updateStatus(inquiry.id, e.target.value)}
-                      className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="NEW">New</option>
-                      <option value="CONTACTED">Contacted</option>
-                      <option value="RESOLVED">Resolved</option>
-                      <option value="CLOSED">Closed</option>
-                    </select>
-                  </div>
+                  {/* Only show status controls for ADMIN/MANAGER */}
+                  {(session?.user?.role === 'ADMIN' || session?.user?.role === 'MANAGER') && (
+                    <div className="flex gap-2 flex-wrap">
+                      <select
+                        value={inquiry.status}
+                        onChange={(e) => updateStatus(inquiry.id, e.target.value)}
+                        className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="NEW">New</option>
+                        <option value="CONTACTED">Contacted</option>
+                        <option value="RESOLVED">Resolved</option>
+                        <option value="CLOSED">Closed</option>
+                      </select>
+                      
+                      <select
+                        value={inquiry.user?.id || 'unassigned'}
+                        onChange={(e) => assignUser(inquiry.id, e.target.value)}
+                        className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[140px]"
+                      >
+                        <option value="unassigned">Unassigned</option>
+                        {staffUsers.map((user) => (
+                          <option key={user.id} value={user.id}>
+                            {user.email} ({user.role})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                   
                   <div className="flex gap-2">
                     <Button

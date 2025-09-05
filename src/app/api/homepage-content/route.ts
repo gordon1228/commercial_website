@@ -7,16 +7,33 @@ import { authOptions } from '@/lib/auth'
 export const dynamic = 'force-dynamic'
 
 async function getHomepageContent() {
-  let content = await prisma.homepageContent.findFirst()
-  
-  if (!content) {
-    // Create default content if none exists
-    content = await prisma.homepageContent.create({
-      data: {}
-    })
+  try {
+    let content = await prisma.homepageContent.findFirst()
+    
+    if (!content) {
+      // Create default content if none exists
+      content = await prisma.homepageContent.create({
+        data: {}
+      })
+    }
+    
+    return content
+  } catch (error) {
+    console.error('Database error in getHomepageContent:', error)
+    
+    // Return simplified fallback data for truck website
+    return {
+      id: 'fallback',
+      heroTitle: 'Premium Commercial',
+      heroSubtitle: 'Trucks',
+      heroDescription: 'Discover elite truck solutions built for businesses that demand excellence, reliability, and uncompromising performance.',
+      heroButtonPrimary: 'Explore Trucks',
+      heroButtonSecondary: 'Get Quote',
+      comingSoonImage: '/uploads/Technology_background.png',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
   }
-  
-  return content
 }
 
 export const GET = createApiHandler(async () => {
@@ -26,7 +43,7 @@ export const GET = createApiHandler(async () => {
 
 export const PUT = createApiHandler(async (req: NextRequest) => {
   const session = await getServerSession(authOptions)
-  if (!session || session.user?.role !== 'ADMIN') {
+  if (!session || (session.user?.role !== 'ADMIN' && session.user?.role !== 'MANAGER')) {
     return NextResponse.json(
       { error: 'Admin access required' },
       { status: 403 }
@@ -47,32 +64,14 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
   const updatedContent = await prisma.homepageContent.update({
     where: { id: existingContent.id },
     data: {
-      // Section visibility
-      showComingSoonSection: data.showComingSoonSection,
-      showHeroSection: data.showHeroSection,
-      showVehicleCategories: data.showVehicleCategories,
-      showFeaturedVehicles: data.showFeaturedVehicles,
-      showTrustSection: data.showTrustSection,
-      // Content fields
+      // Essential hero section fields only
       heroTitle: data.heroTitle,
       heroSubtitle: data.heroSubtitle,
       heroDescription: data.heroDescription,
       heroButtonPrimary: data.heroButtonPrimary,
       heroButtonSecondary: data.heroButtonSecondary,
-      vehiclesSold: data.vehiclesSold,
-      happyClients: data.happyClients,
-      yearsExperience: data.yearsExperience,
-      satisfactionRate: data.satisfactionRate,
-      partnersTitle: data.partnersTitle,
-      partnersDescription: data.partnersDescription,
-      feature1Title: data.feature1Title,
-      feature1Description: data.feature1Description,
-      feature2Title: data.feature2Title,
-      feature2Description: data.feature2Description,
-      feature3Title: data.feature3Title,
-      feature3Description: data.feature3Description,
+      // Coming soon section
       comingSoonImage: data.comingSoonImage,
-      comingSoonImageAlt: data.comingSoonImageAlt,
     }
   })
 

@@ -52,8 +52,19 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (status === 'loading') return
 
-    // Check if user is authenticated and is admin
-    if (status === 'unauthenticated' || session?.user?.role !== 'ADMIN') {
+    // Check if user is authenticated and has admin/manager role
+    // USER role should be redirected to inquiries page
+    if (status === 'unauthenticated') {
+      router.push('/admin/login')
+      return
+    }
+    
+    if (session?.user?.role === 'USER') {
+      router.push('/admin/inquiries')
+      return
+    }
+    
+    if (session?.user?.role !== 'ADMIN' && session?.user?.role !== 'MANAGER') {
       router.push('/admin/login')
       return
     }
@@ -166,13 +177,13 @@ export default function AdminDashboard() {
     )
   }
 
-  if (status === 'unauthenticated' || session?.user?.role !== 'ADMIN') {
+  if (status === 'unauthenticated' || !['ADMIN', 'MANAGER'].includes(session?.user?.role)) {
     return null
   }
 
   const dashboardStats = [
     {
-      title: 'Total Vehicles',
+      title: 'Total Trucks',
       value: stats?.vehiclesCount?.toString() || '0',
       icon: Car,
       href: '/admin/vehicles'
@@ -281,10 +292,10 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Recent Vehicles */}
+        {/* Recent Trucks */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-semibold">Recent Vehicles</CardTitle>
+            <CardTitle className="text-lg font-semibold">Recent Trucks</CardTitle>
             <Link href="/admin/vehicles">
               <Button variant="outline" size="sm">
                 View All
@@ -328,7 +339,7 @@ export default function AdminDashboard() {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500 text-center py-8">No vehicles found</p>
+                <p className="text-gray-500 text-center py-8">No trucks found</p>
               )}
             </div>
           </CardContent>
@@ -345,7 +356,7 @@ export default function AdminDashboard() {
             <Link href="/admin/vehicles/create">
               <Button variant="outline" size="lg" className="w-full h-20 flex flex-col gap-2">
                 <Plus className="h-5 w-5" />
-                Add Vehicle
+                Add Truck
               </Button>
             </Link>
             <Link href="/admin/inquiries">

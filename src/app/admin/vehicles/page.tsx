@@ -162,33 +162,33 @@ export default function AdminVehiclesPage() {
   }
 
   const handleDeleteVehicle = async (vehicleId: string) => {
-    if (!confirm('Are you sure you want to delete this vehicle?')) return
+    if (!confirm('Are you sure you want to delete this truck?')) return
 
     try {
       const response = await fetch(`/api/vehicles/${vehicleId}`, {
         method: 'DELETE',
       })
 
-      if (!response.ok) throw new Error('Failed to delete vehicle')
+      if (!response.ok) throw new Error('Failed to delete truck')
 
       setVehicles(prev => prev.filter(v => v.id !== vehicleId))
-      alert('Vehicle deleted successfully')
+      alert('Truck deleted successfully')
     } catch (error) {
-      console.error('Error deleting vehicle:', error)
-      alert('Failed to delete vehicle')
+      console.error('Error deleting truck:', error)
+      alert('Failed to delete truck')
     }
   }
 
   const handleToggleActive = async (vehicleId: string, currentStatus: boolean) => {
     const action = currentStatus ? 'deactivate' : 'activate'
-    if (!confirm(`Are you sure you want to ${action} this vehicle?`)) return
+    if (!confirm(`Are you sure you want to ${action} this truck?`)) return
 
     try {
       const response = await fetch(`/api/vehicles/${vehicleId}/toggle-active`, {
         method: 'PATCH',
       })
 
-      if (!response.ok) throw new Error(`Failed to ${action} vehicle`)
+      if (!response.ok) throw new Error(`Failed to ${action} truck`)
 
       const result = await response.json()
       
@@ -199,8 +199,8 @@ export default function AdminVehiclesPage() {
       
       alert(result.message)
     } catch (error) {
-      console.error(`Error ${action}ing vehicle:`, error)
-      alert(`Failed to ${action} vehicle`)
+      console.error(`Error ${action}ing truck:`, error)
+      alert(`Failed to ${action} truck`)
     }
   }
 
@@ -235,9 +235,9 @@ export default function AdminVehiclesPage() {
       {/* Page Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Vehicle Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Truck Management</h1>
           <p className="text-gray-600 mt-2">
-            Manage your vehicle inventory - add, edit, or remove vehicles from your fleet.
+            Manage your truck inventory - add, edit, or remove trucks from your fleet.
           </p>
         </div>
         <div className="flex gap-2">

@@ -9,36 +9,17 @@ import { Label } from '@/components/ui/label'
 import { Save, Eye, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import ImageSelector from '@/components/ui/image-selector'
-import PartnersManager from '@/components/ui/partners-manager'
 
 interface HomepageContent {
   id: string
-  // Section Visibility
-  showComingSoonSection: boolean
-  showHeroSection: boolean
-  showVehicleCategories: boolean
-  showFeaturedVehicles: boolean
-  showTrustSection: boolean
-  // Content
+  // Essential Content Only
   heroTitle: string
   heroSubtitle: string
   heroDescription: string
   heroButtonPrimary: string
   heroButtonSecondary: string
-  vehiclesSold: number
-  happyClients: number
-  yearsExperience: number
-  satisfactionRate: number
-  partnersTitle: string
-  partnersDescription: string
-  feature1Title: string
-  feature1Description: string
-  feature2Title: string
-  feature2Description: string
-  feature3Title: string
-  feature3Description: string
+  // Coming Soon Section
   comingSoonImage: string
-  comingSoonImageAlt: string
 }
 
 export default function AdminHomepagePage() {
@@ -160,297 +141,89 @@ export default function AdminHomepagePage() {
         </div>
       )}
 
-      {/* Section Visibility Controls */}
-      <Card>
+
+      {/* Hero Section - Simplified */}
+      <Card className="max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle>Section Visibility</CardTitle>
-          <p className="text-sm text-gray-600">Control which sections appear on the homepage</p>
+          <CardTitle>Hero Section Content</CardTitle>
+          <p className="text-sm text-gray-600">Manage the main homepage hero section content</p>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                id="showComingSoonSection"
-                checked={content.showComingSoonSection}
-                onChange={(e) => updateContent('showComingSoonSection', e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        <CardContent className="space-y-6">
+          <div>
+            <Label htmlFor="heroTitle">Title</Label>
+            <Input
+              id="heroTitle"
+              value={content.heroTitle}
+              onChange={(e) => updateContent('heroTitle', e.target.value)}
+              placeholder="Premium Commercial"
+              className="text-lg"
+            />
+          </div>
+          <div>
+            <Label htmlFor="heroSubtitle">Subtitle</Label>
+            <Input
+              id="heroSubtitle"
+              value={content.heroSubtitle}
+              onChange={(e) => updateContent('heroSubtitle', e.target.value)}
+              placeholder="Trucks"
+              className="text-lg"
+            />
+          </div>
+          <div>
+            <Label htmlFor="heroDescription">Description</Label>
+            <Textarea
+              id="heroDescription"
+              value={content.heroDescription}
+              onChange={(e) => updateContent('heroDescription', e.target.value)}
+              rows={4}
+              placeholder="Discover elite truck solutions built for businesses that demand excellence, reliability, and uncompromising performance."
+              className="text-base"
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="heroButtonPrimary">Primary Button Text</Label>
+              <Input
+                id="heroButtonPrimary"
+                value={content.heroButtonPrimary}
+                onChange={(e) => updateContent('heroButtonPrimary', e.target.value)}
+                placeholder="Explore Trucks"
               />
-              <Label htmlFor="showComingSoonSection" className="text-sm font-medium">
-                Coming Soon Section
-              </Label>
             </div>
-            <div className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                id="showHeroSection"
-                checked={content.showHeroSection}
-                onChange={(e) => updateContent('showHeroSection', e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            <div>
+              <Label htmlFor="heroButtonSecondary">Secondary Button Text</Label>
+              <Input
+                id="heroButtonSecondary"
+                value={content.heroButtonSecondary}
+                onChange={(e) => updateContent('heroButtonSecondary', e.target.value)}
+                placeholder="Get Quote"
               />
-              <Label htmlFor="showHeroSection" className="text-sm font-medium">
-                Hero Section
-              </Label>
-            </div>
-            <div className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                id="showVehicleCategories"
-                checked={content.showVehicleCategories}
-                onChange={(e) => updateContent('showVehicleCategories', e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <Label htmlFor="showVehicleCategories" className="text-sm font-medium">
-                Vehicle Categories
-              </Label>
-            </div>
-            <div className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                id="showFeaturedVehicles"
-                checked={content.showFeaturedVehicles}
-                onChange={(e) => updateContent('showFeaturedVehicles', e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <Label htmlFor="showFeaturedVehicles" className="text-sm font-medium">
-                Featured Vehicles
-              </Label>
-            </div>
-            <div className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                id="showTrustSection"
-                checked={content.showTrustSection}
-                onChange={(e) => updateContent('showTrustSection', e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <Label htmlFor="showTrustSection" className="text-sm font-medium">
-                Trust Section
-              </Label>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Hero Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Hero Section</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="heroTitle">Title</Label>
-              <Input
-                id="heroTitle"
-                value={content.heroTitle}
-                onChange={(e) => updateContent('heroTitle', e.target.value)}
-                placeholder="Premium Commercial"
-              />
-            </div>
-            <div>
-              <Label htmlFor="heroSubtitle">Subtitle</Label>
-              <Input
-                id="heroSubtitle"
-                value={content.heroSubtitle}
-                onChange={(e) => updateContent('heroSubtitle', e.target.value)}
-                placeholder="Vehicles"
-              />
-            </div>
-            <div>
-              <Label htmlFor="heroDescription">Description</Label>
-              <Textarea
-                id="heroDescription"
-                value={content.heroDescription}
-                onChange={(e) => updateContent('heroDescription', e.target.value)}
-                rows={3}
-                placeholder="Discover elite fleet solutions..."
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="heroButtonPrimary">Primary Button</Label>
-                <Input
-                  id="heroButtonPrimary"
-                  value={content.heroButtonPrimary}
-                  onChange={(e) => updateContent('heroButtonPrimary', e.target.value)}
-                  placeholder="Explore Fleet"
-                />
-              </div>
-              <div>
-                <Label htmlFor="heroButtonSecondary">Secondary Button</Label>
-                <Input
-                  id="heroButtonSecondary"
-                  value={content.heroButtonSecondary}
-                  onChange={(e) => updateContent('heroButtonSecondary', e.target.value)}
-                  placeholder="Get Quote"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Statistics */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Statistics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="vehiclesSold">Vehicles Available</Label>
-                <Input
-                  id="vehiclesSold"
-                  type="number"
-                  value={content.vehiclesSold}
-                  onChange={(e) => updateContent('vehiclesSold', parseInt(e.target.value) || 0)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="happyClients">Happy Clients</Label>
-                <Input
-                  id="happyClients"
-                  type="number"
-                  value={content.happyClients}
-                  onChange={(e) => updateContent('happyClients', parseInt(e.target.value) || 0)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="yearsExperience">Years Experience</Label>
-                <Input
-                  id="yearsExperience"
-                  type="number"
-                  value={content.yearsExperience}
-                  onChange={(e) => updateContent('yearsExperience', parseInt(e.target.value) || 0)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="satisfactionRate">Satisfaction Rate (%)</Label>
-                <Input
-                  id="satisfactionRate"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={content.satisfactionRate}
-                  onChange={(e) => updateContent('satisfactionRate', parseInt(e.target.value) || 0)}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Partners Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Partners Section</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="partnersTitle">Title</Label>
-              <Input
-                id="partnersTitle"
-                value={content.partnersTitle}
-                onChange={(e) => updateContent('partnersTitle', e.target.value)}
-                placeholder="Trusted by Industry Leaders"
-              />
-            </div>
-            <div>
-              <Label htmlFor="partnersDescription">Description</Label>
-              <Textarea
-                id="partnersDescription"
-                value={content.partnersDescription}
-                onChange={(e) => updateContent('partnersDescription', e.target.value)}
-                rows={3}
-                placeholder="We partner with the world's most respected..."
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Trust Features */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Trust Features</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Feature 1</Label>
-              <Input
-                value={content.feature1Title}
-                onChange={(e) => updateContent('feature1Title', e.target.value)}
-                placeholder="Quality Guarantee"
-                className="mb-2"
-              />
-              <Textarea
-                value={content.feature1Description}
-                onChange={(e) => updateContent('feature1Description', e.target.value)}
-                rows={2}
-                placeholder="Every vehicle undergoes rigorous inspection..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Feature 2</Label>
-              <Input
-                value={content.feature2Title}
-                onChange={(e) => updateContent('feature2Title', e.target.value)}
-                placeholder="Fast Delivery"
-                className="mb-2"
-              />
-              <Textarea
-                value={content.feature2Description}
-                onChange={(e) => updateContent('feature2Description', e.target.value)}
-                rows={2}
-                placeholder="Quick processing and delivery..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Feature 3</Label>
-              <Input
-                value={content.feature3Title}
-                onChange={(e) => updateContent('feature3Title', e.target.value)}
-                placeholder="24/7 Support"
-                className="mb-2"
-              />
-              <Textarea
-                value={content.feature3Description}
-                onChange={(e) => updateContent('feature3Description', e.target.value)}
-                rows={2}
-                placeholder="Round-the-clock customer support..."
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Coming Soon Section */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Coming Soon Section</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      {/* Coming Soon Section */}
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle>Coming Soon Section</CardTitle>
+          <p className="text-sm text-gray-600">Manage the coming soon section background image</p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
             <ImageSelector
-              value={content.comingSoonImage}
+              value={content.comingSoonImage || ''}
               onChange={(value) => updateContent('comingSoonImage', value)}
               label="Coming Soon Background Image"
-              placeholder="No image selected"
-              folder="uploads"
+              placeholder="No image selected for coming soon section"
+              folder="backgrounds"
             />
-            <div>
-              <Label htmlFor="comingSoonImageAlt">Image Alt Text</Label>
-              <Input
-                id="comingSoonImageAlt"
-                value={content.comingSoonImageAlt}
-                onChange={(e) => updateContent('comingSoonImageAlt', e.target.value)}
-                placeholder="Coming Soon"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Partners Management */}
-        <div className="lg:col-span-2">
-          <PartnersManager />
-        </div>
-      </div>
+            <p className="text-xs text-gray-500 mt-2">
+              This image will be displayed as the background of the coming soon section on the homepage.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

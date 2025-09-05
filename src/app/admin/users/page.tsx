@@ -65,6 +65,32 @@ export default function UsersPage() {
   const createUser = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Client-side password validation
+    if (createForm.password.length < 8) {
+      alert('Password must be at least 8 characters long')
+      return
+    }
+    
+    if (!/(?=.*[a-z])/.test(createForm.password)) {
+      alert('Password must contain at least one lowercase letter')
+      return
+    }
+    
+    if (!/(?=.*[A-Z])/.test(createForm.password)) {
+      alert('Password must contain at least one uppercase letter')
+      return
+    }
+    
+    if (!/(?=.*\d)/.test(createForm.password)) {
+      alert('Password must contain at least one number')
+      return
+    }
+    
+    if (!/(?=.*[@$!%*?&])/.test(createForm.password)) {
+      alert('Password must contain at least one special character (@$!%*?&)')
+      return
+    }
+    
     try {
       const response = await fetch('/api/users', {
         method: 'POST',
@@ -185,14 +211,14 @@ export default function UsersPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Password *
+                    Password * <span className="text-xs text-gray-500">(8+ chars, uppercase, lowercase, number, special char)</span>
                   </label>
                   <Input
                     type="password"
                     value={createForm.password}
                     onChange={(e) => setCreateForm(prev => ({ ...prev, password: e.target.value }))}
-                    placeholder="Minimum 6 characters"
-                    minLength={6}
+                    placeholder="8+ chars, uppercase, lowercase, number, special char"
+                    minLength={8}
                     required
                   />
                 </div>

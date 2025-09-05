@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 // GET /api/categories - Get all categories
 export const GET = createApiHandler(async (req, { session }) => {
   // For non-admin users, only show active categories
-  const isAdmin = session?.user?.role === 'ADMIN'
+  const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'MANAGER'
   const where = isAdmin ? {} : { active: true }
 
   const categories = await prisma.category.findMany({

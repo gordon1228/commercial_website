@@ -38,9 +38,9 @@ export default function HeroSection() {
 
   // Default content while loading or if fetch fails
   const heroTitle = content?.heroTitle || 'Premium Commercial'
-  const heroSubtitle = content?.heroSubtitle || 'Vehicles'
-  const heroDescription = content?.heroDescription || 'Discover elite fleet solutions built for businesses that demand excellence, reliability, and uncompromising quality.'
-  const heroButtonPrimary = content?.heroButtonPrimary || 'Explore Fleet'
+  const heroSubtitle = content?.heroSubtitle || 'Trucks'
+  const heroDescription = content?.heroDescription || 'Discover elite truck solutions built for businesses that demand excellence, reliability, and uncompromising performance.'
+  const heroButtonPrimary = content?.heroButtonPrimary || 'Explore Trucks'
   const heroButtonSecondary = content?.heroButtonSecondary || 'Get Quote'
 
   return (
@@ -80,14 +80,7 @@ export default function HeroSection() {
           className="cursor-pointer animate-bounce flex flex-col items-center"
           onClick={scrollToNext}
         >
-          <div className="text-center text-black hover:text-gray-900 transition-all duration-300">
-            <div className="text-sm sm:text-base mb-2 drop-shadow-lg font-medium tracking-wide">
-              Scroll to explore
-            </div>
-            <div className="flex justify-center">
-              <ChevronDown className="h-6 w-6 sm:h-7 sm:w-7 drop-shadow-lg" />
-            </div>
-          </div>
+          
         </div>
       </div>
     </section>

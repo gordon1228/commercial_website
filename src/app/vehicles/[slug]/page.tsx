@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { formatPrice } from '@/lib/utils'
+import VehicleSpecsTable from '@/components/vehicle-specs-table'
 
 interface Vehicle {
   id: string
@@ -29,7 +30,7 @@ interface Vehicle {
   price: number
   images: string[]
   status: string
-  specifications?: Record<string, string>
+  specs?: Record<string, string>
   features?: string[]
   category: {
     id: string
@@ -47,7 +48,7 @@ interface VehicleResponse {
 
 export default function VehicleDetailPage({ params }: { params: { slug: string } }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('description')
   const [isSaved, setIsSaved] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -171,19 +172,19 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
     notFound()
   }
 
-  const specifications = vehicle.specifications || {}
+  const specifications = vehicle.specs || {}
   const features = vehicle.features || []
 
   return (
     <div className="min-h-screen pt-20 bg-background">
       {/* Breadcrumb */}
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-gray-600 transition-colors">Home</Link>
+        <nav className="flex items-center space-x-2 text-sm text-black">
+          <Link href="/" className="hover:text-black transition-colors">Home</Link>
           <ChevronRight className="h-4 w-4" />
-          <Link href="/vehicles" className="hover:text-gray-600 transition-colors">Vehicles</Link>
+          <Link href="/vehicles" className="hover:text-black transition-colors">Vehicles</Link>
           <ChevronRight className="h-4 w-4" />
-          <span className="hover:text-gray-600 transition-colors">{vehicle.name}</span>
+          <span className="hover:text-black transition-colors">{vehicle.name}</span>
         </nav>
       </div>
 
@@ -214,19 +215,19 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
                   {/* Navigation arrows */}
                   <button
                     onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-black transition-colors"
                   >
                     <ChevronLeft className="h-5 w-5" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-black transition-colors"
                   >
                     <ChevronRight className="h-5 w-5" />
                   </button>
 
                   {/* Image counter */}
-                  <div className="absolute top-4 right-4 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm">
+                  <div className="absolute top-4 right-4 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full text-black text-sm">
                     {currentImageIndex + 1} / {vehicle.images.length}
                   </div>
                 </>
@@ -235,7 +236,7 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
               {/* Save button */}
               <button
                 onClick={() => setIsSaved(!isSaved)}
-                className="absolute top-4 left-4 w-10 h-10 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
+                className="absolute top-4 left-4 w-10 h-10 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-black"
               >
                 <Heart className={`h-5 w-5 ${isSaved ? 'fill-red-600 text-red-600' : ''}`} />
               </button>
@@ -266,11 +267,14 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
 
             {/* Tabs */}
             <div className="border-b border-gray-700 mb-6">
-              <nav className="flex space-x-8">
+              <nav className="flex space-x-8 overflow-x-auto">
                 {[
-                  { id: 'overview', label: 'Overview' },
-                  { id: 'specs', label: 'Specifications' },
-                  { id: 'features', label: 'Features' }
+                  { id: 'description', label: 'Description' },
+                  { id: 'performance', label: 'Performance' },
+                  { id: 'features', label: 'Useful Features' },
+                  { id: 'interior', label: 'Interior' },
+                  { id: 'safety', label: 'Safety' },
+                  { id: 'specs', label: 'Specifications' }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -278,7 +282,7 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
                     className={`py-4 px-2 border-b-2 transition-colors ${
                       activeTab === tab.id
                         ? 'border-gray-900 text-gray-900'
-                        : 'border-transparent text-muted-foreground hover:text-white hover:border-gray-600'
+                        : 'border-transparent text-black hover:text-black hover:border-gray-600'
                     }`}
                   >
                     {tab.label}
@@ -289,44 +293,391 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
 
             {/* Tab Content */}
             <div className="space-y-6">
-              {activeTab === 'overview' && (
+              {activeTab === 'description' && (
                 <div>
-                  <h3 className="text-xl font-semibold text-white mb-4">Description</h3>
-                  <p className="text-muted-foreground mb-6 leading-relaxed">
+                  <h3 className="text-xl font-semibold text-black mb-4">Vehicle Description</h3>
+                  <p className="text-black leading-relaxed">
                     {vehicle.description || 'No description available.'}
                   </p>
                 </div>
               )}
 
-              {activeTab === 'specs' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {Object.keys(specifications).length > 0 ? (
-                    Object.entries(specifications).map(([key, value]) => (
-                      <div key={key} className="flex justify-between py-3 border-b border-gray-700">
-                        <span className="text-muted-foreground capitalize">
-                          {key.replace(/([A-Z])/g, ' $1').trim()}:
-                        </span>
-                        <span className="text-white font-medium">{value as string}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground col-span-2">No specifications available.</p>
+              {activeTab === 'performance' && (
+                <div className="space-y-8">
+                  {/* Engine & Power Section */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-black mb-4 flex items-center">
+                      <Fuel className="h-5 w-5 mr-2 text-blue-400" />
+                      Engine & Power
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {specifications.engine && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-blue-600 font-medium">Engine Type</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.engine}</div>
+                        </div>
+                      )}
+                      {specifications.horsepower && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-blue-600 font-medium">Horsepower</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.horsepower} HP</div>
+                        </div>
+                      )}
+                      {specifications.torque && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-blue-600 font-medium">Torque</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.torque}</div>
+                        </div>
+                      )}
+                      {specifications.displacement && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-blue-600 font-medium">Engine Displacement</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.displacement}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Transmission & Drivetrain */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-black mb-4">Transmission & Drivetrain</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {specifications.transmission && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-blue-600 font-medium">Transmission</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.transmission}</div>
+                        </div>
+                      )}
+                      {specifications.drivetrain && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-blue-600 font-medium">Drivetrain</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.drivetrain}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Fuel Economy */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-black mb-4">Fuel Economy</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {specifications.fuel && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-blue-600 font-medium">Fuel Economy</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.fuel} MPG</div>
+                        </div>
+                      )}
+                      {specifications.fuelCapacity && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-blue-600 font-medium">Fuel Tank Capacity</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.fuelCapacity}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Show message if no performance data */}
+                  {(!specifications.engine && !specifications.horsepower && !specifications.fuel) && (
+                    <div className="text-center py-12">
+                      <Fuel className="h-16 w-16 text-black mx-auto mb-4" />
+                      <p className="text-black">No performance data available for this vehicle.</p>
+                    </div>
                   )}
                 </div>
               )}
 
               {activeTab === 'features' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {features.length > 0 ? (
-                    features.map((feature, index) => (
-                      <div key={index} className="flex items-center text-muted-foreground">
-                        <Shield className="h-4 w-4 text-gray-600 mr-3" />
-                        {feature}
+                <div className="space-y-8">
+                  {/* Convenience Features */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-black mb-4 flex items-center">
+                      <Shield className="h-5 w-5 mr-2 text-green-400" />
+                      Convenience & Comfort Features
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {features.length > 0 ? (
+                        features.slice(0, Math.ceil(features.length / 2)).map((feature, index) => (
+                          <div key={index} className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm flex items-center">
+                            <Shield className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
+                            <span className="text-gray-900 font-medium">{feature}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <span className="text-black">Standard comfort features available</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Technology Features */}
+                  {features.length > 2 && (
+                    <div>
+                      <h4 className="text-lg font-semibold text-black mb-4 flex items-center">
+                        <Users className="h-5 w-5 mr-2 text-purple-400" />
+                        Technology & Connectivity
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {features.slice(Math.ceil(features.length / 2)).map((feature, index) => (
+                          <div key={index} className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm flex items-center">
+                            <Users className="h-5 w-5 text-purple-600 mr-3 flex-shrink-0" />
+                            <span className="text-gray-900 font-medium">{feature}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground col-span-2">No features listed.</p>
+                    </div>
                   )}
+
+                  {/* Additional Features from Specs */}
+                  {(specifications.features || specifications.technology || specifications.comfort) && (
+                    <div>
+                      <h4 className="text-lg font-semibold text-black mb-4">Additional Features</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {specifications.features && (
+                          <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                            <div className="text-sm text-green-600 font-medium">Special Features</div>
+                            <div className="text-gray-900 font-semibold mt-1">{specifications.features}</div>
+                          </div>
+                        )}
+                        {specifications.technology && (
+                          <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                            <div className="text-sm text-green-600 font-medium">Technology</div>
+                            <div className="text-gray-900 font-semibold mt-1">{specifications.technology}</div>
+                          </div>
+                        )}
+                        {specifications.comfort && (
+                          <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                            <div className="text-sm text-green-600 font-medium">Comfort</div>
+                            <div className="text-gray-900 font-semibold mt-1">{specifications.comfort}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Show message if no features */}
+                  {features.length === 0 && !specifications.features && !specifications.technology && (
+                    <div className="text-center py-12">
+                      <Shield className="h-16 w-16 text-black mx-auto mb-4" />
+                      <p className="text-black">No feature information available for this vehicle.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'interior' && (
+                <div className="space-y-8">
+                  {/* Seating & Space */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-black mb-4 flex items-center">
+                      <Users className="h-5 w-5 mr-2 text-orange-600" />
+                      Seating & Space
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {specifications.capacity && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-orange-600 font-medium">Seating Capacity</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.capacity}</div>
+                        </div>
+                      )}
+                      {specifications.seatingCapacity && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-orange-600 font-medium">Total Seats</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.seatingCapacity}</div>
+                        </div>
+                      )}
+                      {specifications.cabinSpace && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-orange-600 font-medium">Cabin Space</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.cabinSpace}</div>
+                        </div>
+                      )}
+                      {specifications.legRoom && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-orange-600 font-medium">Leg Room</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.legRoom}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Interior Comfort */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-black mb-4">Interior Comfort</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {specifications.interior && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-orange-600 font-medium">Interior Features</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.interior}</div>
+                        </div>
+                      )}
+                      {specifications.comfort && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-orange-600 font-medium">Comfort Features</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.comfort}</div>
+                        </div>
+                      )}
+                      {specifications.airConditioning && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-orange-600 font-medium">Climate Control</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.airConditioning}</div>
+                        </div>
+                      )}
+                      {specifications.upholstery && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-orange-600 font-medium">Upholstery</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.upholstery}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Dashboard & Controls */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-black mb-4">Dashboard & Controls</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {specifications.dashboard && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-orange-600 font-medium">Dashboard Features</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.dashboard}</div>
+                        </div>
+                      )}
+                      {specifications.infotainment && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-orange-600 font-medium">Infotainment System</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.infotainment}</div>
+                        </div>
+                      )}
+                      {specifications.storage && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-orange-600 font-medium">Storage</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.storage}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Show message if no interior data */}
+                  {(!specifications.capacity && !specifications.seatingCapacity && !specifications.interior && !specifications.comfort) && (
+                    <div className="text-center py-12">
+                      <Users className="h-16 w-16 text-black mx-auto mb-4" />
+                      <p className="text-black">No interior information available for this vehicle.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'safety' && (
+                <div className="space-y-8">
+                  {/* Active Safety Systems */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-black mb-4 flex items-center">
+                      <Shield className="h-5 w-5 mr-2 text-red-600" />
+                      Active Safety Systems
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {specifications.abs && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Anti-lock Braking System</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.abs}</div>
+                        </div>
+                      )}
+                      {specifications.esc && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Electronic Stability Control</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.esc}</div>
+                        </div>
+                      )}
+                      {specifications.tcs && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Traction Control System</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.tcs}</div>
+                        </div>
+                      )}
+                      {specifications.brakes && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Braking System</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.brakes}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Passive Safety Features */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-black mb-4">Passive Safety Features</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {specifications.airbags && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Airbag System</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.airbags}</div>
+                        </div>
+                      )}
+                      {specifications.seatbelts && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Seatbelt System</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.seatbelts}</div>
+                        </div>
+                      )}
+                      {specifications.crumpleZones && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Crumple Zones</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.crumpleZones}</div>
+                        </div>
+                      )}
+                      {specifications.reinforcement && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Chassis Reinforcement</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.reinforcement}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Safety Ratings & Compliance */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-black mb-4">Safety Ratings & Compliance</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {specifications.safetyRating && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Safety Rating</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.safetyRating}</div>
+                        </div>
+                      )}
+                      {specifications.rating && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Overall Rating</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.rating}</div>
+                        </div>
+                      )}
+                      {specifications.safety && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Safety Features</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.safety}</div>
+                        </div>
+                      )}
+                      {specifications.compliance && (
+                        <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                          <div className="text-sm text-red-600 font-medium">Compliance Standards</div>
+                          <div className="text-gray-900 font-semibold mt-1">{specifications.compliance}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Show message if no safety data */}
+                  {(!specifications.safety && !specifications.airbags && !specifications.brakes && !specifications.abs && !specifications.rating) && (
+                    <div className="text-center py-12">
+                      <Shield className="h-16 w-16 text-black mx-auto mb-4" />
+                      <p className="text-black">No safety information available for this vehicle.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'specs' && (
+                <div className="space-y-8">
+                  <VehicleSpecsTable specs={specifications} vehicleName={vehicle.name} />
                 </div>
               )}
             </div>
@@ -349,29 +700,29 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
                 </span>
               </div>
               <h1 className="text-3xl font-bold text-black mb-2">{vehicle.name}</h1>
-              <p className="text-muted-foreground mb-4">{vehicle.category.name}</p>
+              <p className="text-black mb-4">{vehicle.category.name}</p>
               <p className="text-4xl font-bold text-gray-900 mb-6">{formatPrice(vehicle.price)}</p>
 
               {/* Key Specs */}
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
-                  <Fuel className="h-6 w-6 text-gray-600 mx-auto mb-2" />
-                  <div className="text-sm text-muted-foreground mb-1">Fuel Economy</div>
-                  <div className="text-white font-semibold">
+                  <Fuel className="h-6 w-6 text-black mx-auto mb-2" />
+                  <div className="text-sm text-black mb-1">Fuel Economy</div>
+                  <div className="text-black font-semibold">
                     {specifications.fuel || specifications.fuelEconomy || 'N/A'}
                   </div>
                 </div>
                 <div className="text-center">
-                  <Users className="h-6 w-6 text-gray-600 mx-auto mb-2" />
-                  <div className="text-sm text-muted-foreground mb-1">Capacity</div>
-                  <div className="text-white font-semibold">
+                  <Users className="h-6 w-6 text-black mx-auto mb-2" />
+                  <div className="text-sm text-black mb-1">Capacity</div>
+                  <div className="text-black font-semibold">
                     {specifications.capacity || specifications.seatingCapacity || 'N/A'}
                   </div>
                 </div>
                 <div className="text-center">
-                  <Weight className="h-6 w-6 text-gray-600 mx-auto mb-2" />
-                  <div className="text-sm text-muted-foreground mb-1">Weight</div>
-                  <div className="text-white font-semibold">
+                  <Weight className="h-6 w-6 text-black mx-auto mb-2" />
+                  <div className="text-sm text-black mb-1">Weight</div>
+                  <div className="text-black font-semibold">
                     {specifications.weight || specifications.payload || 'N/A'}
                   </div>
                 </div>
@@ -441,16 +792,16 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
               <CardContent className="pt-6">
                 <div className="space-y-4">
                   <div className="flex items-center">
-                    <Phone className="h-5 w-5 text-gray-600 mr-3" />
+                    <Phone className="h-5 w-5 text-black mr-3" />
                     <div>
-                      <div className="text-sm text-gray-600">Sales</div>
+                      <div className="text-sm text-black">Sales</div>
                       <div className="text-black font-medium">+1 (555) 123-4567</div>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <Mail className="h-5 w-5 text-gray-600 mr-3" />
+                    <Mail className="h-5 w-5 text-black mr-3" />
                     <div>
-                      <div className="text-sm text-gray-600">Email</div>
+                      <div className="text-sm text-black">Email</div>
                       <div className="text-black font-medium">sales@elitefleet.com</div>
                     </div>
                   </div>
@@ -472,14 +823,14 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
                     <Link key={relatedVehicle.id} href={`/vehicles?category=${relatedVehicle.categorySlug}`} className="group">
                       <div className="card-hover bg-gray-300/50 border-gray-800 overflow-hidden">
                         <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                          <div className="text-center text-gray-600">
+                          <div className="text-center text-black">
                             <div className="text-6xl mb-4">🔍</div>
                             <div className="text-lg font-semibold">View All</div>
                             <div className="text-sm opacity-75">{relatedVehicle.category.name}</div>
                           </div>
                         </div>
                         <div className="p-6">
-                          <h3 className="text-lg font-semibold text-black mb-2 group-hover:text-gray-600 transition-colors line-clamp-1">
+                          <h3 className="text-lg font-semibold text-black mb-2 group-hover:text-black transition-colors line-clamp-1">
                             Browse All {relatedVehicle.category.name}
                           </h3>
                           <p className="text-2xl font-bold text-gray-900">View All</p>
@@ -511,7 +862,7 @@ export default function VehicleDetailPage({ params }: { params: { slug: string }
                         )}
                       </div>
                       <div className="p-6">
-                        <h3 className="text-lg font-semibold text-black mb-2 group-hover:text-gray-600 transition-colors">
+                        <h3 className="text-lg font-semibold text-black mb-2 group-hover:text-black transition-colors">
                           {relatedVehicle.name}
                         </h3>
                         <p className="text-2xl font-bold text-gray-900">{formatPrice(relatedVehicle.price)}</p>

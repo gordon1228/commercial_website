@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { validationSchemas } from '@/lib/security'
 
 const prisma = new PrismaClient()
 
@@ -66,9 +67,10 @@ export async function PUT(
     const updateData: Record<string, unknown> = {}
     
     if (email && email !== existingUser.email) {
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(email)) {
+      // Validate email using security schema
+      try {
+        validationSchemas.email.parse(email)
+      } catch (error) {
         return NextResponse.json(
           { error: 'Invalid email format' },
           { status: 400 }
@@ -91,15 +93,17 @@ export async function PUT(
     }
 
     if (password) {
-      // Validate password length
-      if (password.length < 6) {
+      // Validate password using security schema
+      try {
+        validationSchemas.password.parse(password)
+      } catch (error) {
         return NextResponse.json(
-          { error: 'Password must be at least 6 characters' },
+          { error: 'Password must contain uppercase, lowercase, number and special character' },
           { status: 400 }
         )
       }
 
-      updateData.password = await bcrypt.hash(password, 10)
+      updateData.password = await bcrypt.hash(password, 12)
     }
 
     if (role) {

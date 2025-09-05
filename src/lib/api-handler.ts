@@ -63,7 +63,7 @@ export function createApiHandler<T = unknown>(
           )
         }
         
-        if (options.requireAdmin && session.user?.role !== 'ADMIN') {
+        if (options.requireAdmin && session.user?.role !== 'ADMIN' && session.user?.role !== 'MANAGER') {
           return NextResponse.json(
             { error: 'Admin access required' },
             { status: 403, headers }

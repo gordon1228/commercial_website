@@ -92,8 +92,18 @@ export default withAuth(
           return false
         }
         
-        // Check if user has admin role
-        return token.role === 'ADMIN'
+        // Check role-based access
+        // ADMIN and MANAGER: full access to all admin routes
+        // USER: only access to inquiries page
+        if (token.role === 'ADMIN' || token.role === 'MANAGER') {
+          return true
+        }
+        
+        if (token.role === 'USER' && (pathname === '/admin/inquiries' || pathname.startsWith('/admin/profile'))) {
+          return true
+        }
+        
+        return false
       },
     },
     pages: {

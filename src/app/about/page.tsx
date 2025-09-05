@@ -3,9 +3,6 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { 
-  Award, 
-  Users, 
-  Truck, 
   Shield, 
   Clock, 
   Star,
@@ -28,10 +25,6 @@ const iconMap = {
 interface CompanyInfo {
   companyName: string
   companyDescription: string
-  totalVehiclesSold: number
-  totalHappyCustomers: number
-  totalYearsExp: number
-  satisfactionRate: number
   storyTitle: string
   storyParagraph1: string
   storyParagraph2: string
@@ -108,14 +101,10 @@ export default function AboutPage() {
         console.error('Error fetching about page data:', error)
         // Provide fallback data if API fails
         setCompanyInfo({
-          companyName: 'EliteFleet',
+          companyName: 'EVTL',
           companyDescription: 'For over 25 years, we\'ve been the trusted partner for businesses seeking premium commercial vehicles. Our commitment to excellence drives everything we do.',
-          totalVehiclesSold: 2500,
-          totalHappyCustomers: 850,
-          totalYearsExp: 25,
-          satisfactionRate: 98,
           storyTitle: 'Our Story',
-          storyParagraph1: 'Founded in 1998, EliteFleet began as a small family business with a simple mission: to provide high-quality commercial vehicles to businesses that demand excellence. What started as a modest dealership has grown into one of the region\'s most trusted commercial vehicle providers.',
+          storyParagraph1: 'Founded in 1998, EVTL began as a small family business with a simple mission: to provide high-quality commercial vehicles to businesses that demand excellence. What started as a modest dealership has grown into one of the region\'s most trusted commercial vehicle providers.',
           storyParagraph2: 'Over the years, we\'ve built our reputation on three core principles: quality vehicles, exceptional service, and honest business practices. Our experienced team understands that choosing the right commercial vehicle is crucial for your business success.',
           storyParagraph3: 'Today, we continue to evolve with the industry, embracing new technologies and sustainable practices while maintaining the personal touch and attention to detail that our customers have come to expect.',
           missionTitle: 'Our Mission',
@@ -178,13 +167,6 @@ export default function AboutPage() {
     )
   }
 
-  // Dynamic stats based on database data
-  const stats = [
-    { icon: Truck, label: 'Vehicles Sold', value: `${companyInfo.totalVehiclesSold.toLocaleString()}+` },
-    { icon: Users, label: 'Happy Customers', value: `${companyInfo.totalHappyCustomers.toLocaleString()}+` },
-    { icon: Award, label: 'Years Experience', value: `${companyInfo.totalYearsExp}+` },
-    { icon: Star, label: 'Satisfaction Rate', value: `${companyInfo.satisfactionRate}%` }
-  ]
 
   return (
     <div className="min-h-screen pt-20 bg-background">
@@ -200,21 +182,6 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => {
-              const IconComponent = stat.icon
-              return (
-                <div key={index} className="text-center">
-                  <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <IconComponent className="h-8 w-8 text-accent" />
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
-                  <div className="text-gray-600">{stat.label}</div>
-                </div>
-              )
-            })}
-          </div>
         </div>
       </section>
 
@@ -317,43 +284,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Timeline */}
-      {/* 
-      <section className="py-20 bg-gray-400/30">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Our Journey
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Key milestones that have shaped EliteFleet into the company we are today.
-            </p>
-          </div>
-
-          <div className="relative">
-            <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-gray-300 transform md:-translate-x-1/2" />
-
-            <div className="space-y-12">
-              {milestones.map((milestone, index) => (
-                <div key={index} className={`flex items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} border-gray-900`}>
-                  <div className={`flex-1 ${index % 2 === 0 ? 'md:pr-12' : 'md:pl-12'} pl-12 md:pl-0 `}>
-                    <div className="bg-gray-100 border border-gray-300 rounded-lg p-6">
-                      <div className="text-gray-900 font-bold text-lg mb-2">{milestone.year}</div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-3">{milestone.title}</h3>
-                      <p className="text-gray-600">{milestone.description}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="absolute left-4 md:left-1/2 w-8 h-8 bg-gray-600 rounded-full transform md:-translate-x-1/2 flex items-center justify-center">
-                    <div className="w-3 h-3 bg-white rounded-full" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-      */}
 
       {/* Team */}
       <section className="py-20">

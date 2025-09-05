@@ -14,10 +14,10 @@ export default function SettingsPage() {
   const [isSettingsLoading, setIsSettingsLoading] = useState(false)
   const [isPasswordLoading, setIsPasswordLoading] = useState(false)
   const [settings, setSettings] = useState({
-    siteName: 'EliteFleet',
-    contactEmail: 'contact@elitefleet.com',
-    supportPhone: '+1 (555) 123-4567',
-    address: '123 Business Avenue, Commercial District, NY 10001',
+    siteName: 'EVTL',
+    contactEmail: 'contact@EVTL.com',
+    supportPhone: '010-339-1414/+016-332-2349',
+    address: '3-20 Level 3 MKH Boulevard Jalan Changkat, 43000 Kajang Selangor Malaysia',
     emailNotifications: true,
     systemNotifications: true,
     maintenanceMode: false
@@ -45,10 +45,10 @@ export default function SettingsPage() {
       if (response.ok) {
         const data = await response.json()
         setSettings({
-          siteName: data.siteName || 'EliteFleet',
-          contactEmail: data.contactEmail || 'contact@elitefleet.com',
-          supportPhone: data.supportPhone || '+1 (555) 123-4567',
-          address: data.address || '123 Business Avenue, Commercial District, NY 10001',
+          siteName: data.siteName || 'EVTL',
+          contactEmail: data.contactEmail || 'contact@EVTL.com',
+          supportPhone: data.supportPhone || '010-339-1414/+016-332-2349',
+          address: data.address || '3-20 Level 3 MKH Boulevard Jalan Changkat, 43000 Kajang Selangor Malaysia',
           emailNotifications: data.emailNotifications ?? true,
           systemNotifications: data.systemNotifications ?? true,
           maintenanceMode: data.maintenanceMode ?? false

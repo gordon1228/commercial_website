@@ -27,12 +27,49 @@ interface Vehicle {
   featured: boolean
   images: string[]
   specs: {
+    // Performance
     fuel: string
-    capacity: string
-    weight: string
     engine: string
     horsepower: string
+    torque: string
+    displacement: string
+    transmission: string
+    drivetrain: string
+    fuelCapacity: string
+    
+    // Interior
+    capacity: string
+    seatingCapacity: string
+    cabinSpace: string
+    legRoom: string
+    interior: string
+    comfort: string
+    airConditioning: string
+    upholstery: string
+    dashboard: string
+    infotainment: string
+    storage: string
+    
+    // Safety
+    abs: string
+    esc: string
+    tcs: string
+    brakes: string
+    airbags: string
+    seatbelts: string
+    crumpleZones: string
+    reinforcement: string
+    safetyRating: string
+    rating: string
+    safety: string
+    compliance: string
+    
+    // Additional specs
+    weight: string
+    features: string
+    technology: string
   }
+  features: string[]
   category: {
     id: string
     name: string
@@ -46,6 +83,7 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingData, setIsLoadingData] = useState(true)
+  const [activeSpecTab, setActiveSpecTab] = useState('performance')
 
   useEffect(() => {
     if (status === 'loading') return
@@ -77,12 +115,49 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
       const normalizedVehicle = {
         ...vehicleData,
         specs: {
+          // Performance
           fuel: specs.fuel || '',
-          capacity: specs.capacity || '',
-          weight: specs.weight || '',
           engine: specs.engine || '',
-          horsepower: specs.horsepower || ''
-        }
+          horsepower: specs.horsepower || '',
+          torque: specs.torque || '',
+          displacement: specs.displacement || '',
+          transmission: specs.transmission || '',
+          drivetrain: specs.drivetrain || '',
+          fuelCapacity: specs.fuelCapacity || '',
+          
+          // Interior
+          capacity: specs.capacity || '',
+          seatingCapacity: specs.seatingCapacity || '',
+          cabinSpace: specs.cabinSpace || '',
+          legRoom: specs.legRoom || '',
+          interior: specs.interior || '',
+          comfort: specs.comfort || '',
+          airConditioning: specs.airConditioning || '',
+          upholstery: specs.upholstery || '',
+          dashboard: specs.dashboard || '',
+          infotainment: specs.infotainment || '',
+          storage: specs.storage || '',
+          
+          // Safety
+          abs: specs.abs || '',
+          esc: specs.esc || '',
+          tcs: specs.tcs || '',
+          brakes: specs.brakes || '',
+          airbags: specs.airbags || '',
+          seatbelts: specs.seatbelts || '',
+          crumpleZones: specs.crumpleZones || '',
+          reinforcement: specs.reinforcement || '',
+          safetyRating: specs.safetyRating || '',
+          rating: specs.rating || '',
+          safety: specs.safety || '',
+          compliance: specs.compliance || '',
+          
+          // Additional specs
+          weight: specs.weight || '',
+          features: specs.features || '',
+          technology: specs.technology || ''
+        },
+        features: vehicleData.features || []
       }
 
       setVehicle(normalizedVehicle)
@@ -119,6 +194,13 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
     }) : null)
   }
 
+  const handleFeaturesChange = (newFeatures: string[]) => {
+    setVehicle(prev => prev ? ({
+      ...prev,
+      features: newFeatures
+    }) : null)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!vehicle) return
@@ -132,9 +214,13 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
         price: Number(vehicle.price),
         categoryId: vehicle.categoryId,
         status: vehicle.status,
+        featured: vehicle.featured,
         images: vehicle.images.filter(img => img.trim() !== ''),
-        specifications: vehicle.specs
+        specs: vehicle.specs,
+        features: vehicle.features
       }
+      
+      console.log('Sending update request with data:', submitData)
 
       const response = await fetch(`/api/vehicles/${params.id}`, {
         method: 'PUT',
@@ -145,14 +231,18 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to update vehicle')
+        const errorData = await response.json()
+        console.error('API Error Response:', errorData)
+        throw new Error(errorData.error || 'Failed to update vehicle')
       }
-
+      
+      const result = await response.json()
+      console.log('Vehicle updated successfully:', result)
       router.push('/admin/vehicles')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating vehicle:', error)
-      alert(`Failed to update vehicle: ${error}`)
+      const errorMessage = error?.message || error?.toString() || 'Failed to update vehicle'
+      alert(`Failed to update vehicle: ${errorMessage}`)
     } finally {
       setIsLoading(false)
     }
@@ -361,6 +451,345 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
                   placeholder="e.g., 270 HP"
                 />
               </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Specifications & Features */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Vehicle Specifications</CardTitle>
+              <div className="flex space-x-4 border-b">
+                {[
+                  { id: 'performance', label: 'Performance' },
+                  { id: 'interior', label: 'Interior' },
+                  { id: 'safety', label: 'Safety' },
+                  { id: 'features', label: 'Features' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveSpecTab(tab.id)}
+                    className={`py-2 px-4 border-b-2 transition-colors ${
+                      activeSpecTab === tab.id
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Performance Tab */}
+              {activeSpecTab === 'performance' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Engine</label>
+                    <Input
+                      value={vehicle.specs.engine}
+                      onChange={(e) => handleSpecChange('engine', e.target.value)}
+                      placeholder="e.g., 6.7L Power Stroke V8 Turbo Diesel"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Horsepower</label>
+                    <Input
+                      value={vehicle.specs.horsepower}
+                      onChange={(e) => handleSpecChange('horsepower', e.target.value)}
+                      placeholder="e.g., 475"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Torque</label>
+                    <Input
+                      value={vehicle.specs.torque}
+                      onChange={(e) => handleSpecChange('torque', e.target.value)}
+                      placeholder="e.g., 1050 lb-ft"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Displacement</label>
+                    <Input
+                      value={vehicle.specs.displacement}
+                      onChange={(e) => handleSpecChange('displacement', e.target.value)}
+                      placeholder="e.g., 6.7L"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Transmission</label>
+                    <Input
+                      value={vehicle.specs.transmission}
+                      onChange={(e) => handleSpecChange('transmission', e.target.value)}
+                      placeholder="e.g., 10-Speed Automatic"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Drivetrain</label>
+                    <Input
+                      value={vehicle.specs.drivetrain}
+                      onChange={(e) => handleSpecChange('drivetrain', e.target.value)}
+                      placeholder="e.g., 4WD, RWD"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Fuel Economy</label>
+                    <Input
+                      value={vehicle.specs.fuel}
+                      onChange={(e) => handleSpecChange('fuel', e.target.value)}
+                      placeholder="e.g., 15 MPG"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Fuel Capacity</label>
+                    <Input
+                      value={vehicle.specs.fuelCapacity}
+                      onChange={(e) => handleSpecChange('fuelCapacity', e.target.value)}
+                      placeholder="e.g., 40 gallons"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Interior Tab */}
+              {activeSpecTab === 'interior' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Seating Capacity</label>
+                    <Input
+                      value={vehicle.specs.capacity}
+                      onChange={(e) => handleSpecChange('capacity', e.target.value)}
+                      placeholder="e.g., 5 seats"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Total Seats</label>
+                    <Input
+                      value={vehicle.specs.seatingCapacity}
+                      onChange={(e) => handleSpecChange('seatingCapacity', e.target.value)}
+                      placeholder="e.g., 5"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Cabin Space</label>
+                    <Input
+                      value={vehicle.specs.cabinSpace}
+                      onChange={(e) => handleSpecChange('cabinSpace', e.target.value)}
+                      placeholder="e.g., Spacious crew cab"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Leg Room</label>
+                    <Input
+                      value={vehicle.specs.legRoom}
+                      onChange={(e) => handleSpecChange('legRoom', e.target.value)}
+                      placeholder="e.g., 40.8 inches"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Interior Features</label>
+                    <Input
+                      value={vehicle.specs.interior}
+                      onChange={(e) => handleSpecChange('interior', e.target.value)}
+                      placeholder="e.g., Premium materials"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Comfort Features</label>
+                    <Input
+                      value={vehicle.specs.comfort}
+                      onChange={(e) => handleSpecChange('comfort', e.target.value)}
+                      placeholder="e.g., Heated seats"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Air Conditioning</label>
+                    <Input
+                      value={vehicle.specs.airConditioning}
+                      onChange={(e) => handleSpecChange('airConditioning', e.target.value)}
+                      placeholder="e.g., Dual-zone automatic"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Upholstery</label>
+                    <Input
+                      value={vehicle.specs.upholstery}
+                      onChange={(e) => handleSpecChange('upholstery', e.target.value)}
+                      placeholder="e.g., Leather-appointed seats"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Dashboard</label>
+                    <Input
+                      value={vehicle.specs.dashboard}
+                      onChange={(e) => handleSpecChange('dashboard', e.target.value)}
+                      placeholder="e.g., Digital instrument cluster"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Infotainment</label>
+                    <Input
+                      value={vehicle.specs.infotainment}
+                      onChange={(e) => handleSpecChange('infotainment', e.target.value)}
+                      placeholder="e.g., 12-inch touchscreen"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Storage</label>
+                    <Input
+                      value={vehicle.specs.storage}
+                      onChange={(e) => handleSpecChange('storage', e.target.value)}
+                      placeholder="e.g., Multiple compartments"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Weight</label>
+                    <Input
+                      value={vehicle.specs.weight}
+                      onChange={(e) => handleSpecChange('weight', e.target.value)}
+                      placeholder="e.g., 7,494 lbs"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Safety Tab */}
+              {activeSpecTab === 'safety' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Anti-lock Braking (ABS)</label>
+                    <Input
+                      value={vehicle.specs.abs}
+                      onChange={(e) => handleSpecChange('abs', e.target.value)}
+                      placeholder="e.g., Standard"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Electronic Stability Control</label>
+                    <Input
+                      value={vehicle.specs.esc}
+                      onChange={(e) => handleSpecChange('esc', e.target.value)}
+                      placeholder="e.g., AdvanceTrac ESC"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Traction Control</label>
+                    <Input
+                      value={vehicle.specs.tcs}
+                      onChange={(e) => handleSpecChange('tcs', e.target.value)}
+                      placeholder="e.g., TCS Standard"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Braking System</label>
+                    <Input
+                      value={vehicle.specs.brakes}
+                      onChange={(e) => handleSpecChange('brakes', e.target.value)}
+                      placeholder="e.g., Vented disc brakes"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Airbag System</label>
+                    <Input
+                      value={vehicle.specs.airbags}
+                      onChange={(e) => handleSpecChange('airbags', e.target.value)}
+                      placeholder="e.g., Dual-stage frontal airbags"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Seatbelt System</label>
+                    <Input
+                      value={vehicle.specs.seatbelts}
+                      onChange={(e) => handleSpecChange('seatbelts', e.target.value)}
+                      placeholder="e.g., 3-point safety belts"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Crumple Zones</label>
+                    <Input
+                      value={vehicle.specs.crumpleZones}
+                      onChange={(e) => handleSpecChange('crumpleZones', e.target.value)}
+                      placeholder="e.g., Advanced crumple zones"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Chassis Reinforcement</label>
+                    <Input
+                      value={vehicle.specs.reinforcement}
+                      onChange={(e) => handleSpecChange('reinforcement', e.target.value)}
+                      placeholder="e.g., High-strength steel frame"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Safety Rating</label>
+                    <Input
+                      value={vehicle.specs.safetyRating}
+                      onChange={(e) => handleSpecChange('safetyRating', e.target.value)}
+                      placeholder="e.g., 5-Star NHTSA"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Overall Rating</label>
+                    <Input
+                      value={vehicle.specs.rating}
+                      onChange={(e) => handleSpecChange('rating', e.target.value)}
+                      placeholder="e.g., 5 Stars"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Safety Features</label>
+                    <Input
+                      value={vehicle.specs.safety}
+                      onChange={(e) => handleSpecChange('safety', e.target.value)}
+                      placeholder="e.g., Blind spot monitoring"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Compliance Standards</label>
+                    <Input
+                      value={vehicle.specs.compliance}
+                      onChange={(e) => handleSpecChange('compliance', e.target.value)}
+                      placeholder="e.g., FMVSS compliant"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Features Tab */}
+              {activeSpecTab === 'features' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Special Features</label>
+                      <Input
+                        value={vehicle.specs.features}
+                        onChange={(e) => handleSpecChange('features', e.target.value)}
+                        placeholder="e.g., Power tailgate"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Technology</label>
+                      <Input
+                        value={vehicle.specs.technology}
+                        onChange={(e) => handleSpecChange('technology', e.target.value)}
+                        placeholder="e.g., FordPass Connect"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Vehicle Features (One per line)</label>
+                    <textarea
+                      value={vehicle.features?.join('\n') || ''}
+                      onChange={(e) => handleFeaturesChange(e.target.value.split('\n').filter(f => f.trim()))}
+                      placeholder={`Air conditioning\nPower steering\nBluetooth connectivity\nBackup camera\nCruise control`}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[120px]"
+                    />
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

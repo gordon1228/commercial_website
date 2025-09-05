@@ -27,7 +27,7 @@ export const GET = createApiHandler(
   },
   {
     requireAuth: true,
-    requireAdmin: true,
+    requireAdmin: true, // This allows both ADMIN and MANAGER per api-handler.ts line 66
     rateLimit: 'api'
   }
 )

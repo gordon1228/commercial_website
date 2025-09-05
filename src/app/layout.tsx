@@ -7,9 +7,9 @@ import { SessionManager } from "@/components/session-manager";
 import ConditionalLayout from "@/components/conditional-layout";
 
 export const metadata: Metadata = {
-  title: "EliteFleet - Premium Commercial Vehicles",
-  description: "Discover premium commercial vehicles for your business. Trucks, vans, and buses with uncompromising quality and reliability.",
-  keywords: "commercial vehicles, trucks, vans, buses, fleet, business vehicles",
+  title: "EVTL - Premium Commercial Trucks",
+  description: "Discover premium commercial trucks for your business. Electric and commercial trucks with uncompromising quality and reliability.",
+  keywords: "commercial trucks, electric trucks, fleet, business vehicles, EVTL",
 };
 
 export default function RootLayout({

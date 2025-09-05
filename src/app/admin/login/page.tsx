@@ -23,12 +23,19 @@ export default function AdminLoginPage() {
   // Get callback URL from query params or default to /admin
   const callbackUrl = searchParams?.get('callbackUrl') || '/admin'
 
-  // If already logged in as admin, redirect
+  // If already logged in, redirect based on role
   useEffect(() => {
-    if (status === 'authenticated' && session?.user?.role === 'ADMIN') {
-      router.push(callbackUrl)
+    if (status === 'authenticated') {
+      const userRole = session?.user?.role
+      if (userRole === 'ADMIN' || userRole === 'MANAGER') {
+        console.log('Already authenticated, redirecting to:', callbackUrl, 'Role:', userRole)
+        window.location.href = callbackUrl
+      } else if (userRole === 'USER') {
+        console.log('USER authenticated, redirecting to inquiries. Role:', userRole)
+        window.location.href = '/admin/inquiries'
+      }
     }
-  }, [status, session, router, callbackUrl])
+  }, [status, session, callbackUrl])
 
   // Show error messages from URL params
   useEffect(() => {
@@ -55,12 +62,10 @@ export default function AdminLoginPage() {
         setError('Invalid email or password')
         setIsLoading(false)
       } else if (result?.ok) {
-        // Wait a moment for session to be established
-        await new Promise(resolve => setTimeout(resolve, 100))
-        
-        // Use router.push instead of window.location for better handling
-        router.push(callbackUrl)
-        router.refresh() // Force a refresh to update the session
+        // Force a page reload to ensure proper session update
+        // This prevents race conditions with session state
+        // For now, redirect to admin - the layout will handle role-based routing
+        window.location.href = callbackUrl
       } else {
         setError('Login failed. Please try again.')
         setIsLoading(false)
@@ -86,8 +91,8 @@ export default function AdminLoginPage() {
     )
   }
 
-  // Don't show login form if already authenticated as admin
-  if (status === 'authenticated' && session?.user?.role === 'ADMIN') {
+  // Don't show login form if already authenticated with valid role
+  if (status === 'authenticated' && ['ADMIN', 'MANAGER', 'USER'].includes(session?.user?.role)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">

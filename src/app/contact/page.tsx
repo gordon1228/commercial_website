@@ -1,8 +1,7 @@
 'use client'
 
 
-import { useState, useEffect } from 'react'
-
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { 
   Phone, 
@@ -481,6 +480,38 @@ function ContactForm() {
 }
 
 export default function ContactPage() {
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
+
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      try {
+        const response = await fetch('/api/contact-info')
+        if (response.ok) {
+          const data = await response.json()
+          setContactInfo(data)
+        }
+      } catch (error) {
+        console.error('Error fetching contact info:', error)
+        setContactInfo({
+          salesPhone: '+1 (555) 123-4567',
+          servicePhone: '+1 (555) 123-4568',
+          financePhone: '+1 (555) 123-4569',
+          salesEmail: 'sales@elitefleet.com',
+          serviceEmail: 'service@elitefleet.com',
+          supportEmail: 'support@elitefleet.com',
+          address: '123 Business Avenue',
+          city: 'Commercial District, NY 10001',
+          directions: 'Near Metro Station',
+          mondayToFriday: '8:00 AM - 6:00 PM',
+          saturday: '9:00 AM - 4:00 PM',
+          sunday: 'Closed'
+        })
+      }
+    }
+
+    fetchContactInfo()
+  }, [])
+
   return (
     <div className="min-h-screen pt-20 bg-background">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -499,7 +530,7 @@ export default function ContactPage() {
           {services.map((service, index) => {
             const IconComponent = service.icon
             return (
-              <Card key={index} className="bg-gray-900/50 bg-gray-100 border-gray-300 transition-colors">
+              <Card key={index} className="bg-gray-100 border-gray-300 transition-colors">
                 <CardContent className="p-6 text-center">
                   <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                     <IconComponent className="h-6 w-6 text-gray-600" />
@@ -518,16 +549,16 @@ export default function ContactPage() {
 
         {/* Map Placeholder */}
         <div className="mt-16">
-          <Card className="bg-gray-900/50 border-gray-800">
+          <Card className="bg-gray-100 border-gray-300">
             <CardContent className="p-0">
-              <div className="aspect-[21/9] bg-gray-800 rounded-lg flex items-center justify-center">
+              <div className="aspect-[21/9] bg-gray-200 rounded-lg flex items-center justify-center">
                 <div className="text-center">
-                  <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">Visit Our Showroom</h3>
-                  <p className="text-muted-foreground">
+                  <MapPin className="h-12 w-12 text-gray-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Visit Our Showroom</h3>
+                  <p className="text-gray-600">
                     {contactInfo ? `${contactInfo.address}, ${contactInfo.city}` : '123 Business Avenue, Commercial District, NY 10001'}
                   </p>
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <p className="text-sm text-gray-500 mt-2">
                     Interactive map would be embedded here
                   </p>
                 </div>

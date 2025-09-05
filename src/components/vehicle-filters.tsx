@@ -12,6 +12,12 @@ interface FilterState {
   priceMax: string
   status: string[]
   search: string
+  // Truck specifications
+  fuelType: string[]
+  transmission: string[]
+  yearMin: string
+  yearMax: string
+  make: string[]
 }
 
 interface Category {
@@ -26,6 +32,33 @@ const statusOptions = [
   { id: 'SOLD', label: 'Sold' }
 ]
 
+const fuelTypeOptions = [
+  { id: 'Electric', label: 'Electric' },
+  { id: 'Diesel', label: 'Diesel' },
+  { id: 'Gasoline', label: 'Gasoline' },
+  { id: 'Hybrid', label: 'Hybrid' },
+  { id: 'CNG', label: 'CNG' }
+]
+
+const transmissionOptions = [
+  { id: 'Manual', label: 'Manual' },
+  { id: 'Automatic', label: 'Automatic' },
+  { id: 'Semi-Automatic', label: 'Semi-Automatic' }
+]
+
+const makeOptions = [
+  { id: 'Ford', label: 'Ford' },
+  { id: 'Chevrolet', label: 'Chevrolet' },
+  { id: 'RAM', label: 'RAM' },
+  { id: 'GMC', label: 'GMC' },
+  { id: 'Isuzu', label: 'Isuzu' },
+  { id: 'Freightliner', label: 'Freightliner' },
+  { id: 'Volvo', label: 'Volvo' },
+  { id: 'Peterbilt', label: 'Peterbilt' },
+  { id: 'Kenworth', label: 'Kenworth' },
+  { id: 'Mack', label: 'Mack' }
+]
+
 export default function VehicleFilters() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -38,7 +71,12 @@ export default function VehicleFilters() {
     priceMin: searchParams.get('priceMin') || '',
     priceMax: searchParams.get('priceMax') || '',
     status: searchParams.get('status')?.split(',') || [],
-    search: searchParams.get('search') || ''
+    search: searchParams.get('search') || '',
+    fuelType: searchParams.get('fuelType')?.split(',') || [],
+    transmission: searchParams.get('transmission')?.split(',') || [],
+    yearMin: searchParams.get('yearMin') || '',
+    yearMax: searchParams.get('yearMax') || '',
+    make: searchParams.get('make')?.split(',') || []
   })
 
   // Fetch categories from database
@@ -69,7 +107,12 @@ export default function VehicleFilters() {
       priceMin: searchParams.get('priceMin') || '',
       priceMax: searchParams.get('priceMax') || '',
       status: searchParams.get('status')?.split(',') || [],
-      search: searchParams.get('search') || ''
+      search: searchParams.get('search') || '',
+      fuelType: searchParams.get('fuelType')?.split(',') || [],
+      transmission: searchParams.get('transmission')?.split(',') || [],
+      yearMin: searchParams.get('yearMin') || '',
+      yearMax: searchParams.get('yearMax') || '',
+      make: searchParams.get('make')?.split(',') || []
     })
   }, [searchParams])
 
@@ -84,6 +127,11 @@ export default function VehicleFilters() {
     if (updated.priceMax) params.set('priceMax', updated.priceMax)
     if (updated.status.length) params.set('status', updated.status.join(','))
     if (updated.search) params.set('search', updated.search)
+    if (updated.fuelType.length) params.set('fuelType', updated.fuelType.join(','))
+    if (updated.transmission.length) params.set('transmission', updated.transmission.join(','))
+    if (updated.yearMin) params.set('yearMin', updated.yearMin)
+    if (updated.yearMax) params.set('yearMax', updated.yearMax)
+    if (updated.make.length) params.set('make', updated.make.join(','))
     
     const query = params.toString()
     router.push(`/vehicles${query ? `?${query}` : ''}`, { scroll: false })
@@ -95,7 +143,12 @@ export default function VehicleFilters() {
       priceMin: '',
       priceMax: '',
       status: [],
-      search: ''
+      search: '',
+      fuelType: [],
+      transmission: [],
+      yearMin: '',
+      yearMax: '',
+      make: []
     }
     setFilters(cleared)
     router.push('/vehicles', { scroll: false })
@@ -115,12 +168,38 @@ export default function VehicleFilters() {
     updateFilters({ status: newStatus })
   }
 
+  const toggleFuelType = (fuelTypeId: string) => {
+    const newFuelType = filters.fuelType.includes(fuelTypeId)
+      ? filters.fuelType.filter(f => f !== fuelTypeId)
+      : [...filters.fuelType, fuelTypeId]
+    updateFilters({ fuelType: newFuelType })
+  }
+
+  const toggleTransmission = (transmissionId: string) => {
+    const newTransmission = filters.transmission.includes(transmissionId)
+      ? filters.transmission.filter(t => t !== transmissionId)
+      : [...filters.transmission, transmissionId]
+    updateFilters({ transmission: newTransmission })
+  }
+
+  const toggleMake = (makeId: string) => {
+    const newMake = filters.make.includes(makeId)
+      ? filters.make.filter(m => m !== makeId)
+      : [...filters.make, makeId]
+    updateFilters({ make: newMake })
+  }
+
   const hasActiveFilters = 
     filters.category.length > 0 || 
     filters.priceMin || 
     filters.priceMax || 
     filters.status.length > 0 || 
-    filters.search
+    filters.search ||
+    filters.fuelType.length > 0 ||
+    filters.transmission.length > 0 ||
+    filters.yearMin ||
+    filters.yearMax ||
+    filters.make.length > 0
 
   return (
     <>
@@ -135,8 +214,13 @@ export default function VehicleFilters() {
           Filters {hasActiveFilters && `(${
             filters.category.length + 
             filters.status.length + 
+            filters.fuelType.length +
+            filters.transmission.length +
+            filters.make.length +
             (filters.priceMin ? 1 : 0) + 
             (filters.priceMax ? 1 : 0) + 
+            (filters.yearMin ? 1 : 0) +
+            (filters.yearMax ? 1 : 0) +
             (filters.search ? 1 : 0)
           })`}
         </Button>
@@ -242,6 +326,87 @@ export default function VehicleFilters() {
           </div>
         </div>
 
+        {/* Year Range */}
+        <div className="mb-6">
+          <h4 className="text-sm font-medium text-gray-700 mb-3">Year Range</h4>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Input
+                type="number"
+                placeholder="Min Year"
+                value={filters.yearMin}
+                onChange={(e) => updateFilters({ yearMin: e.target.value })}
+                min="1980"
+                max="2024"
+              />
+            </div>
+            <div>
+              <Input
+                type="number"
+                placeholder="Max Year"
+                value={filters.yearMax}
+                onChange={(e) => updateFilters({ yearMax: e.target.value })}
+                min="1980"
+                max="2024"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Make */}
+        <div className="mb-6">
+          <h4 className="text-sm font-medium text-gray-700 mb-3">Make</h4>
+          <div className="space-y-2 max-h-48 overflow-y-auto">
+            {makeOptions.map((make) => (
+              <label key={make.id} className="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={filters.make.includes(make.id)}
+                  onChange={() => toggleMake(make.id)}
+                  className="rounded border-gray-300 text-gray-600"
+                />
+                <span className="text-gray-700 text-sm">{make.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Fuel Type */}
+        <div className="mb-6">
+          <h4 className="text-sm font-medium text-gray-700 mb-3">Fuel Type</h4>
+          <div className="space-y-2">
+            {fuelTypeOptions.map((fuel) => (
+              <label key={fuel.id} className="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={filters.fuelType.includes(fuel.id)}
+                  onChange={() => toggleFuelType(fuel.id)}
+                  className="rounded border-gray-300 text-gray-600"
+                />
+                <span className="text-gray-700 text-sm">{fuel.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Transmission */}
+        <div className="mb-6">
+          <h4 className="text-sm font-medium text-gray-700 mb-3">Transmission</h4>
+          <div className="space-y-2">
+            {transmissionOptions.map((transmission) => (
+              <label key={transmission.id} className="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={filters.transmission.includes(transmission.id)}
+                  onChange={() => toggleTransmission(transmission.id)}
+                  className="rounded border-gray-300 text-gray-600"
+                />
+                <span className="text-gray-700 text-sm">{transmission.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
         {/* Active Filters */}
         {hasActiveFilters && (
           <div className="border-t border-gray-200 pt-4">
@@ -292,6 +457,68 @@ export default function VehicleFilters() {
                   </button>
                 </span>
               )}
+              {(filters.yearMin || filters.yearMax) && (
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700 border border-gray-200">
+                  {filters.yearMin || '1980'} - {filters.yearMax || '2024'}
+                  <button
+                    onClick={() => updateFilters({ yearMin: '', yearMax: '' })}
+                    className="ml-1 hover:text-gray-900"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {filters.make.map((makeId) => {
+                const make = makeOptions.find(m => m.id === makeId)
+                return (
+                  <span
+                    key={makeId}
+                    className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700 border border-gray-200"
+                  >
+                    {make?.label}
+                    <button
+                      onClick={() => toggleMake(makeId)}
+                      className="ml-1 hover:text-gray-900"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )
+              })}
+              {filters.fuelType.map((fuelId) => {
+                const fuel = fuelTypeOptions.find(f => f.id === fuelId)
+                return (
+                  <span
+                    key={fuelId}
+                    className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700 border border-gray-200"
+                  >
+                    {fuel?.label}
+                    <button
+                      onClick={() => toggleFuelType(fuelId)}
+                      className="ml-1 hover:text-gray-900"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )
+              })}
+              {filters.transmission.map((transmissionId) => {
+                const transmission = transmissionOptions.find(t => t.id === transmissionId)
+                return (
+                  <span
+                    key={transmissionId}
+                    className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700 border border-gray-200"
+                  >
+                    {transmission?.label}
+                    <button
+                      onClick={() => toggleTransmission(transmissionId)}
+                      className="ml-1 hover:text-gray-900"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )
+              })}
               {filters.search && (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700 border border-gray-200">
                   &ldquo;{filters.search}&rdquo;

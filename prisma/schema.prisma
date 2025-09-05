@@ -58,22 +58,13 @@ model Vehicle {
   description   String?
   price         Float
   images        String[]
-  specs         Json?     // Changed from specifications
+  specs         Json?     // Vehicle specifications stored as JSON
   status        Status    @default(AVAILABLE)
   featured      Boolean   @default(false)
   active        Boolean   @default(true)
   categoryId    String
   category      Category  @relation(fields: [categoryId], references: [id])
   inquiries     Inquiry[]
-  
-  // Optional fields that exist in API but not in seed
-  year          Int?
-  make          String?
-  model         String?
-  mileage       Int?
-  fuelType      String?
-  transmission  String?
-  features      String[]
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -99,59 +90,20 @@ model Inquiry {
   @@map("inquiries")
 }
 
-model Settings {
-  id                    String  @id @default(cuid())
-  siteName              String  @default("EliteFleet")
-  contactEmail          String  @default("contact@elitefleet.com")
-  supportPhone          String  @default("+1 (555) 123-4567")
-  address               String  @default("123 Business Avenue, Commercial District, NY 10001")
-  emailNotifications    Boolean @default(true)
-  systemNotifications   Boolean @default(true)
-  maintenanceMode       Boolean @default(false)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-
-  @@map("settings")
-}
+// Settings model removed - consolidated into ContactInfo
 
 model HomepageContent {
   id                    String   @id @default(cuid())
   
-  // Section Visibility Controls
-  showComingSoonSection Boolean  @default(true)
-  showHeroSection       Boolean  @default(true)
-  showVehicleCategories Boolean  @default(true)
-  showFeaturedVehicles  Boolean  @default(true)
-  showTrustSection      Boolean  @default(true)
-  
-  // Hero Section
+  // Essential Hero Section Only
   heroTitle             String   @default("Premium Commercial")
-  heroSubtitle          String   @default("Vehicles")
-  heroDescription       String   @default("Discover elite fleet solutions built for businesses that demand excellence, reliability, and uncompromising quality.")
-  heroButtonPrimary     String   @default("Explore Fleet")
+  heroSubtitle          String   @default("Trucks")
+  heroDescription       String   @default("Discover elite truck solutions built for businesses that demand excellence, reliability, and uncompromising performance.")
+  heroButtonPrimary     String   @default("Explore Trucks")
   heroButtonSecondary   String   @default("Get Quote")
   
-  // Trust Section Stats
-  vehiclesSold          Int      @default(50)
-  happyClients          Int      @default(25)
-  yearsExperience       Int      @default(10)
-  satisfactionRate      Int      @default(95)
-  
-  // Trust Section Content
-  partnersTitle         String   @default("Trusted by Industry Leaders")
-  partnersDescription   String   @default("We partner with the world's most respected commercial vehicle manufacturers to bring you unparalleled quality and reliability.")
-  
-  // Trust Features
-  feature1Title         String   @default("Quality Guarantee")
-  feature1Description   String   @default("Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.")
-  feature2Title         String   @default("Fast Delivery")
-  feature2Description   String   @default("Quick processing and delivery to get your business moving without unnecessary delays.")
-  feature3Title         String   @default("24/7 Support")
-  feature3Description   String   @default("Round-the-clock customer support to assist you with any questions or concerns.")
-  
   // Coming Soon Section
-  comingSoonImage       String   @default("/images/comming soon.jpg")
-  comingSoonImageAlt    String   @default("Coming Soon")
+  comingSoonImage       String   @default("/uploads/Technology_background.png")
   
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
@@ -176,8 +128,8 @@ model CompanyInfo {
   id                  String   @id @default(cuid())
   
   // About Section
-  companyName         String   @default("EliteFleet")
-  companyDescription  String   @default("For over 25 years, we've been the trusted partner for businesses seeking premium commercial vehicles. Our commitment to excellence drives everything we do.")
+  companyName         String   @default("EVTL")
+  companyDescription  String   @default("For over 25 years, we've been the trusted partner for businesses seeking premium commercial trucks. Our commitment to excellence drives everything we do.")
   foundedYear         Int      @default(1998)
   
   // Stats
@@ -188,15 +140,15 @@ model CompanyInfo {
   
   // Story
   storyTitle          String   @default("Our Story")
-  storyParagraph1     String   @default("Founded in 1998, EliteFleet began as a small family business with a simple mission: to provide high-quality commercial vehicles to businesses that demand excellence. What started as a modest dealership has grown into one of the region's most trusted commercial vehicle providers.")
-  storyParagraph2     String   @default("Over the years, we've built our reputation on three core principles: quality vehicles, exceptional service, and honest business practices. Our experienced team understands that choosing the right commercial vehicle is crucial for your business success.")
+  storyParagraph1     String   @default("Founded in 1998, EVTL began as a small family business with a simple mission: to provide high-quality commercial trucks to businesses that demand excellence. What started as a modest dealership has grown into one of the region's most trusted commercial truck providers.")
+  storyParagraph2     String   @default("Over the years, we've built our reputation on three core principles: quality trucks, exceptional service, and honest business practices. Our experienced team understands that choosing the right commercial truck is crucial for your business success.")
   storyParagraph3     String   @default("Today, we continue to evolve with the industry, embracing new technologies and sustainable practices while maintaining the personal touch and attention to detail that our customers have come to expect.")
   
   // Mission & Vision
   missionTitle        String   @default("Our Mission")
-  missionText         String   @default("To empower businesses with premium commercial vehicles and exceptional service, enabling them to achieve their goals while building long-lasting partnerships based on trust and mutual success.")
+  missionText         String   @default("To empower businesses with premium commercial trucks and exceptional service, enabling them to achieve their goals while building long-lasting partnerships based on trust and mutual success.")
   visionTitle         String   @default("Our Vision") 
-  visionText          String   @default("To be the leading commercial vehicle provider, recognized for our commitment to quality, innovation, and customer satisfaction, while contributing to sustainable transportation solutions for future generations.")
+  visionText          String   @default("To be the leading commercial truck provider, recognized for our commitment to quality, innovation, and customer satisfaction, while contributing to sustainable transportation solutions for future generations.")
   
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -242,33 +194,6 @@ model Certification {
   @@map("certifications")
 }
 
-model FinancingOption {
-  id              String   @id @default(cuid())
-  title           String
-  interestRate    String   // e.g., "5.5% - 8.5%"
-  loanTerm        String   // e.g., "3-7 years"
-  downPayment     String   // e.g., "10-20%"
-  description     String
-  features        String[] // Array of feature strings
-  iconName        String   // Store icon name as string (DollarSign, TrendingUp, Calendar)
-  order           Int      @default(0)
-  active          Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@map("financing_options")
-}
-
-model FinancingBenefit {
-  id          String   @id @default(cuid())
-  benefit     String
-  order       Int      @default(0)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("financing_benefits")
-}
 
 model ContactInfo {
   id              String   @id @default(cuid())
@@ -279,9 +204,9 @@ model ContactInfo {
   financePhone    String   @default("+1 (555) 123-4569")
   
   // Email Addresses
-  salesEmail      String   @default("sales@elitefleet.com")
-  serviceEmail    String   @default("service@elitefleet.com")
-  supportEmail    String   @default("support@elitefleet.com")
+  salesEmail      String   @default("sales@evtl.com")
+  serviceEmail    String   @default("service@evtl.com")
+  supportEmail    String   @default("support@evtl.com")
   
   // Address
   address         String   @default("123 Business Avenue")
@@ -292,6 +217,12 @@ model ContactInfo {
   mondayToFriday  String   @default("8:00 AM - 6:00 PM")
   saturday        String   @default("9:00 AM - 4:00 PM")
   sunday          String   @default("Closed")
+  
+  // Settings (migrated from Settings table)
+  siteName              String  @default("EVTL")
+  emailNotifications    Boolean @default(true)
+  systemNotifications   Boolean @default(true)
+  maintenanceMode       Boolean @default(false)
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

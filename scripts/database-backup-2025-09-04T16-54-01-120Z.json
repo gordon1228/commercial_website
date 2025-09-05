@@ -1,0 +1,192 @@
+{
+  "timestamp": "2025-09-04T16:53:59.757Z",
+  "tables": {
+    "settings": [
+      {
+        "id": "default",
+        "siteName": "EliteFleet",
+        "contactEmail": "contact@elitefleet.com",
+        "supportPhone": "+1 (555) 123-4567",
+        "address": "123 Business Avenue, Commercial District, NY 10001",
+        "emailNotifications": true,
+        "systemNotifications": true,
+        "maintenanceMode": false,
+        "createdAt": "2025-09-03T09:32:46.183Z",
+        "updatedAt": "2025-09-03T16:16:36.562Z"
+      }
+    ],
+    "contactInfo": [
+      {
+        "id": "default-contact-info",
+        "salesPhone": "+010 339 1414",
+        "servicePhone": "+016 332 2349",
+        "financePhone": "+016 332 2349",
+        "salesEmail": "sales@evtl.com.my",
+        "serviceEmail": "service@evtl.com.my",
+        "supportEmail": "support@evtl.com.my",
+        "address": "3-20 Level 3 MKH Boulevard, Jalan Changkat",
+        "city": "43000 Kajang, Selangor",
+        "directions": "EVTL Trucks Office",
+        "mondayToFriday": "9:00 AM - 6:00 PM",
+        "saturday": "9:00 AM - 1:00 PM",
+        "sunday": "Closed",
+        "createdAt": "2025-09-04T16:26:08.469Z",
+        "updatedAt": "2025-09-04T16:26:08.469Z"
+      }
+    ],
+    "vehicles": [
+      {
+        "id": "cmf3xoh4i0001v5bg8i0sd9lm",
+        "name": "Truck 1",
+        "slug": "truck-1",
+        "description": "Truck 1",
+        "price": 12000,
+        "images": [
+          "/uploads/bb478356-26ec-47c1-9938-80aa761b65fe.jpeg"
+        ],
+        "specs": {
+          "fuel": "",
+          "engine": "",
+          "weight": "",
+          "capacity": "",
+          "horsepower": ""
+        },
+        "status": "AVAILABLE",
+        "featured": true,
+        "active": true,
+        "categoryId": "cat1",
+        "year": null,
+        "make": null,
+        "model": null,
+        "mileage": null,
+        "fuelType": null,
+        "transmission": null,
+        "features": [],
+        "createdAt": "2025-09-03T12:08:32.946Z",
+        "updatedAt": "2025-09-04T03:02:36.504Z",
+        "category": {
+          "id": "cat1",
+          "name": "Trucks",
+          "slug": "trucks",
+          "description": "Heavy-duty commercial trucks for logistics and transportation",
+          "image": "/uploads/08c4d465-62cc-4c24-8616-bc673efd02e1.jpeg",
+          "active": true,
+          "createdAt": "2025-09-03T09:32:46.183Z",
+          "updatedAt": "2025-09-04T02:23:32.143Z"
+        }
+      }
+    ],
+    "companyValues": [],
+    "teamMembers": [],
+    "certifications": [],
+    "users": [
+      {
+        "id": "clx123admin456",
+        "email": "admin@elitefleet.com",
+        "password": "$2b$10$haY5olp/wh4hgR4SP69hXO4MTA5uRJz4Fw1xqlqn41b7LNAJQ3QUC",
+        "role": "ADMIN",
+        "createdAt": "2025-09-03T09:32:46.183Z",
+        "updatedAt": "2025-09-03T09:39:20.741Z"
+      }
+    ],
+    "categories": [
+      {
+        "id": "cat1",
+        "name": "Trucks",
+        "slug": "trucks",
+        "description": "Heavy-duty commercial trucks for logistics and transportation",
+        "image": "/uploads/08c4d465-62cc-4c24-8616-bc673efd02e1.jpeg",
+        "active": true,
+        "createdAt": "2025-09-03T09:32:46.183Z",
+        "updatedAt": "2025-09-04T02:23:32.143Z"
+      }
+    ],
+    "inquiries": [],
+    "homepageContent": [
+      {
+        "id": "default",
+        "heroTitle": "Premium Commercial",
+        "heroSubtitle": "Vehicles",
+        "heroDescription": "Discover elite fleet solutions built for businesses that demand excellence, reliability, and uncompromising quality.",
+        "heroButtonPrimary": "Explore Fleet",
+        "heroButtonSecondary": "Get Quote",
+        "createdAt": "2025-09-03T09:32:46.183Z",
+        "updatedAt": "2025-09-04T07:07:06.935Z"
+      }
+    ],
+    "companyInfo": [
+      {
+        "id": "cmf5mmhuf0000v504ebnuq1fk",
+        "companyName": "EVTL",
+        "companyDescription": "For over 25 years, we've been the trusted partner for businesses seeking premium commercial trucks. Our commitment to excellence drives everything we do.",
+        "foundedYear": 1998,
+        "totalVehiclesSold": 2500,
+        "totalHappyCustomers": 850,
+        "totalYearsExp": 25,
+        "satisfactionRate": 98,
+        "storyTitle": "Our Story",
+        "storyParagraph1": "Founded in 1998, EVTL began as a small family business with a simple mission: to provide high-quality commercial trucks to businesses that demand excellence. What started as a modest dealership has grown into one of the region's most trusted commercial truck providers.",
+        "storyParagraph2": "Over the years, we've built our reputation on three core principles: quality trucks, exceptional service, and honest business practices. Our experienced team understands that choosing the right commercial truck is crucial for your business success.",
+        "storyParagraph3": "Today, we continue to evolve with the industry, embracing new technologies and sustainable practices while maintaining the personal touch and attention to detail that our customers have come to expect.",
+        "missionTitle": "Our Mission",
+        "missionText": "To empower businesses with premium commercial trucks and exceptional service, enabling them to achieve their goals while building long-lasting partnerships based on trust and mutual success.",
+        "visionTitle": "Our Vision",
+        "visionText": "To be the leading commercial truck provider, recognized for our commitment to quality, innovation, and customer satisfaction, while contributing to sustainable transportation solutions for future generations.",
+        "createdAt": "2025-09-04T16:34:37.143Z",
+        "updatedAt": "2025-09-04T16:34:37.143Z"
+      }
+    ],
+    "partners": [
+      {
+        "id": "cmf4wtg4g0005v5y8gjvthkko",
+        "name": "partner 5",
+        "logo": "/uploads/919c82f8-0607-4a7a-b80b-2253eecebaea.jpg",
+        "website": "https://www.google.com/maps",
+        "active": false,
+        "order": 5,
+        "createdAt": "2025-09-04T04:32:11.427Z",
+        "updatedAt": "2025-09-04T11:49:29.740Z"
+      },
+      {
+        "id": "cmf4wr88l0000v5y8cchf6pz0",
+        "name": "Youtube",
+        "logo": "/uploads/a0475016-9ccd-4093-abd3-6e427e877041.png",
+        "website": "https://www.youtube.com/",
+        "active": false,
+        "order": 2,
+        "createdAt": "2025-09-04T04:30:27.935Z",
+        "updatedAt": "2025-09-04T11:49:29.757Z"
+      },
+      {
+        "id": "cmf4wtg4f0003v5y8qpvgoxzj",
+        "name": "Facebook",
+        "logo": "/uploads/b0837928-3271-4fe9-98a5-1a2b741f6e78.jpeg",
+        "website": "https://www.facebook.com/",
+        "active": false,
+        "order": 3,
+        "createdAt": "2025-09-04T04:32:11.427Z",
+        "updatedAt": "2025-09-04T11:49:29.742Z"
+      },
+      {
+        "id": "cmf4wtg4s0006v5y8fx2t9f4h",
+        "name": "Partner 4",
+        "logo": "/uploads/b0837928-3271-4fe9-98a5-1a2b741f6e78.jpeg",
+        "website": "https://www.google.com/maps",
+        "active": false,
+        "order": 4,
+        "createdAt": "2025-09-04T04:32:11.427Z",
+        "updatedAt": "2025-09-04T11:49:29.746Z"
+      },
+      {
+        "id": "cmf3xqtw00002v5bg6iamlqkw",
+        "name": "Google Map",
+        "logo": "/uploads/9eaed01c-9b7a-4002-96bc-17986c179a28.jpg",
+        "website": "https://www.google.com/maps",
+        "active": false,
+        "order": 1,
+        "createdAt": "2025-09-03T12:10:22.765Z",
+        "updatedAt": "2025-09-04T11:49:29.884Z"
+      }
+    ]
+  }
+}

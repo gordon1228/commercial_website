@@ -3,8 +3,8 @@ import VehicleFilters from '@/components/vehicle-filters'
 import { Suspense } from 'react'
 
 export const metadata = {
-  title: 'Commercial Vehicles | EliteFleet',
-  description: 'Browse our extensive fleet of premium commercial vehicles including trucks, vans, and buses.',
+  title: 'Commercial Trucks | EVTL',
+  description: 'Browse our extensive fleet of premium commercial trucks with advanced specifications and features.',
 }
 
 export default function VehiclesPage() {
@@ -14,10 +14,10 @@ export default function VehiclesPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-6">
-            Commercial Vehicle Fleet
+            Commercial Truck Fleet
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-            Discover our comprehensive selection of premium commercial vehicles, each inspected and ready for your business needs.
+            Discover our comprehensive selection of premium commercial trucks with advanced specifications, each inspected and ready for your business needs.
           </p>
         </div>
 

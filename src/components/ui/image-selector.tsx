@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { Loader2, Upload, X, Plus } from 'lucide-react'
+import { Loader2, Upload, X, Plus, Image as ImageIcon } from 'lucide-react'
 
 
 interface ImageOption {
@@ -35,6 +35,7 @@ export default function ImageSelector({
   const [isLoading, setIsLoading] = useState(false)
   const [showSelector, setShowSelector] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (showSelector) {
@@ -297,7 +298,7 @@ export default function ImageSelector({
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        onChange={handleFileInputChange}
+        onChange={handleFileUpload}
         className="hidden"
       />
     </div>

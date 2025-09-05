@@ -42,7 +42,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json()
-    const { status, notes } = body
+    const { status, notes, userId } = body
 
     // Check if inquiry exists
     const existingInquiry = await prisma.inquiry.findUnique({
@@ -61,6 +61,7 @@ export async function PUT(
       data: {
         status: status || existingInquiry.status,
         notes: notes !== undefined ? notes : existingInquiry.notes,
+        userId: userId !== undefined ? userId : existingInquiry.userId,
         updatedAt: new Date()
       },
       include: {

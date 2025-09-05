@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Menu, X, Heart } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function Header() {
@@ -19,10 +19,10 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
             <Link href="/vehicles" className="text-black hover:text-gray-600 transition-colors">
-              Vehicles
+              Electric Trucks
             </Link>
-            <Link href="/financing" className="text-black hover:text-gray-600 transition-colors">
-              Financing
+            <Link href="/technology" className="text-black hover:text-gray-600 transition-colors">
+              Technology
             </Link>
             <Link href="/about" className="text-black hover:text-gray-600 transition-colors">
               About
@@ -33,9 +33,6 @@ export default function Header() {
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/favorites" className="text-black hover:text-gray-600 transition-colors p-2">
-              <Heart className="h-5 w-5" />
-            </Link>
             <Button variant="ghost" asChild>
               <Link href="/vehicles">Browse Fleet</Link>
             </Button>
@@ -66,14 +63,14 @@ export default function Header() {
                 className="text-black hover:text-gray-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Vehicles
+                Trucks
               </Link>
               <Link 
-                href="/financing" 
+                href="/technology" 
                 className="text-black hover:text-gray-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Financing
+                Technology
               </Link>
               <Link 
                 href="/about" 

@@ -33,7 +33,7 @@ export default function AdminPreviewVehiclesPage() {
   const [inactiveCount, setInactiveCount] = useState(0)
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user?.role === 'ADMIN') {
+    if (status === 'authenticated' && (session?.user?.role === 'ADMIN' || session?.user?.role === 'MANAGER')) {
       fetchVehicleStats()
     }
   }, [status, session])

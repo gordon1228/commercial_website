@@ -13,6 +13,12 @@ export const GET = createApiHandler(async (req, { session }) => {
     const priceMax = searchParams.get('priceMax')
     const sortBy = searchParams.get('sortBy') || searchParams.get('sort') || 'name'
     const featured = searchParams.get('featured')
+    // New truck specification filters
+    const fuelType = searchParams.get('fuelType')
+    const transmission = searchParams.get('transmission')
+    const yearMin = searchParams.get('yearMin')
+    const yearMax = searchParams.get('yearMax')
+    const make = searchParams.get('make')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
@@ -23,7 +29,7 @@ export const GET = createApiHandler(async (req, { session }) => {
     
     // For non-admin users, only show active vehicles
     // For admin users, show all vehicles (they can manage inactive ones)
-    const isAdmin = session?.user?.role === 'ADMIN'
+    const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'MANAGER'
     
     if (!isAdmin) {
       where.active = true
@@ -69,6 +75,29 @@ export const GET = createApiHandler(async (req, { session }) => {
       if (priceMin) priceFilter.gte = parseFloat(priceMin)
       if (priceMax) priceFilter.lte = parseFloat(priceMax)
       where.price = priceFilter
+    }
+
+    // Truck specification filters
+    if (fuelType) {
+      const fuelTypes = fuelType.split(',')
+      where.fuelType = { in: fuelTypes }
+    }
+    
+    if (transmission) {
+      const transmissions = transmission.split(',')
+      where.transmission = { in: transmissions }
+    }
+    
+    if (yearMin || yearMax) {
+      const yearFilter: { gte?: number; lte?: number } = {}
+      if (yearMin) yearFilter.gte = parseInt(yearMin)
+      if (yearMax) yearFilter.lte = parseInt(yearMax)
+      where.year = yearFilter
+    }
+    
+    if (make) {
+      const makes = make.split(',')
+      where.make = { in: makes }
     }
 
     // Build orderBy clause
@@ -131,16 +160,10 @@ export const GET = createApiHandler(async (req, { session }) => {
 
 interface VehicleCreateBody {
   name: string;
-  description: string;
+  description?: string;
   price: number;
-  year?: number;
-  make?: string;
-  model?: string;
-  mileage?: number;
-  fuelType?: string;
-  transmission?: string;
   categoryId: string;
-  specifications?: Record<string, unknown>;
+  specs?: Record<string, unknown>;
   images?: string[];
   features?: string[];
   status?: 'AVAILABLE' | 'SOLD' | 'RESERVED';
@@ -156,14 +179,8 @@ export const POST = createApiHandler(async (req) => {
       name,
       description,
       price,
-      year,
-      make,
-      model,
-      mileage,
-      fuelType,
-      transmission,
       categoryId,
-      specifications, // This comes as specifications from frontend
+      specs, // Updated to match frontend field name
       images,
       features,
       status = 'AVAILABLE',
@@ -190,25 +207,24 @@ export const POST = createApiHandler(async (req) => {
       return apiError('A vehicle with this name already exists', 409)
     }
 
+    // Merge features into specs if they exist
+    const mergedSpecs = specs ? { ...specs } : {}
+    if (features && Array.isArray(features)) {
+      mergedSpecs.features = features
+    }
+
     const vehicle = await prisma.vehicle.create({
       data: {
         name,
         slug,
         description,
-        price,
-        year,
-        make,
-        model,
-        mileage,
-        fuelType,
-        transmission,
+        price: Number(price),
         categoryId,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        specs: specifications as any, // Map specifications to specs field
+        specs: mergedSpecs as any,
         images: images || [],
-        features: features || [],
         status,
-        featured
+        featured: Boolean(featured)
       },
       include: {
         category: {
