@@ -143,7 +143,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   // Allow ADMIN, MANAGER, and USER roles (middleware handles specific page access)
-  if (status === 'unauthenticated' || !['ADMIN', 'MANAGER', 'USER'].includes(session?.user?.role)) {
+  if (status === 'unauthenticated' || !session?.user?.role || !['ADMIN', 'MANAGER', 'USER'].includes(session.user.role)) {
     return null // Middleware will handle redirect
   }
 

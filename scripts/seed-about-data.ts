@@ -40,11 +40,12 @@ async function seedAboutData() {
       { title: 'Customer First', description: '24/7 customer support and personalized service ensure that your experience with us exceeds expectations every time.', iconName: 'Heart', order: 4 }
     ];
 
+    // Clear existing values first, then create new ones
+    await prisma.companyValue.deleteMany({});
+    
     for (const value of values) {
-      await prisma.companyValue.upsert({
-        where: { title: value.title },
-        update: {},
-        create: value
+      await prisma.companyValue.create({
+        data: value
       });
     }
 
@@ -58,11 +59,12 @@ async function seedAboutData() {
       { name: 'Emily Zhang', position: 'Finance Manager', description: 'Specializes in commercial vehicle financing', image: null, order: 4 }
     ];
 
+    // Clear existing team members first, then create new ones
+    await prisma.teamMember.deleteMany({});
+    
     for (const member of teamMembers) {
-      await prisma.teamMember.upsert({
-        where: { name: member.name },
-        update: {},
-        create: member
+      await prisma.teamMember.create({
+        data: member
       });
     }
 
@@ -78,11 +80,12 @@ async function seedAboutData() {
       { name: 'Customer Excellence Award 2023', order: 6 }
     ];
 
+    // Clear existing certifications first, then create new ones
+    await prisma.certification.deleteMany({});
+    
     for (const cert of certifications) {
-      await prisma.certification.upsert({
-        where: { name: cert.name },
-        update: {},
-        create: cert
+      await prisma.certification.create({
+        data: cert
       });
     }
 

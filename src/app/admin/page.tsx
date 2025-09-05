@@ -48,30 +48,6 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [fetchingData, setFetchingData] = useState(false)
 
-
-  useEffect(() => {
-    if (status === 'loading') return
-
-    // Check if user is authenticated and has admin/manager role
-    // USER role should be redirected to inquiries page
-    if (status === 'unauthenticated') {
-      router.push('/admin/login')
-      return
-    }
-    
-    if (session?.user?.role === 'USER') {
-      router.push('/admin/inquiries')
-      return
-    }
-    
-    if (session?.user?.role !== 'ADMIN' && session?.user?.role !== 'MANAGER') {
-      router.push('/admin/login')
-      return
-    }
-
-    fetchDashboardData()
-  }, [status, session, router, fetchDashboardData])
-
   const fetchDashboardData = useCallback(async () => {
     // Prevent multiple simultaneous fetches
     if (fetchingData) {
@@ -168,6 +144,28 @@ export default function AdminDashboard() {
     }
   }, [fetchingData])
 
+  useEffect(() => {
+    if (status === 'loading') return
+
+    // Check if user is authenticated and has admin/manager role
+    // USER role should be redirected to inquiries page
+    if (status === 'unauthenticated') {
+      router.push('/admin/login')
+      return
+    }
+    
+    if (session?.user?.role === 'USER') {
+      router.push('/admin/inquiries')
+      return
+    }
+    
+    if (session?.user?.role !== 'ADMIN' && session?.user?.role !== 'MANAGER') {
+      router.push('/admin/login')
+      return
+    }
+
+    fetchDashboardData()
+  }, [status, session, router, fetchDashboardData])
 
   if (status === 'loading' || isLoading) {
     return (
@@ -177,7 +175,7 @@ export default function AdminDashboard() {
     )
   }
 
-  if (status === 'unauthenticated' || !['ADMIN', 'MANAGER'].includes(session?.user?.role)) {
+  if (status === 'unauthenticated' || !session?.user?.role || !['ADMIN', 'MANAGER'].includes(session.user.role)) {
     return null
   }
 

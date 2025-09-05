@@ -58,6 +58,9 @@ async function main() {
         slug: 'mercedes-sprinter-3500',
         description: 'Premium commercial van with excellent fuel efficiency and cargo capacity. Perfect for delivery services, passenger transport, and commercial applications.',
         price: 75000,
+        year: 2024,
+        make: 'Mercedes',
+        fuelType: 'Diesel',
         categoryId: vansCategory.id,
         status: 'AVAILABLE' as const,
         images: ['/images/truck1.jpg'],
@@ -74,6 +77,9 @@ async function main() {
         slug: 'ford-f650-box-truck',
         description: 'Heavy-duty commercial truck with spacious cargo box. Ideal for moving, delivery services, and commercial freight applications.',
         price: 89000,
+        year: 2023,
+        make: 'Ford',
+        fuelType: 'Diesel',
         categoryId: trucksCategory.id,
         status: 'AVAILABLE' as const,
         images: ['/images/truck2.jpg'],
@@ -90,6 +96,9 @@ async function main() {
         slug: 'freightliner-cascadia',
         description: 'Professional over-the-road truck with advanced aerodynamics and fuel efficiency. Built for long-haul transportation and heavy freight.',
         price: 165000,
+        year: 2024,
+        make: 'Freightliner',
+        fuelType: 'Diesel',
         categoryId: trucksCategory.id,
         status: 'AVAILABLE' as const,
         images: ['/images/truck3.jpg'],
@@ -106,6 +115,9 @@ async function main() {
         slug: 'blue-bird-school-bus',
         description: 'Safe and reliable school bus with modern safety features. Perfect for educational institutions and passenger transportation services.',
         price: 125000,
+        year: 2023,
+        make: 'Blue Bird',
+        fuelType: 'Diesel',
         categoryId: busesCategory.id,
         status: 'RESERVED' as const,
         images: ['/images/truck4.jpg'],
@@ -122,6 +134,9 @@ async function main() {
         slug: 'isuzu-npr-hd',
         description: 'Versatile medium-duty truck perfect for local deliveries and commercial applications. Known for reliability and fuel efficiency.',
         price: 58000,
+        year: 2024,
+        make: 'Isuzu',
+        fuelType: 'Diesel',
         categoryId: trucksCategory.id,
         status: 'AVAILABLE' as const,
         images: ['/images/truck1.jpg'],
@@ -138,6 +153,9 @@ async function main() {
         slug: 'ford-transit-350',
         description: 'Popular commercial van with excellent maneuverability and cargo space. Ideal for small businesses and delivery services.',
         price: 42000,
+        year: 2024,
+        make: 'Ford',
+        fuelType: 'Gasoline',
         categoryId: vansCategory.id,
         status: 'AVAILABLE' as const,
         images: ['/images/truck2.jpg'],
@@ -157,8 +175,8 @@ async function main() {
         where: { slug: vehicleData.slug },
         update: {},
         create: {
-          ...vehicleData,
-          features: [] // Empty features array for now
+          ...vehicleData
+          // Note: features field doesn't exist in Vehicle model, removed
         }
       })
       createdVehicles.push(vehicle)
@@ -202,22 +220,26 @@ async function main() {
       })
     }
 
-    // Create default settings
-    console.log('Creating default settings...')
-    await prisma.settings.upsert({
+    // Create default contact info
+    console.log('Creating default contact info...')
+    await prisma.contactInfo.upsert({
       where: { id: 'default' }, // This won't match, so it will create
       update: {},
       create: {
-        siteName: 'EliteFleet',
-        contactEmail: 'contact@elitefleet.com',
-        supportPhone: '+1 (555) 123-4567',
-        address: '123 Business Avenue, Commercial District, NY 10001',
-        emailNotifications: true,
-        systemNotifications: true,
-        maintenanceMode: false
+        salesPhone: '+1 (555) 123-4567',
+        servicePhone: '+1 (555) 123-4568', 
+        financePhone: '+1 (555) 123-4569',
+        salesEmail: 'sales@elitefleet.com',
+        serviceEmail: 'service@elitefleet.com',
+        supportEmail: 'support@elitefleet.com',
+        address: '123 Business Avenue',
+        city: 'Commercial District',
+        state: 'NY',
+        postcode: '10001',
+        siteName: 'EliteFleet'
       }
     }).catch(() => {
-      // Settings might already exist, that's fine
+      // Contact info might already exist, that's fine
     })
 
     // Get counts
@@ -225,7 +247,7 @@ async function main() {
     const categoryCount = await prisma.category.count()
     const inquiryCount = await prisma.inquiry.count()
     const userCount = await prisma.user.count()
-    const settingsCount = await prisma.settings.count()
+    const contactInfoCount = await prisma.contactInfo.count()
     
     console.log('✅ Database seeding completed successfully!')
     console.log(`Created:`)
@@ -233,7 +255,7 @@ async function main() {
     console.log(`- ${categoryCount} categories`)
     console.log(`- ${vehicleCount} vehicles`)
     console.log(`- ${inquiryCount} sample inquiries`)
-    console.log(`- ${settingsCount} settings record(s)`)
+    console.log(`- ${contactInfoCount} contact info record(s)`)
     
   } catch (error) {
     console.error('❌ Seeding error details:', error)

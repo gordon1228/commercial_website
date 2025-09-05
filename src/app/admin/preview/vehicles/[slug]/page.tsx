@@ -74,16 +74,6 @@ export default function AdminPreviewVehicleDetailPage() {
     message: ''
   })
 
-  useEffect(() => {
-    if (status === 'loading') return
-    if (!session || !['ADMIN', 'MANAGER'].includes(session.user?.role || '')) {
-      router.push('/admin/login')
-      return
-    }
-
-    fetchVehicle()
-  }, [session, status, router, slug, fetchVehicle])
-
   const fetchVehicle = useCallback(async () => {
     try {
       const response = await fetch(`/api/vehicles/slug/${slug}`)
@@ -104,6 +94,16 @@ export default function AdminPreviewVehicleDetailPage() {
       setIsLoading(false)
     }
   }, [slug])
+
+  useEffect(() => {
+    if (status === 'loading') return
+    if (!session || !['ADMIN', 'MANAGER'].includes(session.user?.role || '')) {
+      router.push('/admin/login')
+      return
+    }
+
+    fetchVehicle()
+  }, [session, status, router, slug, fetchVehicle])
 
   const nextImage = () => {
     if (!vehicle) return

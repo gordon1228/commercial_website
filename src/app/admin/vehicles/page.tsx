@@ -47,23 +47,6 @@ export default function AdminVehiclesPage() {
   const [sortField, setSortField] = useState<SortField>('updatedAt')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
-  useEffect(() => {
-    if (status === 'loading') return
-    if (!session || session.user?.role !== 'ADMIN') {
-      router.push('/admin/login')
-      return
-    }
-
-    fetchCategories()
-    fetchVehicles()
-  }, [session, status, router, fetchVehicles])
-
-  useEffect(() => {
-    if (vehicles.length > 0) {
-      sortVehicles()
-    }
-  }, [sortField, sortDirection, sortVehicles, vehicles.length])
-
   const fetchCategories = async () => {
     try {
       const response = await fetch('/api/categories')
@@ -138,6 +121,23 @@ export default function AdminVehiclesPage() {
 
     setVehicles(sorted)
   }, [vehicles, sortField, sortDirection])
+
+  useEffect(() => {
+    if (status === 'loading') return
+    if (!session || session.user?.role !== 'ADMIN') {
+      router.push('/admin/login')
+      return
+    }
+
+    fetchCategories()
+    fetchVehicles()
+  }, [session, status, router, fetchVehicles])
+
+  useEffect(() => {
+    if (vehicles.length > 0) {
+      sortVehicles()
+    }
+  }, [sortField, sortDirection, sortVehicles, vehicles.length])
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {

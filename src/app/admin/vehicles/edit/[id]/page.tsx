@@ -116,16 +116,6 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
   const [isLoadingData, setIsLoadingData] = useState(true)
   const [activeSpecTab, setActiveSpecTab] = useState('performance')
 
-  useEffect(() => {
-    if (status === 'loading') return
-    if (!session || session.user?.role !== 'ADMIN') {
-      router.push('/admin/login')
-      return
-    }
-
-    fetchData()
-  }, [session, status, router, params.id, fetchData])
-
   const fetchData = useCallback(async () => {
     try {
       const [vehicleRes, categoriesRes] = await Promise.all([
@@ -200,6 +190,16 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
       setIsLoadingData(false)
     }
   }, [params.id, router])
+
+  useEffect(() => {
+    if (status === 'loading') return
+    if (!session || session.user?.role !== 'ADMIN') {
+      router.push('/admin/login')
+      return
+    }
+
+    fetchData()
+  }, [session, status, router, params.id, fetchData])
 
   const handleInputChange = (field: string, value: string | number | boolean) => {
     setVehicle(prev => prev ? ({

@@ -49,33 +49,6 @@ export default function InquiriesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState('')
 
-  useEffect(() => {
-    if (status === 'loading') return
-    if (!session || !['ADMIN', 'MANAGER', 'USER'].includes(session.user?.role)) {
-      router.push('/admin/login')
-      return
-    }
-
-    fetchInquiries()
-    
-    // Fetch staff users for assignment (only for ADMIN/MANAGER)
-    if (session?.user?.role === 'ADMIN' || session?.user?.role === 'MANAGER') {
-      fetchStaffUsers()
-    }
-  }, [session, status, router, fetchInquiries])
-
-  const fetchStaffUsers = async () => {
-    try {
-      const response = await fetch('/api/users')
-      if (!response.ok) throw new Error('Failed to fetch staff users')
-      
-      const users = await response.json()
-      setStaffUsers(users)
-    } catch (error) {
-      console.error('Error fetching staff users:', error)
-    }
-  }
-
   const fetchInquiries = useCallback(async () => {
     try {
       setIsLoading(true)
@@ -98,6 +71,33 @@ export default function InquiriesPage() {
       setIsLoading(false)
     }
   }, [statusFilter, session?.user?.role, session?.user?.id])
+
+  const fetchStaffUsers = async () => {
+    try {
+      const response = await fetch('/api/users')
+      if (!response.ok) throw new Error('Failed to fetch staff users')
+      
+      const users = await response.json()
+      setStaffUsers(users)
+    } catch (error) {
+      console.error('Error fetching staff users:', error)
+    }
+  }
+
+  useEffect(() => {
+    if (status === 'loading') return
+    if (!session || !['ADMIN', 'MANAGER', 'USER'].includes(session.user?.role)) {
+      router.push('/admin/login')
+      return
+    }
+
+    fetchInquiries()
+    
+    // Fetch staff users for assignment (only for ADMIN/MANAGER)
+    if (session?.user?.role === 'ADMIN' || session?.user?.role === 'MANAGER') {
+      fetchStaffUsers()
+    }
+  }, [session, status, router, fetchInquiries])
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
@@ -131,7 +131,11 @@ export default function InquiriesPage() {
       setInquiries(prev => prev.map(inquiry => 
         inquiry.id === id ? { 
           ...inquiry, 
-          user: userId === 'unassigned' ? null : staffUsers.find(u => u.id === userId) || null 
+          user: userId === 'unassigned' ? undefined : {
+            id: staffUsers.find(u => u.id === userId)?.id || '',
+            email: staffUsers.find(u => u.id === userId)?.email || '',
+            role: staffUsers.find(u => u.id === userId)?.role || ''
+          }
         } : inquiry
       ))
     } catch (error) {

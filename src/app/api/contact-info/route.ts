@@ -21,6 +21,11 @@ const fallbackContactInfo = {
   mondayToFriday: '9:00 AM - 6:00 PM',
   saturday: '9:00 AM - 1:00 PM',
   sunday: 'Closed',
+  // Settings (migrated from Settings table)
+  siteName: 'EVTL',
+  emailNotifications: true,
+  systemNotifications: true,
+  maintenanceMode: false,
   // Footer Settings
   companyDescription: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.',
   facebookUrl: '',
@@ -43,7 +48,7 @@ export const GET = createApiHandler(async () => {
 
     return apiResponse(contactInfo)
   } catch (error) {
-    console.error('Error fetching contact info, using fallback:', error.message)
+    console.error('Error fetching contact info, using fallback:', error instanceof Error ? error.message : 'Unknown error')
     return apiResponse(fallbackContactInfo)
   }
 })
@@ -149,7 +154,7 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
     console.error('Error updating contact info:', error)
     
     // If the table doesn't exist, return an error message indicating database setup is needed
-    if (error.code === 'P2021' || error.message?.includes('does not exist')) {
+    if ((error as {code?: string})?.code === 'P2021' || (error as Error)?.message?.includes('does not exist')) {
       return apiError('Database schema not synchronized. Please run: npx prisma db push', 503)
     }
     
