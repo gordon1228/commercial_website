@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -26,13 +23,13 @@ model User {
 model Session {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   sessionId String   @unique
   userAgent String?
   ipAddress String?
   expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
@@ -44,44 +41,47 @@ model Category {
   description String?
   image       String?
   active      Boolean   @default(true)
-  vehicles    Vehicle[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  vehicles    Vehicle[]
 
+  @@index([active], map: "idx_categories_active")
   @@map("categories")
 }
 
 model Vehicle {
-  id            String    @id @default(cuid())
-  name          String
-  slug          String    @unique
-  description   String?
-  price         Float
-  year          Int
-  make          String
-  fuelType      String
-  transmission  String?   // Transmission type for filtering
-  images        String[]
-  specs         Json?     // Vehicle specifications stored as JSON
-  status        Status    @default(AVAILABLE)
-  featured      Boolean   @default(false)
-  active        Boolean   @default(true)
-  categoryId    String
-  category      Category  @relation(fields: [categoryId], references: [id])
-  inquiries     Inquiry[]
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  name         String
+  slug         String    @unique
+  description  String?
+  price        Float
+  images       String[]
+  specs        Json?
+  status       Status    @default(AVAILABLE)
+  featured     Boolean   @default(false)
+  active       Boolean   @default(true)
+  categoryId   String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  year         Int?      @default(2024)
+  make         String?   @default("Isuzu") @db.VarChar(255)
+  fuelType     String?   @default("Electric") @db.VarChar(255)
+  transmission String?
+  inquiries    Inquiry[]
+  category     Category  @relation(fields: [categoryId], references: [id])
 
+  @@index([active], map: "idx_vehicles_active")
+  @@index([categoryId], map: "idx_vehicles_category_id")
+  @@index([featured], map: "idx_vehicles_featured")
+  @@index([status], map: "idx_vehicles_status")
+  @@index([status, active], map: "idx_vehicles_status_active")
   @@map("vehicles")
 }
 
 model Inquiry {
   id           String        @id @default(cuid())
   vehicleId    String?
-  vehicle      Vehicle?      @relation(fields: [vehicleId], references: [id])
   userId       String?
-  user         User?         @relation(fields: [userId], references: [id])
   customerName String
   email        String
   phone        String?
@@ -90,27 +90,41 @@ model Inquiry {
   status       InquiryStatus @default(NEW)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  user         User?         @relation(fields: [userId], references: [id])
+  vehicle      Vehicle?      @relation(fields: [vehicleId], references: [id])
 
+  @@index([status], map: "idx_inquiries_status")
+  @@index([vehicleId], map: "idx_inquiries_vehicle_id")
   @@map("inquiries")
 }
 
-// Settings model removed - consolidated into ContactInfo
-
 model HomepageContent {
   id                    String   @id @default(cuid())
-  
-  // Essential Hero Section Only
   heroTitle             String   @default("Premium Commercial")
-  heroSubtitle          String   @default("Trucks")
-  heroDescription       String   @default("Discover elite truck solutions built for businesses that demand excellence, reliability, and uncompromising performance.")
-  heroButtonPrimary     String   @default("Explore Trucks")
+  heroSubtitle          String   @default("Vehicles")
+  heroDescription       String   @default("Discover elite fleet solutions built for businesses that demand excellence, reliability, and uncompromising quality.")
+  heroButtonPrimary     String   @default("Explore Fleet")
   heroButtonSecondary   String   @default("Get Quote")
-  
-  // Coming Soon Section
-  comingSoonImage       String   @default("/uploads/Technology_background.png")
-  
+  happyClients          Int      @default(25)
+  yearsExperience       Int      @default(10)
+  satisfactionRate      Int      @default(95)
+  partnersTitle         String   @default("Trusted by Industry Leaders")
+  partnersDescription   String   @default("We partner with the world's most respected commercial vehicle manufacturers to bring you unparalleled quality and reliability.")
+  feature1Title         String   @default("Quality Guarantee")
+  feature1Description   String   @default("Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.")
+  feature2Title         String   @default("Fast Delivery")
+  feature2Description   String   @default("Quick processing and delivery to get your business moving without unnecessary delays.")
+  feature3Title         String   @default("24/7 Support")
+  feature3Description   String   @default("Round-the-clock customer support to assist you with any questions or concerns.")
+  comingSoonImage       String   @default("/images/comming soon.jpg")
+  comingSoonImageAlt    String   @default("Coming Soon")
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+  showComingSoonSection Boolean? @default(true)
+  showHeroSection       Boolean? @default(true)
+  showVehicleCategories Boolean? @default(true)
+  showFeaturedVehicles  Boolean? @default(true)
+  showTrustSection      Boolean? @default(true)
 
   @@map("homepage_content")
 }
@@ -130,32 +144,23 @@ model Partner {
 
 model CompanyInfo {
   id                  String   @id @default(cuid())
-  
-  // About Section
   companyName         String   @default("EVTL")
-  companyDescription  String   @default("For over 25 years, we've been the trusted partner for businesses seeking premium commercial trucks. Our commitment to excellence drives everything we do.")
+  companyDescription  String   @default("For over 25 years, we've been the trusted partner for businesses seeking premium commercial trucks.")
   foundedYear         Int      @default(1998)
-  
-  // Stats
   totalVehiclesSold   Int      @default(2500)
   totalHappyCustomers Int      @default(850)
   totalYearsExp       Int      @default(25)
   satisfactionRate    Int      @default(98)
-  
-  // Story
   storyTitle          String   @default("Our Story")
-  storyParagraph1     String   @default("Founded in 1998, EVTL began as a small family business with a simple mission: to provide high-quality commercial trucks to businesses that demand excellence. What started as a modest dealership has grown into one of the region's most trusted commercial truck providers.")
-  storyParagraph2     String   @default("Over the years, we've built our reputation on three core principles: quality trucks, exceptional service, and honest business practices. Our experienced team understands that choosing the right commercial truck is crucial for your business success.")
-  storyParagraph3     String   @default("Today, we continue to evolve with the industry, embracing new technologies and sustainable practices while maintaining the personal touch and attention to detail that our customers have come to expect.")
-  
-  // Mission & Vision
+  storyParagraph1     String   @default("Founded in 1998, EVTL began as a small family business.")
+  storyParagraph2     String   @default("Over the years, we've built our reputation on quality.")
+  storyParagraph3     String   @default("Today, we continue to evolve with the industry.")
   missionTitle        String   @default("Our Mission")
-  missionText         String   @default("To empower businesses with premium commercial trucks and exceptional service, enabling them to achieve their goals while building long-lasting partnerships based on trust and mutual success.")
-  visionTitle         String   @default("Our Vision") 
-  visionText          String   @default("To be the leading commercial truck provider, recognized for our commitment to quality, innovation, and customer satisfaction, while contributing to sustainable transportation solutions for future generations.")
-  
+  missionText         String   @default("To empower businesses with premium commercial trucks.")
+  visionTitle         String   @default("Our Vision")
+  visionText          String   @default("To be the leading commercial truck provider.")
   createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  updatedAt           DateTime @default(now()) @updatedAt
 
   @@map("company_info")
 }
@@ -164,12 +169,13 @@ model CompanyValue {
   id          String   @id @default(cuid())
   title       String
   description String
-  iconName    String   // Store icon name as string (Shield, Handshake, Clock, Heart)
+  iconName    String
   order       Int      @default(0)
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now()) @updatedAt
 
+  @@index([order, active], map: "idx_company_values_order_active")
   @@map("company_values")
 }
 
@@ -182,66 +188,54 @@ model TeamMember {
   order       Int      @default(0)
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now()) @updatedAt
 
+  @@index([order, active], map: "idx_team_members_order_active")
   @@map("team_members")
 }
 
 model Certification {
-  id          String   @id @default(cuid())
-  name        String
-  order       Int      @default(0)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
+  @@index([order, active], map: "idx_certifications_order_active")
   @@map("certifications")
 }
 
-
 model ContactInfo {
-  id              String   @id @default(cuid())
-  
-  // Phone Numbers
-  salesPhone      String   @default("+1 (555) 123-4567")
-  servicePhone    String   @default("+1 (555) 123-4568")
-  financePhone    String   @default("+1 (555) 123-4569")
-  
-  // Email Addresses
-  salesEmail      String   @default("sales@evtl.com")
-  serviceEmail    String   @default("service@evtl.com")
-  supportEmail    String   @default("support@evtl.com")
-  
-  // Address
-  address         String   @default("123 Business Avenue")
-  city            String   @default("Commercial District")
-  state           String   @default("NY")
-  postcode        String   @default("10001")
-  country         String   @default("United States")
-  directions      String   @default("Near Metro Station")
-  
-  // Business Hours
-  mondayToFriday  String   @default("8:00 AM - 6:00 PM")
-  saturday        String   @default("9:00 AM - 4:00 PM")
-  sunday          String   @default("Closed")
-  
-  // Settings (migrated from Settings table)
-  siteName              String  @default("EVTL")
-  emailNotifications    Boolean @default(true)
-  systemNotifications   Boolean @default(true)
-  maintenanceMode       Boolean @default(false)
-  
-  // Footer Settings
-  companyDescription    String  @default("EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.")
-  facebookUrl           String  @default("")
-  twitterUrl            String  @default("")
-  instagramUrl          String  @default("")
-  linkedinUrl           String  @default("")
-  privacyPolicyUrl      String  @default("/privacy")
-  termsOfServiceUrl     String  @default("/terms")
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  salesPhone          String   @default("+1 (555) 123-4567")
+  servicePhone        String   @default("+1 (555) 123-4568")
+  financePhone        String   @default("+1 (555) 123-4569")
+  salesEmail          String   @default("sales@evtl.com")
+  serviceEmail        String   @default("service@evtl.com")
+  supportEmail        String   @default("support@evtl.com")
+  address             String   @default("123 Business Avenue")
+  city                String   @default("Commercial District, NY 10001")
+  directions          String   @default("Near Metro Station")
+  mondayToFriday      String   @default("8:00 AM - 6:00 PM")
+  saturday            String   @default("9:00 AM - 4:00 PM")
+  sunday              String   @default("Closed")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @default(now()) @updatedAt
+  siteName            String?  @default("EVTL")
+  emailNotifications  Boolean? @default(true)
+  systemNotifications Boolean? @default(true)
+  maintenanceMode     Boolean? @default(false)
+  state               String?  @default("NY") @db.VarChar(255)
+  postcode            String?  @default("10001") @db.VarChar(255)
+  country             String?  @default("United States") @db.VarChar(255)
+  companyDescription  String?  @default("EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.")
+  facebookUrl         String?  @default("") @db.VarChar(255)
+  twitterUrl          String?  @default("") @db.VarChar(255)
+  instagramUrl        String?  @default("") @db.VarChar(255)
+  linkedinUrl         String?  @default("") @db.VarChar(255)
+  privacyPolicyUrl    String?  @default("/privacy") @db.VarChar(255)
+  termsOfServiceUrl   String?  @default("/terms") @db.VarChar(255)
 
   @@map("contact_info")
 }
@@ -261,6 +255,6 @@ enum Status {
 enum InquiryStatus {
   NEW
   CONTACTED
-  RESOLVED  // Changed from RESPONDED
+  RESOLVED
   CLOSED
 }
