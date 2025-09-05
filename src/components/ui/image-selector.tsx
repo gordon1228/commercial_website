@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -41,9 +41,9 @@ export default function ImageSelector({
     if (showSelector) {
       fetchImages()
     }
-  }, [showSelector, folder])
+  }, [showSelector, folder, fetchImages])
 
-  const fetchImages = async () => {
+  const fetchImages = useCallback(async () => {
     setIsLoading(true)
     try {
       const response = await fetch(`/api/images?folder=${folder}`)
@@ -56,7 +56,7 @@ export default function ImageSelector({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [folder])
 
   const handleImageSelect = (imagePath: string) => {
     onChange(imagePath)

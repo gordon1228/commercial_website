@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -124,10 +124,10 @@ export default function TrustSection() {
     }, 3000)
 
     return () => clearInterval(interval)
-  }, [isAutoPlaying, partners.length])
+  }, [isAutoPlaying, partners.length, goToNext])
 
   // Navigation functions
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     setCurrentIndex((prev) => {
       const nextIndex = prev + 1
       // For seamless infinite loop, when we reach the end of first duplicate set,
@@ -141,7 +141,7 @@ export default function TrustSection() {
       }
       return nextIndex
     })
-  }
+  }, [partners.length])
 
   const goToPrev = () => {
     setCurrentIndex((prev) => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { MessageSquare, Mail, Phone, Calendar, Trash2 } from 'lucide-react'
@@ -62,7 +62,7 @@ export default function InquiriesPage() {
     if (session?.user?.role === 'ADMIN' || session?.user?.role === 'MANAGER') {
       fetchStaffUsers()
     }
-  }, [session, status, router])
+  }, [session, status, router, fetchInquiries])
 
   const fetchStaffUsers = async () => {
     try {
@@ -76,7 +76,7 @@ export default function InquiriesPage() {
     }
   }
 
-  const fetchInquiries = async () => {
+  const fetchInquiries = useCallback(async () => {
     try {
       setIsLoading(true)
       const params = new URLSearchParams()
@@ -97,7 +97,7 @@ export default function InquiriesPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [statusFilter, session?.user?.role, session?.user?.id])
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {

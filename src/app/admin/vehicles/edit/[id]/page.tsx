@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Save } from 'lucide-react'
@@ -124,9 +124,9 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
     }
 
     fetchData()
-  }, [session, status, router, params.id])
+  }, [session, status, router, params.id, fetchData])
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [vehicleRes, categoriesRes] = await Promise.all([
         fetch(`/api/vehicles/${params.id}`),
@@ -199,7 +199,7 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
     } finally {
       setIsLoadingData(false)
     }
-  }
+  }, [params.id, router])
 
   const handleInputChange = (field: string, value: string | number | boolean) => {
     setVehicle(prev => prev ? ({

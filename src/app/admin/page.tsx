@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Car, Users, MessageSquare, TrendingUp, Plus } from 'lucide-react'
@@ -70,9 +70,9 @@ export default function AdminDashboard() {
     }
 
     fetchDashboardData()
-  }, [status, session, router])
+  }, [status, session, router, fetchDashboardData])
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     // Prevent multiple simultaneous fetches
     if (fetchingData) {
       console.log('Already fetching data, skipping...')
@@ -166,7 +166,7 @@ export default function AdminDashboard() {
       setIsLoading(false)
       setFetchingData(false)
     }
-  }
+  }, [fetchingData])
 
 
   if (status === 'loading' || isLoading) {

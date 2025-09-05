@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
@@ -82,9 +82,9 @@ export default function AdminPreviewVehicleDetailPage() {
     }
 
     fetchVehicle()
-  }, [session, status, router, slug])
+  }, [session, status, router, slug, fetchVehicle])
 
-  const fetchVehicle = async () => {
+  const fetchVehicle = useCallback(async () => {
     try {
       const response = await fetch(`/api/vehicles/slug/${slug}`)
       if (!response.ok) {
@@ -103,7 +103,7 @@ export default function AdminPreviewVehicleDetailPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [slug])
 
   const nextImage = () => {
     if (!vehicle) return

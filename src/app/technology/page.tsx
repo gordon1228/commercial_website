@@ -2,60 +2,63 @@
 
 import { useState, useEffect } from 'react'
 // import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Battery, Zap, Truck, Leaf, Shield, Gauge } from 'lucide-react'
+// Icons commented out as they're not currently used in the rendered component
+// import { Battery, Zap, Truck, Leaf, Shield, Gauge } from 'lucide-react'
 
-interface TechFeature {
-  id: string
-  title: string
-  description: string
-  icon: string
-  category: string
-}
+// Commented out unused interface
+// interface TechFeature {
+//   id: string
+//   title: string
+//   description: string
+//   icon: string
+//   category: string
+// }
 
-const fallbackTechFeatures = [
-  {
-    id: '1',
-    title: 'Advanced Battery Technology',
-    description: 'High-capacity lithium-ion batteries with fast charging capabilities and extended range for commercial operations.',
-    icon: 'Battery',
-    category: 'Power Systems'
-  },
-  {
-    id: '2',
-    title: 'Smart Fleet Management',
-    description: 'Integrated IoT sensors and AI-powered analytics for real-time vehicle monitoring and predictive maintenance.',
-    icon: 'Gauge',
-    category: 'Software'
-  },
-  {
-    id: '3',
-    title: 'Rapid Charging Infrastructure',
-    description: 'Compatible with multiple charging standards and optimized for commercial fleet operations.',
-    icon: 'Zap',
-    category: 'Infrastructure'
-  },
-  {
-    id: '4',
-    title: 'Zero Emission Drive',
-    description: 'Completely electric powertrain with zero direct emissions for sustainable urban logistics.',
-    icon: 'Leaf',
-    category: 'Environment'
-  },
-  {
-    id: '5',
-    title: 'Commercial Grade Safety',
-    description: 'Enhanced safety systems designed specifically for commercial vehicle operations and driver protection.',
-    icon: 'Shield',
-    category: 'Safety'
-  },
-  {
-    id: '6',
-    title: 'Heavy Duty Performance',
-    description: 'Engineered for commercial payloads with robust construction and reliable performance in demanding conditions.',
-    icon: 'Truck',
-    category: 'Performance'
-  }
-]
+// Commented out unused fallback data
+// const fallbackTechFeatures = [
+//   {
+//     id: '1',
+//     title: 'Advanced Battery Technology',
+//     description: 'High-capacity lithium-ion batteries with fast charging capabilities and extended range for commercial operations.',
+//     icon: 'Battery',
+//     category: 'Power Systems'
+//   },
+//   {
+//     id: '2',
+//     title: 'Smart Fleet Management',
+//     description: 'Integrated IoT sensors and AI-powered analytics for real-time vehicle monitoring and predictive maintenance.',
+//     icon: 'Gauge',
+//     category: 'Software'
+//   },
+//   {
+//     id: '3',
+//     title: 'Rapid Charging Infrastructure',
+//     description: 'Compatible with multiple charging standards and optimized for commercial fleet operations.',
+//     icon: 'Zap',
+//     category: 'Infrastructure'
+//   },
+//   {
+//     id: '4',
+//     title: 'Zero Emission Drive',
+//     description: 'Completely electric powertrain with zero direct emissions for sustainable urban logistics.',
+//     icon: 'Leaf',
+//     category: 'Environment'
+//   },
+//   {
+//     id: '5',
+//     title: 'Commercial Grade Safety',
+//     description: 'Enhanced safety systems designed specifically for commercial vehicle operations and driver protection.',
+//     icon: 'Shield',
+//     category: 'Safety'
+//   },
+//   {
+//     id: '6',
+//     title: 'Heavy Duty Performance',
+//     description: 'Engineered for commercial payloads with robust construction and reliable performance in demanding conditions.',
+//     icon: 'Truck',
+//     category: 'Performance'
+//   }
+// ]
 
 /*
 const getIcon = (iconName: string) => {
@@ -72,17 +75,18 @@ const getIcon = (iconName: string) => {
 */
 
 export default function TechnologyPage() {
-  const [techFeatures, setTechFeatures] = useState<TechFeature[]>([])
+  // Commented out unused state variables
+  // const [techFeatures, setTechFeatures] = useState<TechFeature[]>([])
   const [, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchTechFeatures = async () => {
       try {
         // For now, use fallback data. API endpoint can be added later if needed
-        setTechFeatures(fallbackTechFeatures)
+        // setTechFeatures(fallbackTechFeatures)
       } catch (error) {
         console.error('Error loading technology features:', error)
-        setTechFeatures(fallbackTechFeatures)
+        // setTechFeatures(fallbackTechFeatures)
       } finally {
         setLoading(false)
       }

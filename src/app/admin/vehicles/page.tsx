@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Plus, Edit, Trash2, Eye, Search, Filter, ChevronUp, ChevronDown, Power, PowerOff } from 'lucide-react'
@@ -56,13 +56,13 @@ export default function AdminVehiclesPage() {
 
     fetchCategories()
     fetchVehicles()
-  }, [session, status, router])
+  }, [session, status, router, fetchVehicles])
 
   useEffect(() => {
     if (vehicles.length > 0) {
       sortVehicles()
     }
-  }, [sortField, sortDirection])
+  }, [sortField, sortDirection, sortVehicles, vehicles.length])
 
   const fetchCategories = async () => {
     try {
@@ -76,7 +76,7 @@ export default function AdminVehiclesPage() {
     }
   }
 
-  const fetchVehicles = async () => {
+  const fetchVehicles = useCallback(async () => {
     try {
       const params = new URLSearchParams()
       if (searchTerm) params.set('search', searchTerm)
@@ -94,9 +94,9 @@ export default function AdminVehiclesPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [searchTerm, statusFilter, categoryFilter])
 
-  const sortVehicles = () => {
+  const sortVehicles = useCallback(() => {
     const sorted = [...vehicles].sort((a, b) => {
       let aValue: string | number | Date
       let bValue: string | number | Date
@@ -137,7 +137,7 @@ export default function AdminVehiclesPage() {
     })
 
     setVehicles(sorted)
-  }
+  }, [vehicles, sortField, sortDirection])
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {

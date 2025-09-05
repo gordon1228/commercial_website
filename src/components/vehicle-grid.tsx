@@ -253,7 +253,7 @@ export default function VehicleGrid() {
     }
 
     fetchVehicles()
-  }, [searchParams, sortBy])
+  }, [searchParams, sortBy, showError])
 
   return (
     <div>
