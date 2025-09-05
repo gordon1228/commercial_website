@@ -1,4 +1,3 @@
-import { prisma } from '@/lib/prisma'
 import { withRetry } from '@/lib/db-utils'
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 import { getServerSession } from 'next-auth/next'
@@ -66,7 +65,7 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
     const data = await req.json()
     
     // Get existing contact info or create if none exists with retry
-    let existingContactInfo = await withRetry(async (prisma) => {
+    const existingContactInfo = await withRetry(async (prisma) => {
       let contactInfo = await prisma.contactInfo.findFirst()
       
       if (!contactInfo) {

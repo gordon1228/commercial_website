@@ -1,6 +1,5 @@
 // src/app/api/vehicles/route.ts
 // Vehicle management API routes
-import { prisma } from '@/lib/prisma'
 import { withRetry } from '@/lib/db-utils'
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 

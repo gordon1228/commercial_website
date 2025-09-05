@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { healthCheck, getConnectionInfo, withRetry } from '@/lib/db-utils'
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 
@@ -69,5 +68,5 @@ export const GET = createApiHandler(async (req: NextRequest) => {
     })
   }
 }, {
-  rateLimit: 'health'
+  rateLimit: 'api'
 })

@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
 declare global {
+  // eslint-disable-next-line no-var
   var __prisma: PrismaClient | undefined
 }
 
@@ -10,15 +11,6 @@ const createPrismaClient = () => {
     datasources: {
       db: {
         url: process.env.DATABASE_URL
-      }
-    },
-    // Optimized for serverless/transaction pooling
-    __internal: {
-      engine: {
-        connectTimeout: 60000,
-        pool: {
-          timeout: 60000
-        }
       }
     }
   })
