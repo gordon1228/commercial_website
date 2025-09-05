@@ -62,10 +62,8 @@ export default function AdminLoginPage() {
         setError('Invalid email or password')
         setIsLoading(false)
       } else if (result?.ok) {
-        // Force a page reload to ensure proper session update
-        // This prevents race conditions with session state
-        // For now, redirect to admin - the layout will handle role-based routing
-        window.location.href = callbackUrl
+        // Use router.push instead of window.location for better Next.js compatibility
+        window.location.href = result.url || callbackUrl
       } else {
         setError('Login failed. Please try again.')
         setIsLoading(false)
