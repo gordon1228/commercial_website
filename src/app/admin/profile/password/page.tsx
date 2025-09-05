@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function ChangePasswordPage() {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const router = useRouter()
   const [formData, setFormData] = useState({
     currentPassword: '',
@@ -113,8 +113,8 @@ export default function ChangePasswordPage() {
 
       setMessage({ type: 'success', text: 'Password changed successfully!' })
       setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' })
-    } catch (error: any) {
-      setMessage({ type: 'error', text: error.message })
+    } catch (error: unknown) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : String(error) })
     } finally {
       setIsLoading(false)
     }

@@ -18,7 +18,7 @@ export const PUT = createApiHandler(
     // Validate new password using security schema
     try {
       validationSchemas.password.parse(newPassword)
-    } catch (error) {
+    } catch {
       return apiError('New password must contain uppercase, lowercase, number and special character', 400)
     }
 

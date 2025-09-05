@@ -70,7 +70,7 @@ export async function PUT(
       // Validate email using security schema
       try {
         validationSchemas.email.parse(email)
-      } catch (error) {
+      } catch {
         return NextResponse.json(
           { error: 'Invalid email format' },
           { status: 400 }
@@ -96,7 +96,7 @@ export async function PUT(
       // Validate password using security schema
       try {
         validationSchemas.password.parse(password)
-      } catch (error) {
+      } catch {
         return NextResponse.json(
           { error: 'Password must contain uppercase, lowercase, number and special character' },
           { status: 400 }
