@@ -163,6 +163,10 @@ interface VehicleCreateBody {
   description?: string;
   price: number;
   categoryId: string;
+  year: number;
+  make: string;
+  fuelType: string;
+  transmission?: string;
   specs?: Record<string, unknown>;
   images?: string[];
   features?: string[];
@@ -180,6 +184,10 @@ export const POST = createApiHandler(async (req) => {
       description,
       price,
       categoryId,
+      year,
+      make,
+      fuelType,
+      transmission,
       specs, // Updated to match frontend field name
       images,
       features,
@@ -188,8 +196,8 @@ export const POST = createApiHandler(async (req) => {
     } = body
 
     // Validate required fields
-    if (!name || !price || !categoryId) {
-      return apiError('Missing required fields: name, price, categoryId', 400)
+    if (!name || !price || !categoryId || !year || !make || !fuelType || !transmission) {
+      return apiError('Missing required fields: name, price, categoryId, year, make, fuelType, transmission', 400)
     }
 
     // Generate slug from name
@@ -220,6 +228,10 @@ export const POST = createApiHandler(async (req) => {
         description,
         price: Number(price),
         categoryId,
+        year: Number(year),
+        make,
+        fuelType,
+        transmission,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         specs: mergedSpecs as any,
         images: images || [],

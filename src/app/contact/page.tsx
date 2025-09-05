@@ -31,6 +31,9 @@ interface ContactInfo {
   supportEmail: string
   address: string
   city: string
+  state: string
+  postcode: string
+  country: string
   directions: string
   mondayToFriday: string
   saturday: string
@@ -103,7 +106,10 @@ function ContactForm() {
           serviceEmail: 'service@elitefleet.com',
           supportEmail: 'support@elitefleet.com',
           address: '123 Business Avenue',
-          city: 'Commercial District, NY 10001',
+          city: 'Commercial District',
+          state: 'NY',
+          postcode: '10001',
+          country: 'United States',
           directions: 'Near Metro Station',
           mondayToFriday: '8:00 AM - 6:00 PM',
           saturday: '9:00 AM - 4:00 PM',
@@ -415,18 +421,17 @@ function ContactForm() {
                       <h3 className="text-lg font-semibold text-gray-900">Location</h3>
                     </div>
                     <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 text-sm">Address:</span>
-                        <span className="text-gray-900 text-sm font-medium">{contactInfo.address}</span>
+                      <div className="text-gray-900 text-sm font-medium">
+                        {contactInfo.address}<br />
+                        {contactInfo.city}, {contactInfo.state} {contactInfo.postcode}<br />
+                        {contactInfo.country}
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 text-sm">City:</span>
-                        <span className="text-gray-900 text-sm font-medium">{contactInfo.city}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 text-sm">Directions:</span>
-                        <span className="text-gray-900 text-sm font-medium">{contactInfo.directions}</span>
-                      </div>
+                      {contactInfo.directions && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 text-sm">Directions:</span>
+                          <span className="text-gray-900 text-sm font-medium">{contactInfo.directions}</span>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -500,7 +505,10 @@ export default function ContactPage() {
           serviceEmail: 'service@elitefleet.com',
           supportEmail: 'support@elitefleet.com',
           address: '123 Business Avenue',
-          city: 'Commercial District, NY 10001',
+          city: 'Commercial District',
+          state: 'NY',
+          postcode: '10001',
+          country: 'United States',
           directions: 'Near Metro Station',
           mondayToFriday: '8:00 AM - 6:00 PM',
           saturday: '9:00 AM - 4:00 PM',
@@ -556,7 +564,10 @@ export default function ContactPage() {
                   <MapPin className="h-12 w-12 text-gray-600 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">Visit Our Showroom</h3>
                   <p className="text-gray-600">
-                    {contactInfo ? `${contactInfo.address}, ${contactInfo.city}` : '123 Business Avenue, Commercial District, NY 10001'}
+                    {contactInfo ? 
+                      `${contactInfo.address}, ${contactInfo.city}, ${contactInfo.state} ${contactInfo.postcode}, ${contactInfo.country}` : 
+                      '123 Business Avenue, Commercial District, NY 10001, United States'
+                    }
                   </p>
                   <p className="text-sm text-gray-500 mt-2">
                     Interactive map would be embedded here

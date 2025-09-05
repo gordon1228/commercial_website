@@ -6,21 +6,31 @@ import { ChevronDown } from 'lucide-react'
 
 export default function ComingSoonSection() {
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [comingSoonImage, setComingSoonImage] = useState('/uploads/Technology_background.png')
+  const [dataLoaded, setDataLoaded] = useState(false)
+  const [comingSoonImage, setComingSoonImage] = useState('')
   
   useEffect(() => {
     const fetchComingSoonImage = async () => {
       try {
-        const response = await fetch('/api/homepage-content')
+        const response = await fetch('/api/homepage-content?t=' + Date.now())
         if (response.ok) {
           const data = await response.json()
-          if (data.comingSoonImage) {
-            setComingSoonImage(data.comingSoonImage)
-          }
+          const imageUrl = data.comingSoonImage || '/uploads/Technology_background.png'
+          console.log('Coming Soon - API Response:', data)
+          console.log('Coming Soon - Image URL:', imageUrl)
+          console.log('Coming Soon - Setting image to:', imageUrl)
+          setComingSoonImage(imageUrl)
+          setDataLoaded(true)
+        } else {
+          // Fallback to default image
+          setComingSoonImage('/uploads/Technology_background.png')
+          setDataLoaded(true)
         }
       } catch (error) {
         console.error('Error fetching coming soon image:', error)
-        // Keep default image if fetch fails
+        // Use fallback image if fetch fails
+        setComingSoonImage('/uploads/Technology_background.png')
+        setDataLoaded(true)
       }
     }
 
@@ -34,28 +44,48 @@ export default function ComingSoonSection() {
     nextSection?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  return (
+  // Don't render the image until we have the correct URL from the API
+  if (!dataLoaded || !comingSoonImage) {
+    return (
+      <section id="commingSoon" className="relative w-full h-screen overflow-hidden pt-20">
+        <div className="absolute inset-0 w-full h-full top-20 flex items-center justify-center bg-gray-900">
+          <div className="animate-pulse text-white text-lg">Loading Coming Soon Section...</div>
+        </div>
+      </section>
+    )
+  }
 
+  return (
     <section id="commingSoon" className="relative w-full h-screen overflow-hidden pt-20">
       {/* Image container - Full screen behind navigation, accounting for header */}
       <div className="absolute inset-0 w-full h-full top-20">
-        {/* Show static image */}
-        <>
-          <div className={`transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
-            <Image
-              src={comingSoonImage}
-              alt={comingSoonImageAlt}
-              fill
-              className="object-contain"
-              priority
-              sizes="100vw"
-              quality={90}
-              onLoad={() => setImageLoaded(true)}
-            />
+        <div className={`transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
+          <Image
+            src={comingSoonImage}
+            alt={comingSoonImageAlt}
+            fill
+            className="object-contain"
+            priority
+            sizes="100vw"
+            quality={90}
+            unoptimized
+            onLoad={() => setImageLoaded(true)}
+            onError={(e) => {
+              console.error('Failed to load coming soon image:', e)
+              // Try fallback image
+              if (comingSoonImage !== '/uploads/Technology_background.png') {
+                setComingSoonImage('/uploads/Technology_background.png')
+              }
+            }}
+          />
+        </div>
+        {!imageLoaded && (
+          <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-gray-900 z-20">
+            <div className="animate-pulse text-white text-lg">Loading Image...</div>
           </div>
-          {/* Enhanced responsive overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/50 z-10" />
-        </>
+        )}
+        {/* Enhanced responsive overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/50 z-10" />
       </div>
 
 

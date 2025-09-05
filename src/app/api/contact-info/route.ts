@@ -13,11 +13,22 @@ const fallbackContactInfo = {
   serviceEmail: 'service@evtl.com.my',
   supportEmail: 'support@evtl.com.my',
   address: '3-20 Level 3 MKH Boulevard, Jalan Changkat',
-  city: '43000 Kajang, Selangor',
+  city: 'Kajang',
+  state: 'Selangor',
+  postcode: '43000',
+  country: 'Malaysia',
   directions: 'EVTL Trucks Office',
   mondayToFriday: '9:00 AM - 6:00 PM',
   saturday: '9:00 AM - 1:00 PM',
   sunday: 'Closed',
+  // Footer Settings
+  companyDescription: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.',
+  facebookUrl: '',
+  twitterUrl: '',
+  instagramUrl: '',
+  linkedinUrl: '',
+  privacyPolicyUrl: '/privacy',
+  termsOfServiceUrl: '/terms',
   createdAt: new Date(),
   updatedAt: new Date()
 }
@@ -55,22 +66,82 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
       })
     }
 
+    // Prepare update data - only include fields that exist in the request
+    const updateData: any = {}
+    
+    // Contact information fields
+    if (data.salesPhone !== undefined) updateData.salesPhone = data.salesPhone
+    if (data.servicePhone !== undefined) updateData.servicePhone = data.servicePhone
+    if (data.financePhone !== undefined) updateData.financePhone = data.financePhone
+    if (data.salesEmail !== undefined) updateData.salesEmail = data.salesEmail
+    if (data.serviceEmail !== undefined) updateData.serviceEmail = data.serviceEmail
+    if (data.supportEmail !== undefined) updateData.supportEmail = data.supportEmail
+    if (data.address !== undefined) updateData.address = data.address
+    if (data.city !== undefined) updateData.city = data.city
+    if (data.state !== undefined) updateData.state = data.state
+    if (data.postcode !== undefined) updateData.postcode = data.postcode
+    if (data.country !== undefined) updateData.country = data.country
+    if (data.directions !== undefined) updateData.directions = data.directions
+    if (data.mondayToFriday !== undefined) updateData.mondayToFriday = data.mondayToFriday
+    if (data.saturday !== undefined) updateData.saturday = data.saturday
+    if (data.sunday !== undefined) updateData.sunday = data.sunday
+    
+    // Footer settings fields (handled via raw SQL for now due to Prisma client issues)
+    if (data.companyDescription !== undefined || data.facebookUrl !== undefined || 
+        data.twitterUrl !== undefined || data.instagramUrl !== undefined || 
+        data.linkedinUrl !== undefined || data.privacyPolicyUrl !== undefined || 
+        data.termsOfServiceUrl !== undefined) {
+      
+      // Build individual SQL updates for footer fields that exist
+      const updates: string[] = []
+      const values: any[] = [existingContactInfo.id]
+      let paramIndex = 2
+      
+      if (data.companyDescription !== undefined) {
+        updates.push(`"companyDescription" = $${paramIndex}`)
+        values.push(data.companyDescription)
+        paramIndex++
+      }
+      if (data.facebookUrl !== undefined) {
+        updates.push(`"facebookUrl" = $${paramIndex}`)
+        values.push(data.facebookUrl)
+        paramIndex++
+      }
+      if (data.twitterUrl !== undefined) {
+        updates.push(`"twitterUrl" = $${paramIndex}`)
+        values.push(data.twitterUrl)
+        paramIndex++
+      }
+      if (data.instagramUrl !== undefined) {
+        updates.push(`"instagramUrl" = $${paramIndex}`)
+        values.push(data.instagramUrl)
+        paramIndex++
+      }
+      if (data.linkedinUrl !== undefined) {
+        updates.push(`"linkedinUrl" = $${paramIndex}`)
+        values.push(data.linkedinUrl)
+        paramIndex++
+      }
+      if (data.privacyPolicyUrl !== undefined) {
+        updates.push(`"privacyPolicyUrl" = $${paramIndex}`)
+        values.push(data.privacyPolicyUrl)
+        paramIndex++
+      }
+      if (data.termsOfServiceUrl !== undefined) {
+        updates.push(`"termsOfServiceUrl" = $${paramIndex}`)
+        values.push(data.termsOfServiceUrl)
+        paramIndex++
+      }
+      
+      if (updates.length > 0) {
+        const query = `UPDATE contact_info SET ${updates.join(', ')} WHERE id = $1`
+        await prisma.$executeRawUnsafe(query, ...values)
+      }
+    }
+
     const updatedContactInfo = await prisma.contactInfo.update({
       where: { id: existingContactInfo.id },
-      data: {
-        salesPhone: data.salesPhone,
-        servicePhone: data.servicePhone,
-        financePhone: data.financePhone,
-        salesEmail: data.salesEmail,
-        serviceEmail: data.serviceEmail,
-        supportEmail: data.supportEmail,
-        address: data.address,
-        city: data.city,
-        directions: data.directions,
-        mondayToFriday: data.mondayToFriday,
-        saturday: data.saturday,
-        sunday: data.sunday,
-      }
+      data: updateData
     })
 
     return apiResponse(updatedContactInfo)

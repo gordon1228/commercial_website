@@ -19,10 +19,20 @@ interface ContactInfo {
   supportEmail: string
   address: string
   city: string
+  state: string
+  postcode: string
+  country: string
   directions: string
   mondayToFriday: string
   saturday: string
   sunday: string
+  companyDescription?: string
+  facebookUrl?: string
+  twitterUrl?: string
+  instagramUrl?: string
+  linkedinUrl?: string
+  privacyPolicyUrl?: string
+  termsOfServiceUrl?: string
 }
 
 export default function Footer() {
@@ -70,14 +80,30 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-xl font-display font-bold text-white">EVTL</h3>
             <p className="text-muted-foreground">
-              EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.
+              {contactInfo?.companyDescription || 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.'}
             </p>
 
             <div className="flex space-x-4">
-              <Facebook className="h-5 w-5 text-muted-foreground hover:text-accent cursor-pointer transition-colors" />
-              <Twitter className="h-5 w-5 text-muted-foreground hover:text-accent cursor-pointer transition-colors" />
-              <Instagram className="h-5 w-5 text-muted-foreground hover:text-accent cursor-pointer transition-colors" />
-              <Linkedin className="h-5 w-5 text-muted-foreground hover:text-accent cursor-pointer transition-colors" />
+              {contactInfo?.facebookUrl && (
+                <a href={contactInfo.facebookUrl} target="_blank" rel="noopener noreferrer">
+                  <Facebook className="h-5 w-5 text-muted-foreground hover:text-accent cursor-pointer transition-colors" />
+                </a>
+              )}
+              {contactInfo?.twitterUrl && (
+                <a href={contactInfo.twitterUrl} target="_blank" rel="noopener noreferrer">
+                  <Twitter className="h-5 w-5 text-muted-foreground hover:text-accent cursor-pointer transition-colors" />
+                </a>
+              )}
+              {contactInfo?.instagramUrl && (
+                <a href={contactInfo.instagramUrl} target="_blank" rel="noopener noreferrer">
+                  <Instagram className="h-5 w-5 text-muted-foreground hover:text-accent cursor-pointer transition-colors" />
+                </a>
+              )}
+              {contactInfo?.linkedinUrl && (
+                <a href={contactInfo.linkedinUrl} target="_blank" rel="noopener noreferrer">
+                  <Linkedin className="h-5 w-5 text-muted-foreground hover:text-accent cursor-pointer transition-colors" />
+                </a>
+              )}
             </div>
           </div>
 
@@ -142,7 +168,8 @@ export default function Footer() {
                 <MapPin className="h-4 w-4 text-accent mt-1" />
                 <span className="text-muted-foreground">
                   {contactInfo?.address || '123 Business Avenue'}<br />
-                  {contactInfo?.city || 'Commercial District, NY 10001'}
+                  {contactInfo?.city || 'Commercial District'}, {contactInfo?.state || 'NY'} {contactInfo?.postcode || '10001'}<br />
+                  {contactInfo?.country || 'United States'}
                 </span>
               </div>
             </div>
@@ -155,10 +182,10 @@ export default function Footer() {
               © 2024 EVTL. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 sm:mt-0">
-              <Link href="/privacy" className="text-muted-foreground hover:text-accent text-sm transition-colors">
+              <Link href={contactInfo?.privacyPolicyUrl || '/privacy'} className="text-muted-foreground hover:text-accent text-sm transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-muted-foreground hover:text-accent text-sm transition-colors">
+              <Link href={contactInfo?.termsOfServiceUrl || '/terms'} className="text-muted-foreground hover:text-accent text-sm transition-colors">
                 Terms of Service
               </Link>
             </div>

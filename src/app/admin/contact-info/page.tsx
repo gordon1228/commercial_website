@@ -18,6 +18,9 @@ interface ContactInfo {
   supportEmail: string
   address: string
   city: string
+  state: string
+  postcode: string
+  country: string
   directions: string
   mondayToFriday: string
   saturday: string
@@ -218,7 +221,7 @@ export default function AdminContactInfoPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address">Street Address</Label>
               <Input
                 id="address"
                 value={contactInfo.address}
@@ -226,14 +229,45 @@ export default function AdminContactInfoPage() {
                 placeholder="123 Business Avenue"
               />
             </div>
-            <div>
-              <Label htmlFor="city">City</Label>
-              <Input
-                id="city"
-                value={contactInfo.city}
-                onChange={(e) => updateContactInfo('city', e.target.value)}
-                placeholder="Commercial District, NY 10001"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={contactInfo.city}
+                  onChange={(e) => updateContactInfo('city', e.target.value)}
+                  placeholder="Commercial District"
+                />
+              </div>
+              <div>
+                <Label htmlFor="state">State/Province</Label>
+                <Input
+                  id="state"
+                  value={contactInfo.state}
+                  onChange={(e) => updateContactInfo('state', e.target.value)}
+                  placeholder="NY"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="postcode">Postal Code</Label>
+                <Input
+                  id="postcode"
+                  value={contactInfo.postcode}
+                  onChange={(e) => updateContactInfo('postcode', e.target.value)}
+                  placeholder="10001"
+                />
+              </div>
+              <div>
+                <Label htmlFor="country">Country</Label>
+                <Input
+                  id="country"
+                  value={contactInfo.country}
+                  onChange={(e) => updateContactInfo('country', e.target.value)}
+                  placeholder="United States"
+                />
+              </div>
             </div>
             <div>
               <Label htmlFor="directions">Directions/Landmark</Label>

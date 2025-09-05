@@ -216,7 +216,7 @@ export default function AdminHomepagePage() {
               onChange={(value) => updateContent('comingSoonImage', value)}
               label="Coming Soon Background Image"
               placeholder="No image selected for coming soon section"
-              folder="backgrounds"
+              folder="uploads"
             />
             <p className="text-xs text-gray-500 mt-2">
               This image will be displayed as the background of the coming soon section on the homepage.

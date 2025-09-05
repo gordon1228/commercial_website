@@ -57,6 +57,10 @@ model Vehicle {
   slug          String    @unique
   description   String?
   price         Float
+  year          Int
+  make          String
+  fuelType      String
+  transmission  String?   // Transmission type for filtering
   images        String[]
   specs         Json?     // Vehicle specifications stored as JSON
   status        Status    @default(AVAILABLE)
@@ -210,7 +214,10 @@ model ContactInfo {
   
   // Address
   address         String   @default("123 Business Avenue")
-  city            String   @default("Commercial District, NY 10001")
+  city            String   @default("Commercial District")
+  state           String   @default("NY")
+  postcode        String   @default("10001")
+  country         String   @default("United States")
   directions      String   @default("Near Metro Station")
   
   // Business Hours
@@ -223,6 +230,15 @@ model ContactInfo {
   emailNotifications    Boolean @default(true)
   systemNotifications   Boolean @default(true)
   maintenanceMode       Boolean @default(false)
+  
+  // Footer Settings
+  companyDescription    String  @default("EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.")
+  facebookUrl           String  @default("")
+  twitterUrl            String  @default("")
+  instagramUrl          String  @default("")
+  linkedinUrl           String  @default("")
+  privacyPolicyUrl      String  @default("/privacy")
+  termsOfServiceUrl     String  @default("/terms")
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Settings, Save, User, Mail, Lock, Bell } from 'lucide-react'
+import { Settings, Save, User, Mail, Lock, Bell, Link2, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -22,6 +22,16 @@ export default function SettingsPage() {
     systemNotifications: true,
     maintenanceMode: false
   })
+  
+  const [footerSettings, setFooterSettings] = useState({
+    companyDescription: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.',
+    facebookUrl: '',
+    twitterUrl: '',
+    instagramUrl: '',
+    linkedinUrl: '',
+    privacyPolicyUrl: '/privacy',
+    termsOfServiceUrl: '/terms'
+  })
   const [profileForm, setProfileForm] = useState({
     currentPassword: '',
     newPassword: '',
@@ -37,6 +47,7 @@ export default function SettingsPage() {
     
     // Load settings from API
     loadSettings()
+    loadFooterSettings()
   }, [session, status, router])
 
   const loadSettings = async () => {
@@ -59,8 +70,58 @@ export default function SettingsPage() {
     }
   }
 
+  const loadFooterSettings = async () => {
+    try {
+      const response = await fetch('/api/contact-info')
+      if (response.ok) {
+        const data = await response.json()
+        setFooterSettings({
+          companyDescription: data.companyDescription || 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.',
+          facebookUrl: data.facebookUrl || '',
+          twitterUrl: data.twitterUrl || '',
+          instagramUrl: data.instagramUrl || '',
+          linkedinUrl: data.linkedinUrl || '',
+          privacyPolicyUrl: data.privacyPolicyUrl || '/privacy',
+          termsOfServiceUrl: data.termsOfServiceUrl || '/terms'
+        })
+      }
+    } catch (error) {
+      console.error('Failed to load footer settings:', error)
+    }
+  }
+
   const handleSettingsChange = (field: string, value: string | boolean) => {
     setSettings(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleFooterSettingsChange = (field: string, value: string) => {
+    setFooterSettings(prev => ({ ...prev, [field]: value }))
+  }
+
+  const saveFooterSettings = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSettingsLoading(true)
+    
+    try {
+      // For now, we'll use the contact-info endpoint to save footer settings
+      // In a real implementation, we'd extend that endpoint or create a dedicated one
+      const response = await fetch('/api/contact-info', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(footerSettings)
+      })
+      
+      if (response.ok) {
+        alert('Footer settings saved successfully!')
+      } else {
+        const error = await response.json()
+        alert(`Failed to save footer settings: ${error.error}`)
+      }
+    } catch {
+      alert('Failed to save footer settings')
+    } finally {
+      setIsSettingsLoading(false)
+    }
   }
 
   const saveSettings = async (e: React.FormEvent) => {
@@ -351,6 +412,116 @@ export default function SettingsPage() {
               <Button type="submit" disabled={isSettingsLoading} className="w-full">
                 <Save className="h-4 w-4 mr-2" />
                 {isSettingsLoading ? 'Saving...' : 'Save System Settings'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Footer Settings */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Link2 className="h-5 w-5" />
+              Footer Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={saveFooterSettings} className="space-y-6">
+              {/* Company Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Company Description
+                </label>
+                <textarea
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  rows={3}
+                  value={footerSettings.companyDescription}
+                  onChange={(e) => handleFooterSettingsChange('companyDescription', e.target.value)}
+                  placeholder="Company description shown in footer"
+                />
+              </div>
+
+              {/* Social Media URLs */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Social Media Links</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1 flex items-center gap-2">
+                      <Facebook className="h-4 w-4" />
+                      Facebook URL
+                    </label>
+                    <Input
+                      value={footerSettings.facebookUrl}
+                      onChange={(e) => handleFooterSettingsChange('facebookUrl', e.target.value)}
+                      placeholder="https://facebook.com/your-page"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1 flex items-center gap-2">
+                      <Twitter className="h-4 w-4" />
+                      Twitter URL
+                    </label>
+                    <Input
+                      value={footerSettings.twitterUrl}
+                      onChange={(e) => handleFooterSettingsChange('twitterUrl', e.target.value)}
+                      placeholder="https://twitter.com/your-handle"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1 flex items-center gap-2">
+                      <Instagram className="h-4 w-4" />
+                      Instagram URL
+                    </label>
+                    <Input
+                      value={footerSettings.instagramUrl}
+                      onChange={(e) => handleFooterSettingsChange('instagramUrl', e.target.value)}
+                      placeholder="https://instagram.com/your-account"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1 flex items-center gap-2">
+                      <Linkedin className="h-4 w-4" />
+                      LinkedIn URL
+                    </label>
+                    <Input
+                      value={footerSettings.linkedinUrl}
+                      onChange={(e) => handleFooterSettingsChange('linkedinUrl', e.target.value)}
+                      placeholder="https://linkedin.com/company/your-company"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Legal Links */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Legal Pages</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Privacy Policy URL
+                    </label>
+                    <Input
+                      value={footerSettings.privacyPolicyUrl}
+                      onChange={(e) => handleFooterSettingsChange('privacyPolicyUrl', e.target.value)}
+                      placeholder="/privacy"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Terms of Service URL
+                    </label>
+                    <Input
+                      value={footerSettings.termsOfServiceUrl}
+                      onChange={(e) => handleFooterSettingsChange('termsOfServiceUrl', e.target.value)}
+                      placeholder="/terms"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Button type="submit" disabled={isSettingsLoading} className="w-full">
+                <Save className="h-4 w-4 mr-2" />
+                {isSettingsLoading ? 'Saving...' : 'Save Footer Settings'}
               </Button>
             </form>
           </CardContent>

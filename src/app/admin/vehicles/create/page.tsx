@@ -23,6 +23,10 @@ interface VehicleFormData {
   categoryId: string
   status: string
   featured: boolean
+  year: number
+  make: string
+  fuelType: string
+  transmission: string
   images: string[]
   specs: {
     // Performance
@@ -70,6 +74,33 @@ interface VehicleFormData {
   features: string[]
 }
 
+const fuelTypeOptions = [
+  { id: 'Electric', label: 'Electric' },
+  { id: 'Diesel', label: 'Diesel' },
+  { id: 'Gasoline', label: 'Gasoline' },
+  { id: 'Hybrid', label: 'Hybrid' },
+  { id: 'CNG', label: 'CNG' }
+]
+
+const makeOptions = [
+  { id: 'Ford', label: 'Ford' },
+  { id: 'Chevrolet', label: 'Chevrolet' },
+  { id: 'RAM', label: 'RAM' },
+  { id: 'GMC', label: 'GMC' },
+  { id: 'Isuzu', label: 'Isuzu' },
+  { id: 'Freightliner', label: 'Freightliner' },
+  { id: 'Volvo', label: 'Volvo' },
+  { id: 'Peterbilt', label: 'Peterbilt' },
+  { id: 'Kenworth', label: 'Kenworth' },
+  { id: 'Mack', label: 'Mack' }
+]
+
+const transmissionOptions = [
+  { id: 'Manual', label: 'Manual' },
+  { id: 'Automatic', label: 'Automatic' },
+  { id: 'Semi-Automatic', label: 'Semi-Automatic' }
+]
+
 export default function CreateVehiclePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -83,6 +114,10 @@ export default function CreateVehiclePage() {
     categoryId: '',
     status: 'AVAILABLE',
     featured: false,
+    year: new Date().getFullYear(),
+    make: '',
+    fuelType: '',
+    transmission: '',
     images: [''],
     specs: {
       // Performance
@@ -312,6 +347,82 @@ export default function CreateVehiclePage() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Year *
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.year}
+                    onChange={(e) => handleInputChange('year', parseInt(e.target.value) || new Date().getFullYear())}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    min="1990"
+                    max="2030"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Make *
+                  </label>
+                  <select
+                    value={formData.make}
+                    onChange={(e) => handleInputChange('make', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">Select Make</option>
+                    {makeOptions.map((make) => (
+                      <option key={make.id} value={make.id}>
+                        {make.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Fuel Type *
+                  </label>
+                  <select
+                    value={formData.fuelType}
+                    onChange={(e) => handleInputChange('fuelType', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">Select Fuel Type</option>
+                    {fuelTypeOptions.map((fuel) => (
+                      <option key={fuel.id} value={fuel.id}>
+                        {fuel.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Transmission *
+                  </label>
+                  <select
+                    value={formData.transmission}
+                    onChange={(e) => handleInputChange('transmission', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">Select Transmission</option>
+                    {transmissionOptions.map((transmission) => (
+                      <option key={transmission.id} value={transmission.id}>
+                        {transmission.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div>

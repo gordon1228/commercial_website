@@ -206,12 +206,23 @@ export default function VehicleGrid() {
         const search = searchParams.get('search')
         const priceMin = searchParams.get('priceMin')
         const priceMax = searchParams.get('priceMax')
+        // New truck specification filters
+        const fuelType = searchParams.get('fuelType')
+        const transmission = searchParams.get('transmission')
+        const yearMin = searchParams.get('yearMin')
+        const yearMax = searchParams.get('yearMax')
+        const make = searchParams.get('make')
 
         if (category) params.set('category', category)
         if (status) params.set('status', status)
         if (search) params.set('search', search)
         if (priceMin) params.set('priceMin', priceMin)
         if (priceMax) params.set('priceMax', priceMax)
+        if (fuelType) params.set('fuelType', fuelType)
+        if (transmission) params.set('transmission', transmission)
+        if (yearMin) params.set('yearMin', yearMin)
+        if (yearMax) params.set('yearMax', yearMax)
+        if (make) params.set('make', make)
         if (sortBy) params.set('sortBy', sortBy)
         params.set('limit', '100') // Show up to 100 vehicles on public page
         
@@ -301,12 +312,23 @@ export default function VehicleGrid() {
                 const search = searchParams.get('search')
                 const priceMin = searchParams.get('priceMin')
                 const priceMax = searchParams.get('priceMax')
+                // New truck specification filters
+                const fuelType = searchParams.get('fuelType')
+                const transmission = searchParams.get('transmission')
+                const yearMin = searchParams.get('yearMin')
+                const yearMax = searchParams.get('yearMax')
+                const make = searchParams.get('make')
 
                 if (category) params.set('category', category)
                 if (status) params.set('status', status)
                 if (search) params.set('search', search)
                 if (priceMin) params.set('priceMin', priceMin)
                 if (priceMax) params.set('priceMax', priceMax)
+                if (fuelType) params.set('fuelType', fuelType)
+                if (transmission) params.set('transmission', transmission)
+                if (yearMin) params.set('yearMin', yearMin)
+                if (yearMax) params.set('yearMax', yearMax)
+                if (make) params.set('make', make)
                 if (sortBy) params.set('sortBy', sortBy)
                 params.set('limit', '100') // Show up to 100 vehicles on public page
 
