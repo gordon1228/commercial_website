@@ -57,7 +57,8 @@ const fallbackTechFeatures = [
   }
 ]
 
-// const getIcon = (iconName: string) => {
+/*
+const getIcon = (iconName: string) => {
   switch (iconName) {
     case 'Battery': return <Battery className="h-8 w-8" />
     case 'Gauge': return <Gauge className="h-8 w-8" />
@@ -68,6 +69,7 @@ const fallbackTechFeatures = [
     default: return <Battery className="h-8 w-8" />
   }
 }
+*/
 
 export default function TechnologyPage() {
   const [techFeatures, setTechFeatures] = useState<TechFeature[]>([])
