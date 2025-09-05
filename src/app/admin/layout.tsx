@@ -20,7 +20,6 @@ import {
   Phone,
   KeyRound
 } from 'lucide-react'
-// import { SessionMonitor, InactivityMonitor } from '@/components/session-monitor'
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
@@ -36,7 +35,6 @@ const navigation = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const pathname = usePathname()
-  // const router = useRouter() // Commented out - not currently used
   const [sidebarOpen, setSidebarOpen] = useState(false)
   // Track user activity for session management
   const [, setLastActivity] = useState(Date.now())
@@ -122,10 +120,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <>
-      {/* Session Monitors - uncomment when session-monitor component is created */}
-      {/* <SessionMonitor />
-      <InactivityMonitor timeout={30 * 60 * 1000} /> */}
-
       <div className="min-h-screen flex overflow-hidden bg-gray-100">
         {/* Mobile sidebar backdrop */}
         {sidebarOpen && (
