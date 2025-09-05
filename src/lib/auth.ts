@@ -94,23 +94,36 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     async redirect({ url, baseUrl }) {
-      // Handle post-login redirects based on user role
-      if (url.startsWith('/admin/login')) {
-        return `${baseUrl}/admin`
+      // Handle Vercel environment - ensure proper baseUrl
+      const actualBaseUrl = process.env.NEXTAUTH_URL || baseUrl
+      
+      console.log('NextAuth redirect:', { url, baseUrl, actualBaseUrl })
+      
+      // Handle post-login redirects
+      if (url.includes('/admin/login') || url === '/admin/login') {
+        return `${actualBaseUrl}/admin`
       }
       
       // If it's a relative URL, make it absolute
       if (url.startsWith('/')) {
-        return `${baseUrl}${url}`
+        return `${actualBaseUrl}${url}`
       }
       
-      // If it's the same origin, allow it
-      if (new URL(url).origin === baseUrl) {
-        return url
+      // Parse URL to check origin
+      try {
+        const urlObj = new URL(url)
+        const baseUrlObj = new URL(actualBaseUrl)
+        
+        // If it's the same origin, allow it
+        if (urlObj.origin === baseUrlObj.origin) {
+          return url
+        }
+      } catch (e) {
+        console.error('URL parsing error:', e)
       }
       
       // Default to admin dashboard
-      return `${baseUrl}/admin`
+      return `${actualBaseUrl}/admin`
     },
   },
   pages: {

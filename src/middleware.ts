@@ -77,14 +77,12 @@ export default withAuth(
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl
         
-        // Only log in development
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Authorization check:', { 
-            pathname, 
-            hasToken: !!token,
-            role: token?.role 
-          })
-        }
+        console.log('Authorization check:', { 
+          pathname, 
+          hasToken: !!token,
+          role: token?.role,
+          origin: req.nextUrl.origin 
+        })
         
         // Allow all public pages (non-admin, non-protected-api)
         if (!pathname.startsWith('/admin') && !pathname.startsWith('/api/')) {
@@ -107,9 +105,7 @@ export default withAuth(
         ]
         
         if (pathname.startsWith('/api/') && publicApiRoutes.some(route => pathname.startsWith(route))) {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Public API access granted to:', pathname)
-          }
+          console.log('Public API access granted to:', pathname)
           return true
         }
         
@@ -122,9 +118,7 @@ export default withAuth(
           
           // For all other admin routes, require authentication
           if (!token) {
-            if (process.env.NODE_ENV === 'development') {
-              console.log('No token found, denying access to:', pathname)
-            }
+            console.log('No token found, denying access to:', pathname)
             return false
           }
           
@@ -132,31 +126,23 @@ export default withAuth(
           // ADMIN and MANAGER: full access to all admin routes
           // USER: only access to inquiries page
           if (token.role === 'ADMIN' || token.role === 'MANAGER') {
-            if (process.env.NODE_ENV === 'development') {
-              console.log('Admin/Manager access granted to:', pathname)
-            }
+            console.log('Admin/Manager access granted to:', pathname)
             return true
           }
           
           if (token.role === 'USER' && (pathname === '/admin/inquiries' || pathname.startsWith('/admin/profile'))) {
-            if (process.env.NODE_ENV === 'development') {
-              console.log('User access granted to:', pathname)
-            }
+            console.log('User access granted to:', pathname)
             return true
           }
           
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Access denied for role:', token.role, 'to:', pathname)
-          }
+          console.log('Access denied for role:', token.role, 'to:', pathname)
           return false
         }
         
         // All other API routes require authentication
         if (pathname.startsWith('/api/')) {
           if (!token) {
-            if (process.env.NODE_ENV === 'development') {
-              console.log('No token found, denying API access to:', pathname)
-            }
+            console.log('No token found, denying API access to:', pathname)
             return false
           }
           return true

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { signIn, useSession } from 'next-auth/react'
 import { Car, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function AdminLoginPage() {
-  // const router = useRouter() // Commented out - not currently used
+  const router = useRouter()
   const searchParams = useSearchParams()
   const { data: session, status } = useSession()
   const [formData, setFormData] = useState({
@@ -25,17 +25,21 @@ export default function AdminLoginPage() {
 
   // If already logged in, redirect based on role
   useEffect(() => {
-    if (status === 'authenticated') {
-      const userRole = session?.user?.role
-      if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-        console.log('Already authenticated, redirecting to:', callbackUrl, 'Role:', userRole)
-        window.location.href = callbackUrl
-      } else if (userRole === 'USER') {
-        console.log('USER authenticated, redirecting to inquiries. Role:', userRole)
-        window.location.href = '/admin/inquiries'
+    if (status === 'authenticated' && session?.user?.role) {
+      const userRole = session.user.role
+      
+      // Prevent redirect loops by checking current path
+      if (typeof window !== 'undefined' && window.location.pathname === '/admin/login') {
+        if (userRole === 'ADMIN' || userRole === 'MANAGER') {
+          console.log('Already authenticated, redirecting to:', callbackUrl, 'Role:', userRole)
+          router.push(callbackUrl)
+        } else if (userRole === 'USER') {
+          console.log('USER authenticated, redirecting to inquiries. Role:', userRole)
+          router.push('/admin/inquiries')
+        }
       }
     }
-  }, [status, session, callbackUrl])
+  }, [status, session, callbackUrl, router])
 
   // Show error messages from URL params
   useEffect(() => {
@@ -62,8 +66,8 @@ export default function AdminLoginPage() {
         setError('Invalid email or password')
         setIsLoading(false)
       } else if (result?.ok) {
-        // Use router.push instead of window.location for better Next.js compatibility
-        window.location.href = result.url || callbackUrl
+        // Use router.push for better Next.js compatibility
+        router.push(result.url || callbackUrl)
       } else {
         setError('Login failed. Please try again.')
         setIsLoading(false)
