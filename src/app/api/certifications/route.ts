@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
+import { createApiHandler, apiResponse } from '@/lib/api-handler'
 
 const fallbackCertifications = [
   { id: '1', name: 'Malaysia Green Technology Corporation (GreenTech) Certified', order: 1, active: true, createdAt: new Date(), updatedAt: new Date() },
@@ -10,7 +10,7 @@ const fallbackCertifications = [
   { id: '6', name: 'Malaysia Digital Economy Corporation (MDEC) Registered', order: 6, active: true, createdAt: new Date(), updatedAt: new Date() }
 ]
 
-export const GET = createApiHandler(async (req) => {
+export const GET = createApiHandler(async () => {
   try {
     let certifications = await prisma.certification.findMany({
       where: { active: true },
@@ -23,7 +23,7 @@ export const GET = createApiHandler(async (req) => {
 
     return apiResponse(certifications)
   } catch (error) {
-    console.error('Error fetching certifications, using fallback:', error.message)
+    console.error('Error fetching certifications, using fallback:', error instanceof Error ? error.message : String(error))
     return apiResponse(fallbackCertifications)
   }
 })

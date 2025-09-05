@@ -33,7 +33,7 @@ const fallbackContactInfo = {
   updatedAt: new Date()
 }
 
-export const GET = createApiHandler(async (req) => {
+export const GET = createApiHandler(async () => {
   try {
     let contactInfo = await prisma.contactInfo.findFirst()
     
@@ -67,7 +67,7 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
     }
 
     // Prepare update data - only include fields that exist in the request
-    const updateData: any = {}
+    const updateData: Record<string, unknown> = {}
     
     // Contact information fields
     if (data.salesPhone !== undefined) updateData.salesPhone = data.salesPhone
@@ -94,7 +94,7 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
       
       // Build individual SQL updates for footer fields that exist
       const updates: string[] = []
-      const values: any[] = [existingContactInfo.id]
+      const values: unknown[] = [existingContactInfo.id]
       let paramIndex = 2
       
       if (data.companyDescription !== undefined) {

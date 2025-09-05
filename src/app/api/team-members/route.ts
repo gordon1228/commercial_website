@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
+import { createApiHandler, apiResponse } from '@/lib/api-handler'
 
 const fallbackTeamMembers = [
   { id: '1', name: 'Ahmad Rahman', position: 'Founder & CEO', description: 'Visionary leader in sustainable mobility and green technology', image: null, order: 1, active: true, createdAt: new Date(), updatedAt: new Date() },
@@ -8,7 +8,7 @@ const fallbackTeamMembers = [
   { id: '4', name: 'James Tan', position: 'Partnership Director', description: 'Building strategic alliances with local and international partners', image: null, order: 4, active: true, createdAt: new Date(), updatedAt: new Date() }
 ]
 
-export const GET = createApiHandler(async (req) => {
+export const GET = createApiHandler(async () => {
   try {
     let teamMembers = await prisma.teamMember.findMany({
       where: { active: true },

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
+import { createApiHandler, apiResponse } from '@/lib/api-handler'
 
 const fallbackCompanyInfo = {
   id: 'default',
@@ -22,7 +22,7 @@ const fallbackCompanyInfo = {
   updatedAt: new Date()
 }
 
-export const GET = createApiHandler(async (req) => {
+export const GET = createApiHandler(async () => {
   try {
     let companyInfo = await prisma.companyInfo.findFirst()
     
@@ -33,7 +33,7 @@ export const GET = createApiHandler(async (req) => {
 
     return apiResponse(companyInfo)
   } catch (error) {
-    console.error('Error fetching company info, using fallback:', error.message)
+    console.error('Error fetching company info, using fallback:', error instanceof Error ? error.message : String(error))
     // Return fallback data on any database error
     return apiResponse(fallbackCompanyInfo)
   }

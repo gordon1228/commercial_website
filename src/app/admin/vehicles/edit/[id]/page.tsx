@@ -274,9 +274,9 @@ export default function EditVehiclePage({ params }: { params: { id: string } }) 
       const result = await response.json()
       console.log('Vehicle updated successfully:', result)
       router.push('/admin/vehicles')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating vehicle:', error)
-      const errorMessage = error?.message || error?.toString() || 'Failed to update vehicle'
+      const errorMessage = (error instanceof Error ? error.message : String(error)) || 'Failed to update vehicle'
       alert(`Failed to update vehicle: ${errorMessage}`)
     } finally {
       setIsLoading(false)

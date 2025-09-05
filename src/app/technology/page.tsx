@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Battery, Zap, Truck, Leaf, Shield, Gauge } from 'lucide-react'
 
 interface TechFeature {
@@ -57,7 +57,7 @@ const fallbackTechFeatures = [
   }
 ]
 
-const getIcon = (iconName: string) => {
+// const getIcon = (iconName: string) => {
   switch (iconName) {
     case 'Battery': return <Battery className="h-8 w-8" />
     case 'Gauge': return <Gauge className="h-8 w-8" />
@@ -71,7 +71,7 @@ const getIcon = (iconName: string) => {
 
 export default function TechnologyPage() {
   const [techFeatures, setTechFeatures] = useState<TechFeature[]>([])
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchTechFeatures = async () => {
@@ -89,7 +89,7 @@ export default function TechnologyPage() {
     fetchTechFeatures()
   }, [])
 
-  const categories = [...new Set(techFeatures.map(feature => feature.category))]
+  // const categories = [...new Set(techFeatures.map(feature => feature.category))]
 
   return (
     <div className="min-h-screen">

@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function AdminLoginPage() {
-  const router = useRouter()
+  // const router = useRouter() // Commented out - not currently used
   const searchParams = useSearchParams()
   const { data: session, status } = useSession()
   const [formData, setFormData] = useState({

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
+import { createApiHandler, apiResponse } from '@/lib/api-handler'
 
 const fallbackValues = [
   { id: '1', title: 'Sustainability', description: 'Leading Malaysia\'s transition to zero-carbon logistics through innovative electric truck technology and smart mobility solutions.', iconName: 'Shield', order: 1, active: true, createdAt: new Date(), updatedAt: new Date() },
@@ -8,7 +8,7 @@ const fallbackValues = [
   { id: '4', title: 'Green Future', description: 'Committed to creating a sustainable tomorrow through clean energy transport solutions that benefit businesses and communities.', iconName: 'Heart', order: 4, active: true, createdAt: new Date(), updatedAt: new Date() }
 ]
 
-export const GET = createApiHandler(async (req) => {
+export const GET = createApiHandler(async () => {
   try {
     let values = await prisma.companyValue.findMany({
       where: { active: true },
@@ -21,7 +21,7 @@ export const GET = createApiHandler(async (req) => {
 
     return apiResponse(values)
   } catch (error) {
-    console.error('Error fetching company values, using fallback:', error.message)
+    console.error('Error fetching company values, using fallback:', error instanceof Error ? error.message : String(error))
     return apiResponse(fallbackValues)
   }
 })

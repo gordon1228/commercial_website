@@ -4,7 +4,7 @@ import React from 'react'
 import { Car, Gauge, Settings, Shield, Zap, Weight } from 'lucide-react'
 
 interface VehicleSpecsProps {
-  specs: Record<string, any>
+  specs: Record<string, unknown>
   vehicleName: string
 }
 

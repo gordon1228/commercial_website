@@ -266,7 +266,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {values.map((value, index) => {
+            {values.map((value) => {
               const IconComponent = iconMap[value.iconName as keyof typeof iconMap] || Shield
               return (
                 <div key={value.id} className="flex items-start space-x-4">

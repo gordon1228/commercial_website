@@ -36,7 +36,7 @@ const navigation = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const pathname = usePathname()
-  const router = useRouter()
+  // const router = useRouter() // Commented out - not currently used
   const [sidebarOpen, setSidebarOpen] = useState(false)
   // Track user activity for session management
   const [, setLastActivity] = useState(Date.now())
