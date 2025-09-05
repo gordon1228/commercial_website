@@ -62,47 +62,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }
 
-  // Check session on mount and route changes
+  // Handle authenticated users on login page redirecting to appropriate dashboard
   useEffect(() => {
     if (status === 'loading') return
 
-    // If not authenticated and not on login page, redirect
-    if (status === 'unauthenticated' && pathname !== '/admin/login') {
-      window.location.href = '/admin/login'
-      return
-    }
-
-    // Handle role-based access
-    if (status === 'authenticated' && pathname !== '/admin/login') {
-      const userRole = session?.user?.role
-      
-      // ADMIN and MANAGER have full access
-      if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-        // All good, continue
-      }
-      // USER can only access inquiries page and profile routes
-      else if (userRole === 'USER' && pathname !== '/admin/inquiries' && !pathname.startsWith('/admin/profile')) {
-        console.log('USER role redirected to inquiries page from:', pathname)
-        window.location.href = '/admin/inquiries'
-        return
-      }
-      // Invalid role
-      else if (userRole !== 'USER') {
-        console.log('Invalid role, redirecting to login. Role:', userRole)
-        window.location.href = '/admin/login'
-        return
-      }
-    }
-
-    // If authenticated with proper role and on login page, redirect appropriately
+    // Only handle redirect for authenticated users on login page
     if (status === 'authenticated' && pathname === '/admin/login') {
       const userRole = session?.user?.role
       if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-        console.log('Admin/Manager authenticated, redirecting to admin. Role:', userRole)
+        console.log('Admin/Manager authenticated, redirecting from login to admin dashboard')
         window.location.href = '/admin'
         return
       } else if (userRole === 'USER') {
-        console.log('User authenticated, redirecting to inquiries. Role:', userRole)
+        console.log('User authenticated, redirecting from login to inquiries')
+        window.location.href = '/admin/inquiries'
+        return
+      }
+    }
+
+    // Handle role-based page access for USER role (redirect to inquiries if accessing restricted pages)
+    if (status === 'authenticated' && pathname !== '/admin/login') {
+      const userRole = session?.user?.role
+      if (userRole === 'USER' && pathname !== '/admin/inquiries' && !pathname.startsWith('/admin/profile')) {
+        console.log('USER role redirected to inquiries page from:', pathname)
         window.location.href = '/admin/inquiries'
         return
       }
@@ -142,9 +124,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return <>{children}</>
   }
 
-  // Allow ADMIN, MANAGER, and USER roles (middleware handles specific page access)
-  if (status === 'unauthenticated' || !session?.user?.role || !['ADMIN', 'MANAGER', 'USER'].includes(session.user.role)) {
+  // Let middleware handle unauthenticated users - don't render anything
+  if (status === 'unauthenticated') {
     return null // Middleware will handle redirect
+  }
+
+  // Only render for authenticated users with valid roles
+  if (!session?.user?.role || !['ADMIN', 'MANAGER', 'USER'].includes(session.user.role)) {
+    return null // Invalid role, let middleware handle
   }
 
   return (

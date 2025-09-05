@@ -77,33 +77,83 @@ export default withAuth(
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl
         
-        // Public routes - always allow
-        if (!pathname.startsWith('/admin')) {
+        // Only log in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Authorization check:', { 
+            pathname, 
+            hasToken: !!token,
+            role: token?.role 
+          })
+        }
+        
+        // Public API routes that don't require authentication
+        const publicApiRoutes = [
+          '/api/public/',
+          '/api/company-info',
+          '/api/company-values',
+          '/api/team-members',
+          '/api/certifications',
+          '/api/contact-info',
+          '/api/vehicles/slug/',
+          '/api/inquiries/vehicle',
+          '/api/auth/'
+        ]
+        
+        if (pathname.startsWith('/api/') && publicApiRoutes.some(route => pathname.startsWith(route))) {
           return true
         }
         
-        // Allow access to login page
-        if (pathname === '/admin/login') {
-          return true
-        }
-        
-        // For other admin routes, require authentication
-        if (!token) {
+        // Admin routes require authentication
+        if (pathname.startsWith('/admin')) {
+          // Allow access to login page without authentication
+          if (pathname === '/admin/login') {
+            return true
+          }
+          
+          // For all other admin routes, require authentication
+          if (!token) {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('No token found, denying access to:', pathname)
+            }
+            return false
+          }
+          
+          // Check role-based access
+          // ADMIN and MANAGER: full access to all admin routes
+          // USER: only access to inquiries page
+          if (token.role === 'ADMIN' || token.role === 'MANAGER') {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('Admin/Manager access granted to:', pathname)
+            }
+            return true
+          }
+          
+          if (token.role === 'USER' && (pathname === '/admin/inquiries' || pathname.startsWith('/admin/profile'))) {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('User access granted to:', pathname)
+            }
+            return true
+          }
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Access denied for role:', token.role, 'to:', pathname)
+          }
           return false
         }
         
-        // Check role-based access
-        // ADMIN and MANAGER: full access to all admin routes
-        // USER: only access to inquiries page
-        if (token.role === 'ADMIN' || token.role === 'MANAGER') {
+        // All other API routes require authentication
+        if (pathname.startsWith('/api/')) {
+          if (!token) {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('No token found, denying API access to:', pathname)
+            }
+            return false
+          }
           return true
         }
         
-        if (token.role === 'USER' && (pathname === '/admin/inquiries' || pathname.startsWith('/admin/profile'))) {
-          return true
-        }
-        
-        return false
+        // Should not reach here with current matcher config
+        return true
       },
     },
     pages: {
@@ -115,12 +165,12 @@ export default withAuth(
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
+     * Only apply middleware to:
+     * - Admin routes (/admin/*)
+     * - API routes that need authentication (/api/*)
+     * Exclude static files and public assets
      */
-    '/((?!_next/static|_next/image|favicon.ico|public).*)',
+    '/admin/:path*',
+    '/api/:path*'
   ],
 }

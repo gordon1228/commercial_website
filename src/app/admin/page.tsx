@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { Car, Users, MessageSquare, TrendingUp, Plus } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -41,7 +40,6 @@ interface RecentVehicle {
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession()
-  const router = useRouter()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentInquiries, setRecentInquiries] = useState<RecentInquiry[]>([])
   const [recentVehicles, setRecentVehicles] = useState<RecentVehicle[]>([])
@@ -147,25 +145,12 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (status === 'loading') return
 
-    // Check if user is authenticated and has admin/manager role
-    // USER role should be redirected to inquiries page
-    if (status === 'unauthenticated') {
-      router.push('/admin/login')
-      return
+    // Only fetch data for authenticated ADMIN/MANAGER users
+    // Let middleware handle authentication and role-based redirects
+    if (status === 'authenticated' && (session?.user?.role === 'ADMIN' || session?.user?.role === 'MANAGER')) {
+      fetchDashboardData()
     }
-    
-    if (session?.user?.role === 'USER') {
-      router.push('/admin/inquiries')
-      return
-    }
-    
-    if (session?.user?.role !== 'ADMIN' && session?.user?.role !== 'MANAGER') {
-      router.push('/admin/login')
-      return
-    }
-
-    fetchDashboardData()
-  }, [status, session, router, fetchDashboardData])
+  }, [status, session, fetchDashboardData])
 
   if (status === 'loading' || isLoading) {
     return (
@@ -175,7 +160,13 @@ export default function AdminDashboard() {
     )
   }
 
-  if (status === 'unauthenticated' || !session?.user?.role || !['ADMIN', 'MANAGER'].includes(session.user.role)) {
+  // Let middleware handle authentication and authorization
+  if (status === 'unauthenticated' || !session?.user?.role) {
+    return null
+  }
+
+  // This page is only for ADMIN and MANAGER roles
+  if (!['ADMIN', 'MANAGER'].includes(session.user.role)) {
     return null
   }
 
