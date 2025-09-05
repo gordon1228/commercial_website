@@ -1,6 +1,7 @@
 // src/app/api/vehicles/route.ts
 // Vehicle management API routes
 import { prisma } from '@/lib/prisma'
+import { withRetry } from '@/lib/db-utils'
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 
 // GET /api/vehicles - Get all vehicles with optional filtering
@@ -118,23 +119,25 @@ export const GET = createApiHandler(async (req, { session }) => {
         break
     }
 
-    const [vehicles, totalCount] = await Promise.all([
-      prisma.vehicle.findMany({
-        where,
-        orderBy,
-        skip,
-        take: limit,
-        include: {
-          category: {
-            select: { id: true, name: true }
-          },
-          _count: {
-            select: { inquiries: true }
+    const [vehicles, totalCount] = await withRetry(async (prisma) => {
+      return Promise.all([
+        prisma.vehicle.findMany({
+          where,
+          orderBy,
+          skip,
+          take: limit,
+          include: {
+            category: {
+              select: { id: true, name: true }
+            },
+            _count: {
+              select: { inquiries: true }
+            }
           }
-        }
-      }),
-      prisma.vehicle.count({ where })
-    ])
+        }),
+        prisma.vehicle.count({ where })
+      ])
+    })
 
     const response = apiResponse({
       vehicles,
@@ -206,43 +209,45 @@ export const POST = createApiHandler(async (req) => {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '')
 
-    // Check if slug already exists
-    const existingVehicle = await prisma.vehicle.findUnique({
-      where: { slug }
-    })
+    // Check if slug already exists and create vehicle with retry
+    const vehicle = await withRetry(async (prisma) => {
+      const existingVehicle = await prisma.vehicle.findUnique({
+        where: { slug }
+      })
 
-    if (existingVehicle) {
-      return apiError('A vehicle with this name already exists', 409)
-    }
-
-    // Merge features into specs if they exist
-    const mergedSpecs = specs ? { ...specs } : {}
-    if (features && Array.isArray(features)) {
-      mergedSpecs.features = features
-    }
-
-    const vehicle = await prisma.vehicle.create({
-      data: {
-        name,
-        slug,
-        description,
-        price: Number(price),
-        categoryId,
-        year: Number(year),
-        make,
-        fuelType,
-        transmission,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        specs: mergedSpecs as any,
-        images: images || [],
-        status,
-        featured: Boolean(featured)
-      },
-      include: {
-        category: {
-          select: { id: true, name: true }
-        }
+      if (existingVehicle) {
+        throw new Error('A vehicle with this name already exists')
       }
+
+      // Merge features into specs if they exist
+      const mergedSpecs = specs ? { ...specs } : {}
+      if (features && Array.isArray(features)) {
+        mergedSpecs.features = features
+      }
+
+      return prisma.vehicle.create({
+        data: {
+          name,
+          slug,
+          description,
+          price: Number(price),
+          categoryId,
+          year: Number(year),
+          make,
+          fuelType,
+          transmission,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          specs: mergedSpecs as any,
+          images: images || [],
+          status,
+          featured: Boolean(featured)
+        },
+        include: {
+          category: {
+            select: { id: true, name: true }
+          }
+        }
+      })
     })
 
     return apiResponse(vehicle, { status: 201 })

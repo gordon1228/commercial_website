@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { withRetry } from '@/lib/db-utils'
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
@@ -40,10 +41,12 @@ const fallbackContactInfo = {
 
 export const GET = createApiHandler(async () => {
   try {
-    let contactInfo = await prisma.contactInfo.findFirst()
+    const contactInfo = await withRetry(async (prisma) => {
+      return await prisma.contactInfo.findFirst()
+    })
     
     if (!contactInfo) {
-      contactInfo = fallbackContactInfo
+      return apiResponse(fallbackContactInfo)
     }
 
     return apiResponse(contactInfo)
@@ -62,14 +65,18 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
   try {
     const data = await req.json()
     
-    // Get existing contact info or create if none exists
-    let existingContactInfo = await prisma.contactInfo.findFirst()
-    
-    if (!existingContactInfo) {
-      existingContactInfo = await prisma.contactInfo.create({
-        data: {}
-      })
-    }
+    // Get existing contact info or create if none exists with retry
+    let existingContactInfo = await withRetry(async (prisma) => {
+      let contactInfo = await prisma.contactInfo.findFirst()
+      
+      if (!contactInfo) {
+        contactInfo = await prisma.contactInfo.create({
+          data: {}
+        })
+      }
+      
+      return contactInfo
+    })
 
     // Prepare update data - only include fields that exist in the request
     const updateData: Record<string, unknown> = {}
@@ -139,14 +146,18 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
       }
       
       if (updates.length > 0) {
-        const query = `UPDATE contact_info SET ${updates.join(', ')} WHERE id = $1`
-        await prisma.$executeRawUnsafe(query, ...values)
+        await withRetry(async (prisma) => {
+          const query = `UPDATE contact_info SET ${updates.join(', ')} WHERE id = $1`
+          return await prisma.$executeRawUnsafe(query, ...values)
+        })
       }
     }
 
-    const updatedContactInfo = await prisma.contactInfo.update({
-      where: { id: existingContactInfo.id },
-      data: updateData
+    const updatedContactInfo = await withRetry(async (prisma) => {
+      return await prisma.contactInfo.update({
+        where: { id: existingContactInfo.id },
+        data: updateData
+      })
     })
 
     return apiResponse(updatedContactInfo)
