@@ -142,7 +142,8 @@
       "Read(/C:\\Users\\User\\Desktop\\commercial_website\\src\\app\\api\\homepage-content/**)",
       "Read(/C:\\Users\\User\\Desktop\\commercial_website\\scripts/**)",
       "WebFetch(domain:trucks.isuzu.net.my)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []

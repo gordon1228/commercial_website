@@ -86,6 +86,11 @@ export default withAuth(
           })
         }
         
+        // Allow all public pages (non-admin, non-protected-api)
+        if (!pathname.startsWith('/admin') && !pathname.startsWith('/api/')) {
+          return true
+        }
+        
         // Public API routes that don't require authentication
         const publicApiRoutes = [
           '/api/public/',
@@ -100,6 +105,9 @@ export default withAuth(
         ]
         
         if (pathname.startsWith('/api/') && publicApiRoutes.some(route => pathname.startsWith(route))) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Public API access granted to:', pathname)
+          }
           return true
         }
         
@@ -152,7 +160,7 @@ export default withAuth(
           return true
         }
         
-        // Should not reach here with current matcher config
+        // Default allow for any other routes
         return true
       },
     },
@@ -165,12 +173,9 @@ export default withAuth(
 export const config = {
   matcher: [
     /*
-     * Only apply middleware to:
-     * - Admin routes (/admin/*)
-     * - API routes that need authentication (/api/*)
-     * Exclude static files and public assets
+     * Apply middleware to admin routes and API routes that need protection
+     * Exclude static files, images, favicon, and public assets
      */
-    '/admin/:path*',
-    '/api/:path*'
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
   ],
 }
