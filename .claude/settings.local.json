@@ -144,7 +144,10 @@
       "WebFetch(domain:trucks.isuzu.net.my)",
       "WebSearch",
       "Bash(timeout:*)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(rd:*)",
+      "Bash(del test-image-cleanup.js)"
     ],
     "deny": [],
     "ask": []

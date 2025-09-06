@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import NextAuthSessionProvider from "@/components/providers/session-provider";
-import { ToastProvider } from "@/components/ui/toast";
 import { SessionManager } from "@/components/session-manager";
 import ConditionalLayout from "@/components/conditional-layout";
 
@@ -20,14 +19,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-background font-sans antialiased flex flex-col">
-        <ToastProvider>
-          <NextAuthSessionProvider>
-            <SessionManager />
-            <ConditionalLayout>
-              {children}
-            </ConditionalLayout>
-          </NextAuthSessionProvider>
-        </ToastProvider>
+        <NextAuthSessionProvider>
+          <SessionManager />
+          <ConditionalLayout>
+            {children}
+          </ConditionalLayout>
+        </NextAuthSessionProvider>
       </body>
     </html>
   );

@@ -15,7 +15,7 @@ export default function ComingSoonSection() {
         const response = await fetch('/api/homepage-content?t=' + Date.now())
         if (response.ok) {
           const data = await response.json()
-          const imageUrl = data.comingSoonImage || '/uploads/Technology_background.png'
+          const imageUrl = data.comingSoonImage || '/uploads/ComingSoon.jpg'
           console.log('Coming Soon - API Response:', data)
           console.log('Coming Soon - Image URL:', imageUrl)
           console.log('Coming Soon - Setting image to:', imageUrl)
@@ -23,13 +23,13 @@ export default function ComingSoonSection() {
           setDataLoaded(true)
         } else {
           // Fallback to default image
-          setComingSoonImage('/uploads/Technology_background.png')
+          setComingSoonImage('/uploads/ComingSoon.jpg')
           setDataLoaded(true)
         }
       } catch (error) {
         console.error('Error fetching coming soon image:', error)
         // Use fallback image if fetch fails
-        setComingSoonImage('/uploads/Technology_background.png')
+        setComingSoonImage('/uploads/ComingSoon.jpg')
         setDataLoaded(true)
       }
     }
@@ -73,8 +73,8 @@ export default function ComingSoonSection() {
             onError={(e) => {
               console.error('Failed to load coming soon image:', e)
               // Try fallback image
-              if (comingSoonImage !== '/uploads/Technology_background.png') {
-                setComingSoonImage('/uploads/Technology_background.png')
+              if (comingSoonImage !== '/uploads/ComingSoon.jpg') {
+                setComingSoonImage('/uploads/ComingSoon.jpg')
               }
             }}
           />

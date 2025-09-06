@@ -1,10 +1,8 @@
 // User management API routes
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 import { validationSchemas } from '@/lib/security'
-
-const prisma = new PrismaClient()
 
 // GET /api/users - Get all users (admin only)
 export const GET = createApiHandler(

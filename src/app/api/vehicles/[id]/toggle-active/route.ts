@@ -1,7 +1,5 @@
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 // PATCH /api/vehicles/[id]/toggle-active - Toggle active status for a vehicle
 export const PATCH = createApiHandler(

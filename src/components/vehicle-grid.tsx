@@ -9,7 +9,6 @@ import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 // import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { ErrorDisplay } from '@/components/ui/error-display'
-import { useToast } from '@/components/ui/toast'
 
 interface Vehicle {
   id: string
@@ -185,7 +184,6 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
 
 export default function VehicleGrid() {
   const searchParams = useSearchParams()
-  const { showError } = useToast()
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [sortBy, setSortBy] = useState('name')
   const [viewCount, setViewCount] = useState(0)
@@ -244,7 +242,6 @@ export default function VehicleGrid() {
         console.error('Error fetching vehicles:', err)
         const errorMessage = err instanceof Error ? err.message : 'Failed to load vehicles'
         setError(errorMessage)
-        showError('Failed to load vehicles', errorMessage)
         setVehicles([])
         setViewCount(0)
       } finally {
@@ -253,7 +250,7 @@ export default function VehicleGrid() {
     }
 
     fetchVehicles()
-  }, [searchParams, sortBy, showError])
+  }, [searchParams, sortBy])
 
   return (
     <div>

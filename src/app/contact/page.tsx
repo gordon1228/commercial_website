@@ -17,8 +17,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/toast'
-import { useFormSubmit } from '@/hooks/use-api'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { InlineError } from '@/components/ui/error-display'
 
@@ -70,10 +68,11 @@ const services = [
 function ContactForm() {
   const searchParams = useSearchParams()
   const vehicleSlug = searchParams?.get('vehicle')
-  const { showSuccess, showError } = useToast()
-  const { submit, error, clearError, isSubmitting } = useFormSubmit()
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -125,7 +124,9 @@ function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    clearError()
+    setError(null)
+    setSuccessMessage(null)
+    setIsSubmitting(true)
     
     const submissionData = {
       customerName: `${formData.firstName} ${formData.lastName}`,
@@ -135,12 +136,17 @@ function ContactForm() {
       vehicleId: null // General inquiry
     }
 
-    await submit('/api/inquiries', submissionData, {
-      onSuccess: () => {
-        showSuccess(
-          'Inquiry submitted successfully!', 
-          'We will contact you within 24 hours.'
-        )
+    try {
+      const response = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData)
+      })
+
+      if (response.ok) {
+        setSuccessMessage('Inquiry submitted successfully! We will contact you within 24 hours.')
         // Reset form
         setFormData({
           firstName: '',
@@ -153,11 +159,16 @@ function ContactForm() {
           message: '',
           preferredContact: 'email'
         })
-      },
-      onError: (error) => {
-        showError('Failed to submit inquiry', error)
+      } else {
+        const errorData = await response.json()
+        setError(errorData.error || 'Failed to submit inquiry')
       }
-    })
+    } catch (err) {
+      console.error('Error submitting form:', err)
+      setError('Network error. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleInputChange = (field: string, value: string) => {
@@ -320,12 +331,16 @@ function ContactForm() {
                     </div>
                   </div>
 
-                  {/* Error Display */}
+                  {/* Success/Error Display */}
+                  {successMessage && (
+                    <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md">
+                      {successMessage}
+                    </div>
+                  )}
                   {error && (
-                    <InlineError 
-                      message={error}
-                      onDismiss={clearError}
-                    />
+                    <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md">
+                      {error}
+                    </div>
                   )}
 
                   {/* Submit Button */}

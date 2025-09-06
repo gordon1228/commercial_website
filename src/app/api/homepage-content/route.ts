@@ -29,7 +29,7 @@ async function getHomepageContent() {
       heroDescription: 'Discover elite truck solutions built for businesses that demand excellence, reliability, and uncompromising performance.',
       heroButtonPrimary: 'Explore Trucks',
       heroButtonSecondary: 'Get Quote',
-      comingSoonImage: '/uploads/Technology_background.png',
+      comingSoonImage: '/uploads/ComingSoon.png',
       createdAt: new Date(),
       updatedAt: new Date()
     }

@@ -1,9 +1,7 @@
 import { createApiHandler, apiResponse } from '@/lib/api-handler'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
-
-const prisma = new PrismaClient()
 
 export const GET = createApiHandler(
   async () => {

@@ -1,6 +1,7 @@
 // import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
+import { deleteUploadFiles, getRemovedImages } from '@/lib/file-utils'
 
 // GET /api/vehicles/[id] - Get a specific vehicle by ID
 export const GET = createApiHandler(async (req, { params }) => {
@@ -86,6 +87,20 @@ export const PUT = createApiHandler(async (req, { params }) => {
     slug = newSlug
   }
 
+  // Handle image cleanup for removed images
+  const newImages = images || []
+  const oldImages = existingVehicle.images || []
+  const removedImages = getRemovedImages(oldImages, newImages)
+  
+  if (removedImages.length > 0) {
+    // Delete removed image files in the background
+    deleteUploadFiles(removedImages).then(result => {
+      console.log(`Vehicle ${id} image cleanup on update: ${result.deleted} deleted, ${result.failed} failed`)
+    }).catch(error => {
+      console.error('Error cleaning up removed images:', error)
+    })
+  }
+
   // Merge features into specs if they exist
   const mergedSpecs = specs ? { ...specs } : {}
   if (features && Array.isArray(features)) {
@@ -100,7 +115,7 @@ export const PUT = createApiHandler(async (req, { params }) => {
     categoryId,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     specs: mergedSpecs as any,
-    images: images || [],
+    images: newImages,
     status: status || 'AVAILABLE',
     featured: Boolean(featured)
   }
@@ -139,7 +154,13 @@ export const DELETE = createApiHandler(async (req, { params }) => {
     return apiError('Vehicle not found', 404)
   }
 
-  // Delete the vehicle
+  // Delete associated image files before deleting the vehicle record
+  if (existingVehicle.images && Array.isArray(existingVehicle.images) && existingVehicle.images.length > 0) {
+    const deleteResult = await deleteUploadFiles(existingVehicle.images)
+    console.log(`Vehicle ${id} image cleanup: ${deleteResult.deleted} deleted, ${deleteResult.failed} failed`)
+  }
+
+  // Delete the vehicle from database
   await prisma.vehicle.delete({
     where: { id }
   })

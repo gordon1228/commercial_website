@@ -1,7 +1,5 @@
 import { createApiHandler, apiResponse } from '@/lib/api-handler'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 // GET /api/inquiries - Get all inquiries with optional filtering
 export const GET = createApiHandler(
