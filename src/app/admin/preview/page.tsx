@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Eye, Edit, ExternalLink, Home, Truck, Lightbulb, Users, Phone, ArrowLeft, ArrowRight, Settings, Monitor, Smartphone, Tablet } from 'lucide-react'
@@ -239,7 +239,7 @@ export default function AdminPreviewPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Admin Preview Toolbar - positioned to work with sidebar */}
-      <div className="admin-preview-toolbar bg-white border-b border-gray-200 shadow-sm fixed top-16 left-0 md:left-64 right-0 z-[60]">
+      <div className="admin-preview-toolbar bg-white border-b border-gray-200 shadow-sm fixed top-0 left-0 md:left-64 right-0 z-[60]">
         <div className="max-w-full mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Left: Page Info */}
@@ -268,7 +268,7 @@ export default function AdminPreviewPage() {
               </Button>
               
               <div className="flex items-center space-x-1">
-                {pages.map((page, index) => {
+                {pages.map((page) => {
                   const Icon = page.icon
                   return (
                     <Button
@@ -380,7 +380,7 @@ export default function AdminPreviewPage() {
       </div>
 
       {/* Preview Frame */}
-      <div className="p-4 pt-20">
+      <div className="p-4 pt-24">
         <div className={`${getPreviewStyles()} bg-white shadow-lg rounded-lg overflow-hidden`}>
           {previewMode !== 'desktop' && (
             <div className="bg-gray-800 text-white text-center py-2 text-sm">
