@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ChevronDown } from 'lucide-react'
+// import { ChevronDown } from 'lucide-react'
 import ResponsiveImage from '@/components/ui/responsive-image'
 
 export default function ComingSoonSection() {
@@ -41,10 +41,10 @@ export default function ComingSoonSection() {
 
   const comingSoonImageAlt = 'EVTL Commercial Trucks - Coming Soon'
 
-  const scrollToNext = () => {
-    const nextSection = document.getElementById('PremiumCommercial')
-    nextSection?.scrollIntoView({ behavior: 'smooth' })
-  }
+  // const scrollToNext = () => {
+  //   const nextSection = document.getElementById('PremiumCommercial')
+  //   nextSection?.scrollIntoView({ behavior: 'smooth' })
+  // }
 
   // Don't render the image until we have the correct URL from the API
   if (!dataLoaded || !comingSoonImage) {

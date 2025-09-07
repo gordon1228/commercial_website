@@ -13,6 +13,7 @@ export async function GET(request: Request) {
     // Check if directory exists
     try {
       await fs.access(uploadsDir)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       return NextResponse.json({ 
         images: [],

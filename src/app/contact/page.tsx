@@ -8,7 +8,7 @@ import {
   Mail, 
   MapPin, 
   Clock, 
-  Send,
+  // Send,
   MessageCircle,
   Calculator,
   Calendar,
@@ -16,8 +16,8 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { LoadingSpinner } from '@/components/ui/loading-spinner'
+// import { Input } from '@/components/ui/input'
+// import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { useJsonData } from '@/lib/data-loader'
 import type { ContactInfoConfig } from '@/types/data-config'
 

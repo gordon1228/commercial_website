@@ -238,8 +238,149 @@ export default function AdminPreviewPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      {/* Admin Preview Toolbar - positioned to work with sidebar */}
+      <div className="admin-preview-toolbar bg-white border-b border-gray-200 shadow-sm fixed top-16 left-0 md:left-64 right-0 z-[60]">
+        <div className="max-w-full mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Left: Page Info */}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Eye className="h-5 w-5 text-blue-600" />
+                <h1 className="text-lg font-semibold text-gray-900">Preview Mode</h1>
+              </div>
+              <div className="hidden sm:flex items-center space-x-2">
+                <currentPageData.icon className="h-4 w-4 text-gray-500" />
+                <span className="text-sm text-gray-600">{currentPageData.name}</span>
+                <span className="text-xs text-gray-400">({currentPageIndex + 1}/{pages.length})</span>
+              </div>
+            </div>
+
+            {/* Center: Page Navigation */}
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigateToPage(prevPage.id)}
+                className="h-8"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden sm:inline ml-1">{prevPage.name}</span>
+              </Button>
+              
+              <div className="flex items-center space-x-1">
+                {pages.map((page, index) => {
+                  const Icon = page.icon
+                  return (
+                    <Button
+                      key={page.id}
+                      variant={currentPage === page.id ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => navigateToPage(page.id)}
+                      className="h-8 px-2"
+                      title={page.name}
+                    >
+                      <Icon className="h-3 w-3" />
+                      <span className="hidden lg:inline ml-1 text-xs">{page.name}</span>
+                    </Button>
+                  )
+                })}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigateToPage(nextPage.id)}
+                className="h-8"
+              >
+                <span className="hidden sm:inline mr-1">{nextPage.name}</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Right: Actions */}
+            <div className="flex items-center space-x-2">
+              {/* Responsive Preview */}
+              <div className="hidden md:flex items-center space-x-1 border rounded p-1">
+                <Button
+                  variant={previewMode === 'desktop' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setPreviewMode('desktop')}
+                  className="h-6 px-2"
+                >
+                  <Monitor className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant={previewMode === 'tablet' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setPreviewMode('tablet')}
+                  className="h-6 px-2"
+                >
+                  <Tablet className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant={previewMode === 'mobile' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setPreviewMode('mobile')}
+                  className="h-6 px-2"
+                >
+                  <Smartphone className="h-3 w-3" />
+                </Button>
+              </div>
+
+              {/* Quick Actions */}
+              {currentPage === 'home' && (
+                <Link href="/admin/homepage">
+                  <Button variant="outline" size="sm" className="h-8">
+                    <Edit className="h-3 w-3 mr-1" />
+                    <span className="hidden sm:inline">Edit</span>
+                  </Button>
+                </Link>
+              )}
+              {currentPage === 'vehicles' && (
+                <Link href="/admin/vehicles">
+                  <Button variant="outline" size="sm" className="h-8">
+                    <Edit className="h-3 w-3 mr-1" />
+                    <span className="hidden sm:inline">Manage</span>
+                  </Button>
+                </Link>
+              )}
+              {currentPage === 'about' && (
+                <Link href="/admin/settings">
+                  <Button variant="outline" size="sm" className="h-8">
+                    <Edit className="h-3 w-3 mr-1" />
+                    <span className="hidden sm:inline">Edit</span>
+                  </Button>
+                </Link>
+              )}
+              {currentPage === 'contact' && (
+                <Link href="/admin/contact-info">
+                  <Button variant="outline" size="sm" className="h-8">
+                    <Edit className="h-3 w-3 mr-1" />
+                    <span className="hidden sm:inline">Edit</span>
+                  </Button>
+                </Link>
+              )}
+
+              <Link href={`/${currentPage === 'home' ? '' : currentPage}`} target="_blank">
+                <Button variant="outline" size="sm" className="h-8">
+                  <ExternalLink className="h-3 w-3 mr-1" />
+                  <span className="hidden sm:inline">Live</span>
+                </Button>
+              </Link>
+
+              <Link href="/admin">
+                <Button variant="outline" size="sm" className="h-8">
+                  <Settings className="h-3 w-3 mr-1" />
+                  <span className="hidden sm:inline">Admin</span>
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Preview Frame */}
-      <div className="p-4">
+      <div className="p-4 pt-20">
         <div className={`${getPreviewStyles()} bg-white shadow-lg rounded-lg overflow-hidden`}>
           {previewMode !== 'desktop' && (
             <div className="bg-gray-800 text-white text-center py-2 text-sm">
