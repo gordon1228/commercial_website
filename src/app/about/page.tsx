@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { 
-  Shield, 
-  Clock, 
+  // Shield, 
+  // Clock, 
   Star,
-  CheckCircle,
-  Heart,
+  // CheckCircle,
+  // Heart,
   Target,
-  Handshake
+  // Handshake
 } from 'lucide-react'
 import { useJsonData } from '@/lib/data-loader'
 import type { CompanyInfoConfig } from '@/types/data-config'
@@ -16,12 +16,12 @@ import type { CompanyInfoConfig } from '@/types/data-config'
 // Note: metadata moved to layout.tsx since this is now a client component
 
 // Icon mapping for dynamic rendering
-const iconMap = {
-  Shield,
-  Handshake,
-  Clock,
-  Heart
-}
+// const iconMap = {
+//   Shield,
+//   Handshake,
+//   Clock,
+//   Heart
+// }
 
 interface CompanyInfo {
   companyName: string
@@ -36,28 +36,28 @@ interface CompanyInfo {
   visionText: string
 }
 
-interface CompanyValue {
-  id: string
-  title: string
-  description: string
-  iconName: string
-  order: number
-}
+// interface CompanyValue {
+//   id: string
+//   title: string
+//   description: string
+//   iconName: string
+//   order: number
+// }
 
 
-interface Certification {
-  id: string
-  name: string
-  order: number
-}
+// interface Certification {
+//   id: string
+//   name: string
+//   order: number
+// }
 
 
 
 
 export default function AboutPage() {
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
-  const [values, setValues] = useState<CompanyValue[]>([])
-  const [certifications, setCertifications] = useState<Certification[]>([])
+  // const [values, setValues] = useState<CompanyValue[]>([])
+  // const [certifications, setCertifications] = useState<Certification[]>([])
   const [isLoading, setIsLoading] = useState(true)
   
   // Load fallback data from JSON
@@ -66,33 +66,36 @@ export default function AboutPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [companyRes, valuesRes, certsRes] = await Promise.all([
-          fetch('/api/company-info'),
-          fetch('/api/company-values'),
-          fetch('/api/certifications')
+        const [companyRes] = await Promise.all([
+          fetch('/api/company-info')
         ])
+        // const [companyRes, valuesRes, certsRes] = await Promise.all([
+        //   fetch('/api/company-info'),
+        //   fetch('/api/company-values'),
+        //   fetch('/api/certifications')
+        // ])
 
         if (companyRes.ok) {
           const companyData = await companyRes.json()
           setCompanyInfo(companyData)
         }
 
-        if (valuesRes.ok) {
-          const valuesData = await valuesRes.json()
-          setValues(valuesData)
-        }
+        // if (valuesRes.ok) {
+        //   const valuesData = await valuesRes.json()
+        //   setValues(valuesData)
+        // }
 
-        if (certsRes.ok) {
-          const certsData = await certsRes.json()
-          setCertifications(certsData)
-        }
+        // if (certsRes.ok) {
+        //   const certsData = await certsRes.json()
+        //   setCertifications(certsData)
+        // }
       } catch (error) {
         console.error('Error fetching about page data:', error)
         // Use fallback data from JSON if available
         if (fallbackData) {
           setCompanyInfo(fallbackData.companyInfo)
-          setValues(fallbackData.values)
-          setCertifications(fallbackData.certifications)
+          // setValues(fallbackData.values)
+          // setCertifications(fallbackData.certifications)
         }
       } finally {
         setIsLoading(false)
