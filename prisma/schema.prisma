@@ -56,6 +56,7 @@ model Vehicle {
   description  String?
   price        Float
   images       String[]
+  mobileImages String[]  @default([])
   specs        Json?
   status       Status    @default(AVAILABLE)
   featured     Boolean   @default(false)
@@ -117,6 +118,7 @@ model HomepageContent {
   feature3Title         String   @default("24/7 Support")
   feature3Description   String   @default("Round-the-clock customer support to assist you with any questions or concerns.")
   comingSoonImage       String   @default("/images/comming soon.jpg")
+  comingSoonImageMobile String?  @default("/images/comming-soon-mobile.jpg")
   comingSoonImageAlt    String   @default("Coming Soon")
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
@@ -126,21 +128,10 @@ model HomepageContent {
   showFeaturedVehicles  Boolean? @default(true)
   showTrustSection      Boolean? @default(true)
 
+  @@index([updatedAt], map: "idx_homepage_content_updated_at")
   @@map("homepage_content")
 }
 
-model Partner {
-  id        String   @id @default(cuid())
-  name      String
-  logo      String
-  website   String?
-  active    Boolean  @default(true)
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("partners")
-}
 
 model CompanyInfo {
   id                  String   @id @default(cuid())
@@ -179,20 +170,6 @@ model CompanyValue {
   @@map("company_values")
 }
 
-model TeamMember {
-  id          String   @id @default(cuid())
-  name        String
-  position    String
-  description String
-  image       String?
-  order       Int      @default(0)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-
-  @@index([order, active], map: "idx_team_members_order_active")
-  @@map("team_members")
-}
 
 model Certification {
   id        String   @id @default(cuid())
@@ -238,6 +215,40 @@ model ContactInfo {
   termsOfServiceUrl   String?  @default("/terms") @db.VarChar(255)
 
   @@map("contact_info")
+}
+
+model TechnologyContent {
+  id                     String   @id @default(cuid())
+  heroTitle              String   @default("Next-Generation Electric Truck Technology")
+  heroSubtitle           String   @default("Advanced electric vehicle technology designed for commercial success and environmental sustainability")
+  heroBackgroundImage    String   @default("/uploads/Technology_background.png")
+  heroBackgroundImageAlt String   @default("Electric Truck Technology Background")
+  section1Title          String   @default("Advanced Battery Technology")
+  section1Description    String   @default("Our cutting-edge battery systems provide exceptional range and durability for commercial applications.")
+  section2Title          String   @default("Smart Fleet Management")
+  section2Description    String   @default("Integrated IoT solutions for real-time monitoring, maintenance prediction, and route optimization.")
+  section3Title          String   @default("Rapid Charging Infrastructure")
+  section3Description    String   @default("Fast-charging capabilities designed to minimize downtime and maximize operational efficiency.")
+  section4Title          String   @default("Sustainable Manufacturing")
+  section4Description    String   @default("Eco-friendly production processes that reduce environmental impact while maintaining quality.")
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("technology_content")
+}
+
+model TechnologyFeature {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  iconName    String   @default("Zap")
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order, active], map: "idx_technology_features_order_active")
+  @@map("technology_features")
 }
 
 enum Role {

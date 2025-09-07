@@ -8,6 +8,8 @@ export const dynamic = 'force-dynamic'
 
 async function getHomepageContent() {
   try {
+    // Direct Prisma import to avoid potential import issues
+    const { prisma } = await import('@/lib/prisma')
     let content = await prisma.homepageContent.findFirst()
     
     if (!content) {
@@ -30,6 +32,7 @@ async function getHomepageContent() {
       heroButtonPrimary: 'Explore Trucks',
       heroButtonSecondary: 'Get Quote',
       comingSoonImage: '/uploads/ComingSoon.png',
+      comingSoonImageMobile: '/uploads/ComingSoon-mobile.png',
       createdAt: new Date(),
       updatedAt: new Date()
     }
@@ -52,6 +55,9 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
 
   const data = await req.json()
   
+  // Direct Prisma import to avoid potential import issues  
+  const { prisma } = await import('@/lib/prisma')
+  
   // Get existing content or create if none exists
   let existingContent = await prisma.homepageContent.findFirst()
   
@@ -72,6 +78,7 @@ export const PUT = createApiHandler(async (req: NextRequest) => {
       heroButtonSecondary: data.heroButtonSecondary,
       // Coming soon section
       comingSoonImage: data.comingSoonImage,
+      comingSoonImageMobile: data.comingSoonImageMobile,
     }
   })
 

@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('🌱 Starting database seeding...')
+  console.log('🌱 Starting comprehensive database seeding...')
 
   try {
     // Create admin user
@@ -12,10 +12,10 @@ async function main() {
     const hashedPassword = await bcrypt.hash('admin123', 10)
     
     const adminUser = await prisma.user.upsert({
-      where: { email: 'admin@elitefleet.com' },
+      where: { email: 'admin@evtl.com' },
       update: {},
       create: {
-        email: 'admin@elitefleet.com',
+        email: 'admin@evtl.com',
         password: hashedPassword,
         role: 'ADMIN'
       }
@@ -229,33 +229,218 @@ async function main() {
         salesPhone: '+1 (555) 123-4567',
         servicePhone: '+1 (555) 123-4568', 
         financePhone: '+1 (555) 123-4569',
-        salesEmail: 'sales@elitefleet.com',
-        serviceEmail: 'service@elitefleet.com',
-        supportEmail: 'support@elitefleet.com',
+        salesEmail: 'sales@evtl.com',
+        serviceEmail: 'service@evtl.com',
+        supportEmail: 'support@evtl.com',
         address: '123 Business Avenue',
         city: 'Commercial District',
         state: 'NY',
         postcode: '10001',
-        siteName: 'EliteFleet'
+        siteName: 'EVTL',
+        companyDescription: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.'
       }
     }).catch(() => {
       // Contact info might already exist, that's fine
     })
 
-    // Get counts
+    // Create company info
+    console.log('Creating company info...')
+    await prisma.companyInfo.upsert({
+      where: { id: 'default' },
+      update: {},
+      create: {
+        companyName: 'EVTL',
+        companyDescription: 'For over 25 years, we\'ve been the trusted partner for businesses seeking premium commercial vehicles. Our commitment to excellence drives everything we do.',
+        foundedYear: 1998,
+        totalVehiclesSold: 2500,
+        totalHappyCustomers: 850,
+        totalYearsExp: 25,
+        satisfactionRate: 98,
+        storyTitle: 'Our Story',
+        storyParagraph1: 'Founded in 1998, EVTL began as a small family business with a simple mission: to provide high-quality commercial vehicles to businesses that demand excellence. What started as a modest dealership has grown into one of the region\'s most trusted commercial vehicle providers.',
+        storyParagraph2: 'Over the years, we\'ve built our reputation on three core principles: quality vehicles, exceptional service, and honest business practices. Our experienced team understands that choosing the right commercial vehicle is crucial for your business success.',
+        storyParagraph3: 'Today, we continue to evolve with the industry, embracing new technologies and sustainable practices while maintaining the personal touch and attention to detail that our customers have come to expect.',
+        missionTitle: 'Our Mission',
+        missionText: 'To empower businesses with premium commercial vehicles and exceptional service, enabling them to achieve their goals while building long-lasting partnerships based on trust and mutual success.',
+        visionTitle: 'Our Vision',
+        visionText: 'To be the leading commercial vehicle provider, recognized for our commitment to quality, innovation, and customer satisfaction, while contributing to sustainable transportation solutions for future generations.'
+      }
+    }).catch(() => {
+      // Company info might already exist, that's fine
+    })
+
+    // Create company values
+    console.log('Creating company values...')
+    const companyValues = [
+      {
+        title: 'Sustainability',
+        description: 'Leading Malaysia\'s transition to zero-carbon logistics through innovative electric truck technology and smart mobility solutions.',
+        iconName: 'Shield',
+        order: 1
+      },
+      {
+        title: 'Innovation',
+        description: 'Partnering with local and international technology leaders to deliver next-generation electric vehicle solutions for the future.',
+        iconName: 'Handshake',
+        order: 2
+      },
+      {
+        title: 'Smart Solutions',
+        description: 'Integrating advanced technology and data-driven insights to optimize logistics and transport efficiency for our partners.',
+        iconName: 'Clock',
+        order: 3
+      },
+      {
+        title: 'Green Future',
+        description: 'Committed to creating a sustainable tomorrow through clean energy transport solutions that benefit businesses and communities.',
+        iconName: 'Heart',
+        order: 4
+      }
+    ]
+
+    for (const value of companyValues) {
+      await prisma.companyValue.upsert({
+        where: { id: `value-${value.order}` },
+        update: {},
+        create: value
+      })
+    }
+
+    // Create certifications
+    console.log('Creating certifications...')
+    const certifications = [
+      { name: 'Malaysia Green Technology Corporation (GreenTech) Certified', order: 1 },
+      { name: 'Electric Vehicle Technology License', order: 2 },
+      { name: 'ISO 14001:2015 Environmental Management', order: 3 },
+      { name: 'Partnership with Superlux Technology', order: 4 },
+      { name: 'EVpower Strategic Alliance', order: 5 },
+      { name: 'Malaysia Digital Economy Corporation (MDEC) Registered', order: 6 }
+    ]
+
+    for (const cert of certifications) {
+      await prisma.certification.upsert({
+        where: { id: `cert-${cert.order}` },
+        update: {},
+        create: cert
+      })
+    }
+
+
+    // Create homepage content
+    console.log('Creating homepage content...')
+    await prisma.homepageContent.upsert({
+      where: { id: 'default' },
+      update: {},
+      create: {
+        heroTitle: 'Premium Electric',
+        heroSubtitle: 'Commercial Vehicles',
+        heroDescription: 'Discover elite fleet solutions built for businesses that demand excellence, reliability, and sustainable electric vehicle technology.',
+        heroButtonPrimary: 'Explore Fleet',
+        heroButtonSecondary: 'Get Quote',
+        happyClients: 850,
+        yearsExperience: 25,
+        satisfactionRate: 98,
+        partnersTitle: 'Trusted by Industry Leaders',
+        partnersDescription: 'We partner with the world\'s most respected electric vehicle manufacturers to bring you unparalleled quality and sustainability.',
+        feature1Title: 'Quality Guarantee',
+        feature1Description: 'Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.',
+        feature2Title: 'Fast Delivery',
+        feature2Description: 'Quick processing and delivery to get your business moving without unnecessary delays.',
+        feature3Title: '24/7 Support',
+        feature3Description: 'Round-the-clock customer support to assist you with any questions or concerns.'
+      }
+    }).catch(() => {
+      // Homepage content might already exist, that's fine
+    })
+
+
+    // Create technology content
+    console.log('Creating technology content...')
+    await prisma.technologyContent.upsert({
+      where: { id: 'default' },
+      update: {},
+      create: {
+        heroTitle: 'Next-Generation Electric Truck Technology',
+        heroSubtitle: 'Advanced electric vehicle technology designed for commercial success and environmental sustainability',
+        heroBackgroundImage: '/uploads/Technology_background.png',
+        heroBackgroundImageAlt: 'Electric Truck Technology Background',
+        section1Title: 'Advanced Battery Technology',
+        section1Description: 'Our cutting-edge battery systems provide exceptional range and durability for commercial applications. With state-of-the-art lithium-ion technology, our trucks deliver up to 300 miles of range on a single charge.',
+        section2Title: 'Smart Fleet Management',
+        section2Description: 'Integrated IoT solutions for real-time monitoring, maintenance prediction, and route optimization. Our advanced telematics system provides comprehensive insights into vehicle performance and driver behavior.',
+        section3Title: 'Rapid Charging Infrastructure',
+        section3Description: 'Fast-charging capabilities designed to minimize downtime and maximize operational efficiency. Our trucks support DC fast charging with charging times as low as 30 minutes for 80% capacity.',
+        section4Title: 'Sustainable Manufacturing',
+        section4Description: 'Eco-friendly production processes that reduce environmental impact while maintaining quality. Our manufacturing facilities use renewable energy and sustainable materials wherever possible.'
+      }
+    }).catch(() => {
+      // Technology content might already exist, that's fine
+    })
+
+    // Create technology features
+    console.log('Creating technology features...')
+    const techFeatures = [
+      {
+        title: 'Long Range Battery',
+        description: 'Up to 300 miles range on a single charge with our advanced battery technology',
+        iconName: 'Battery',
+        order: 1
+      },
+      {
+        title: 'Fast Charging',
+        description: 'Rapid charging capabilities with 80% charge in just 30 minutes',
+        iconName: 'Zap',
+        order: 2
+      },
+      {
+        title: 'Smart Monitoring',
+        description: 'Real-time vehicle diagnostics and performance monitoring',
+        iconName: 'Wifi',
+        order: 3
+      },
+      {
+        title: 'Eco-Friendly',
+        description: 'Zero emissions operation with sustainable manufacturing practices',
+        iconName: 'Leaf',
+        order: 4
+      }
+    ]
+
+    for (const feature of techFeatures) {
+      await prisma.technologyFeature.upsert({
+        where: { id: `tech-feature-${feature.order}` },
+        update: {},
+        create: feature
+      })
+    }
+
+    // Get counts for summary
     const vehicleCount = await prisma.vehicle.count()
     const categoryCount = await prisma.category.count()
     const inquiryCount = await prisma.inquiry.count()
     const userCount = await prisma.user.count()
     const contactInfoCount = await prisma.contactInfo.count()
+    const companyInfoCount = await prisma.companyInfo.count()
+    const companyValueCount = await prisma.companyValue.count()
+    const certificationCount = await prisma.certification.count()
+    const homepageContentCount = await prisma.homepageContent.count()
+    const technologyContentCount = await prisma.technologyContent.count()
+    const technologyFeatureCount = await prisma.technologyFeature.count()
     
-    console.log('✅ Database seeding completed successfully!')
+    console.log('✅ Comprehensive database seeding completed successfully!')
     console.log(`Created:`)
     console.log(`- ${userCount} user(s)`)
     console.log(`- ${categoryCount} categories`)
     console.log(`- ${vehicleCount} vehicles`)
     console.log(`- ${inquiryCount} sample inquiries`)
     console.log(`- ${contactInfoCount} contact info record(s)`)
+    console.log(`- ${companyInfoCount} company info record(s)`)
+    console.log(`- ${companyValueCount} company values`)
+    console.log(`- ${certificationCount} certifications`)
+    console.log(`- ${homepageContentCount} homepage content record(s)`)
+    console.log(`- ${technologyContentCount} technology content record(s)`)
+    console.log(`- ${technologyFeatureCount} technology features`)
+    console.log('🎉 Your EVTL database is now fully populated!')
     
   } catch (error) {
     console.error('❌ Seeding error details:', error)

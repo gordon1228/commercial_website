@@ -3,55 +3,75 @@ import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { NextRequest } from 'next/server'
+import { loadApiFallbackData } from '@/lib/api-data-loader'
+import type { ContactInfoFallback } from '@/types/data-config'
 
-const fallbackContactInfo = {
-  id: 'default',
-  salesPhone: '+010 339 1414',
-  servicePhone: '+016 332 2349',
-  financePhone: '+016 332 2349',
-  salesEmail: 'sales@evtl.com.my',
-  serviceEmail: 'service@evtl.com.my',
-  supportEmail: 'support@evtl.com.my',
-  address: '3-20 Level 3 MKH Boulevard, Jalan Changkat',
-  city: 'Kajang',
-  state: 'Selangor',
-  postcode: '43000',
-  country: 'Malaysia',
-  directions: 'EVTL Trucks Office',
-  mondayToFriday: '9:00 AM - 6:00 PM',
-  saturday: '9:00 AM - 1:00 PM',
-  sunday: 'Closed',
-  // Settings (migrated from Settings table)
-  siteName: 'EVTL',
-  emailNotifications: true,
-  systemNotifications: true,
-  maintenanceMode: false,
-  // Footer Settings
-  companyDescription: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.',
-  facebookUrl: '',
-  twitterUrl: '',
-  instagramUrl: '',
-  linkedinUrl: '',
-  privacyPolicyUrl: '/privacy',
-  termsOfServiceUrl: '/terms',
-  createdAt: new Date(),
-  updatedAt: new Date()
+// In-memory cache for fallback data
+let cachedFallbackContactInfo: ContactInfoFallback | null = null
+
+async function getFallbackContactInfo(): Promise<ContactInfoFallback> {
+  if (!cachedFallbackContactInfo) {
+    cachedFallbackContactInfo = await loadApiFallbackData<ContactInfoFallback>('contact-info-fallback.json')
+  }
+  
+  // Default fallback if JSON file fails to load
+  return cachedFallbackContactInfo || {
+    id: 'default',
+    salesPhone: '+010 339 1414',
+    servicePhone: '+016 332 2349',
+    financePhone: '+016 332 2349',
+    salesEmail: 'sales@evtl.com.my',
+    serviceEmail: 'service@evtl.com.my',
+    supportEmail: 'support@evtl.com.my',
+    address: '3-20 Level 3 MKH Boulevard, Jalan Changkat',
+    city: 'Kajang',
+    state: 'Selangor',
+    postcode: '43000',
+    country: 'Malaysia',
+    directions: 'EVTL Trucks Office',
+    mondayToFriday: '9:00 AM - 6:00 PM',
+    saturday: '9:00 AM - 1:00 PM',
+    sunday: 'Closed',
+    siteName: 'EVTL',
+    emailNotifications: true,
+    systemNotifications: true,
+    maintenanceMode: false,
+    companyDescription: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.',
+    facebookUrl: '',
+    twitterUrl: '',
+    instagramUrl: '',
+    linkedinUrl: '',
+    privacyPolicyUrl: '/privacy',
+    termsOfServiceUrl: '/terms'
+  }
 }
 
 export const GET = createApiHandler(async () => {
   try {
-    const contactInfo = await withRetry(async (prisma) => {
-      return await prisma.contactInfo.findFirst()
-    })
+    // Direct Prisma call with timeout to prevent hanging
+    const { prisma } = await import('@/lib/prisma')
+    const contactInfo = await prisma.contactInfo.findFirst()
     
     if (!contactInfo) {
-      return apiResponse(fallbackContactInfo)
+      const fallbackData = await getFallbackContactInfo()
+      const contactInfoWithDates = {
+        ...fallbackData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+      return apiResponse(contactInfoWithDates)
     }
 
     return apiResponse(contactInfo)
   } catch (error) {
     console.error('Error fetching contact info, using fallback:', error instanceof Error ? error.message : 'Unknown error')
-    return apiResponse(fallbackContactInfo)
+    const fallbackData = await getFallbackContactInfo()
+    const contactInfoWithDates = {
+      ...fallbackData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+    return apiResponse(contactInfoWithDates)
   }
 })
 

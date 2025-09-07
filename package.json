@@ -9,9 +9,11 @@
     "lint": "next lint",
     "postinstall": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed-from-supabase": "tsx prisma/seed-from-supabase.ts",
     "db:seed-export": "node prisma/seed-from-export.js",
     "db:reset": "prisma migrate reset && npm run db:seed",
-    "db:reset-with-data": "prisma migrate reset && npm run db:seed-export"
+    "db:reset-with-data": "prisma migrate reset && npm run db:seed-export",
+    "db:reset-with-supabase": "prisma migrate reset && npm run db:seed-from-supabase"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",

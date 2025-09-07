@@ -113,7 +113,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/vehicles" className="text-muted-foreground hover:text-accent transition-colors">
-                  Browse Trucks
+                  Browse Fleet
                 </Link>
               </li>
               <li>

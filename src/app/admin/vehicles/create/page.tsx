@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ImageUpload } from '@/components/ui/image-upload'
 import Link from 'next/link'
+import { useJsonData } from '@/lib/data-loader'
+import type { VehicleFiltersConfig } from '@/types/data-config'
 
 interface Category {
   id: string
@@ -74,32 +76,38 @@ interface VehicleFormData {
   features: string[]
 }
 
-const fuelTypeOptions = [
-  { id: 'Electric', label: 'Electric' },
-  { id: 'Diesel', label: 'Diesel' },
-  { id: 'Gasoline', label: 'Gasoline' },
-  { id: 'Hybrid', label: 'Hybrid' },
-  { id: 'CNG', label: 'CNG' }
-]
-
-const makeOptions = [
-  { id: 'Ford', label: 'Ford' },
-  { id: 'Chevrolet', label: 'Chevrolet' },
-  { id: 'RAM', label: 'RAM' },
-  { id: 'GMC', label: 'GMC' },
-  { id: 'Isuzu', label: 'Isuzu' },
-  { id: 'Freightliner', label: 'Freightliner' },
-  { id: 'Volvo', label: 'Volvo' },
-  { id: 'Peterbilt', label: 'Peterbilt' },
-  { id: 'Kenworth', label: 'Kenworth' },
-  { id: 'Mack', label: 'Mack' }
-]
-
-const transmissionOptions = [
-  { id: 'Manual', label: 'Manual' },
-  { id: 'Automatic', label: 'Automatic' },
-  { id: 'Semi-Automatic', label: 'Semi-Automatic' }
-]
+// Fallback data in case JSON loading fails
+const defaultVehicleOptions: VehicleFiltersConfig = {
+  statusOptions: [
+    { id: 'AVAILABLE', label: 'Available' },
+    { id: 'RESERVED', label: 'Reserved' },
+    { id: 'SOLD', label: 'Sold' }
+  ],
+  fuelTypeOptions: [
+    { id: 'Electric', label: 'Electric' },
+    { id: 'Diesel', label: 'Diesel' },
+    { id: 'Gasoline', label: 'Gasoline' },
+    { id: 'Hybrid', label: 'Hybrid' },
+    { id: 'CNG', label: 'CNG' }
+  ],
+  transmissionOptions: [
+    { id: 'Manual', label: 'Manual' },
+    { id: 'Automatic', label: 'Automatic' },
+    { id: 'Semi-Automatic', label: 'Semi-Automatic' }
+  ],
+  makeOptions: [
+    { id: 'Ford', label: 'Ford' },
+    { id: 'Chevrolet', label: 'Chevrolet' },
+    { id: 'RAM', label: 'RAM' },
+    { id: 'GMC', label: 'GMC' },
+    { id: 'Isuzu', label: 'Isuzu' },
+    { id: 'Freightliner', label: 'Freightliner' },
+    { id: 'Volvo', label: 'Volvo' },
+    { id: 'Peterbilt', label: 'Peterbilt' },
+    { id: 'Kenworth', label: 'Kenworth' },
+    { id: 'Mack', label: 'Mack' }
+  ]
+}
 
 export default function CreateVehiclePage() {
   const { data: session, status } = useSession()
@@ -107,6 +115,12 @@ export default function CreateVehiclePage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [activeSpecTab, setActiveSpecTab] = useState('performance')
+  
+  // Load vehicle options from JSON
+  const { data: vehicleOptions } = useJsonData<VehicleFiltersConfig>(
+    'vehicle-filters.json',
+    defaultVehicleOptions
+  )
   const [formData, setFormData] = useState<VehicleFormData>({
     name: '',
     description: '',
@@ -376,7 +390,7 @@ export default function CreateVehiclePage() {
                     required
                   >
                     <option value="">Select Make</option>
-                    {makeOptions.map((make) => (
+                    {vehicleOptions?.makeOptions.map((make) => (
                       <option key={make.id} value={make.id}>
                         {make.label}
                       </option>
@@ -397,7 +411,7 @@ export default function CreateVehiclePage() {
                     required
                   >
                     <option value="">Select Fuel Type</option>
-                    {fuelTypeOptions.map((fuel) => (
+                    {vehicleOptions?.fuelTypeOptions.map((fuel) => (
                       <option key={fuel.id} value={fuel.id}>
                         {fuel.label}
                       </option>
@@ -416,7 +430,7 @@ export default function CreateVehiclePage() {
                     required
                   >
                     <option value="">Select Transmission</option>
-                    {transmissionOptions.map((transmission) => (
+                    {vehicleOptions?.transmissionOptions.map((transmission) => (
                       <option key={transmission.id} value={transmission.id}>
                         {transmission.label}
                       </option>

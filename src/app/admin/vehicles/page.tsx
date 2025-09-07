@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Plus, Edit, Trash2, Eye, Search, Filter, ChevronUp, ChevronDown, Power, PowerOff } from 'lucide-react'
@@ -46,6 +46,7 @@ export default function AdminVehiclesPage() {
   const [categoryFilter, setCategoryFilter] = useState('')
   const [sortField, setSortField] = useState<SortField>('updatedAt')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+  const initialFetchDone = useRef(false)
 
   const fetchCategories = async () => {
     try {
@@ -72,6 +73,7 @@ export default function AdminVehiclesPage() {
 
       const data = await response.json()
       setVehicles(data.vehicles)
+      initialFetchDone.current = true
     } catch (error) {
       console.error('Error fetching vehicles:', error)
     } finally {
@@ -79,8 +81,8 @@ export default function AdminVehiclesPage() {
     }
   }, [searchTerm, statusFilter, categoryFilter])
 
-  const sortVehicles = useCallback(() => {
-    const sorted = [...vehicles].sort((a, b) => {
+  const sortVehicles = useCallback((vehicleList: Vehicle[]) => {
+    const sorted = [...vehicleList].sort((a, b) => {
       let aValue: string | number | Date
       let bValue: string | number | Date
 
@@ -120,7 +122,7 @@ export default function AdminVehiclesPage() {
     })
 
     setVehicles(sorted)
-  }, [vehicles, sortField, sortDirection])
+  }, [sortField, sortDirection])
 
   useEffect(() => {
     if (status === 'loading') return
@@ -129,15 +131,17 @@ export default function AdminVehiclesPage() {
       return
     }
 
-    fetchCategories()
-    fetchVehicles()
+    if (!initialFetchDone.current) {
+      fetchCategories()
+      fetchVehicles()
+    }
   }, [session, status, router, fetchVehicles])
 
   useEffect(() => {
     if (vehicles.length > 0) {
-      sortVehicles()
+      sortVehicles(vehicles)
     }
-  }, [sortField, sortDirection, sortVehicles, vehicles.length])
+  }, [sortField, sortDirection, sortVehicles])
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -204,16 +208,16 @@ export default function AdminVehiclesPage() {
     }
   }
 
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     fetchVehicles()
-  }
+  }, [fetchVehicles])
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchTerm('')
     setStatusFilter('')
     setCategoryFilter('')
     fetchVehicles()
-  }
+  }, [fetchVehicles])
 
   if (status === 'loading' || isLoading) {
     return (

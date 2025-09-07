@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 import { ChevronDown } from 'lucide-react'
+import ResponsiveImage from '@/components/ui/responsive-image'
 
 export default function ComingSoonSection() {
   const [imageLoaded, setImageLoaded] = useState(false)
   const [dataLoaded, setDataLoaded] = useState(false)
   const [comingSoonImage, setComingSoonImage] = useState('')
+  const [comingSoonImageMobile, setComingSoonImageMobile] = useState('')
   
   useEffect(() => {
     const fetchComingSoonImage = async () => {
@@ -16,20 +17,21 @@ export default function ComingSoonSection() {
         if (response.ok) {
           const data = await response.json()
           const imageUrl = data.comingSoonImage || '/uploads/ComingSoon.jpg'
-          console.log('Coming Soon - API Response:', data)
-          console.log('Coming Soon - Image URL:', imageUrl)
-          console.log('Coming Soon - Setting image to:', imageUrl)
+          const mobileImageUrl = data.comingSoonImageMobile || '/uploads/ComingSoon-mobile.jpg'
           setComingSoonImage(imageUrl)
+          setComingSoonImageMobile(mobileImageUrl)
           setDataLoaded(true)
         } else {
-          // Fallback to default image
+          // Fallback to default images
           setComingSoonImage('/uploads/ComingSoon.jpg')
+          setComingSoonImageMobile('/uploads/ComingSoon-mobile.jpg')
           setDataLoaded(true)
         }
       } catch (error) {
         console.error('Error fetching coming soon image:', error)
-        // Use fallback image if fetch fails
+        // Use fallback images if fetch fails
         setComingSoonImage('/uploads/ComingSoon.jpg')
+        setComingSoonImageMobile('/uploads/ComingSoon-mobile.jpg')
         setDataLoaded(true)
       }
     }
@@ -60,11 +62,12 @@ export default function ComingSoonSection() {
       {/* Image container - Full screen behind navigation, accounting for header */}
       <div className="absolute inset-0 w-full h-full top-20">
         <div className={`transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
-          <Image
-            src={comingSoonImage}
+          <ResponsiveImage
+            desktopSrc={comingSoonImage}
+            mobileSrc={comingSoonImageMobile}
             alt={comingSoonImageAlt}
             fill
-            className="object-contain"
+            className="object-cover"
             priority
             sizes="100vw"
             quality={90}
@@ -72,9 +75,13 @@ export default function ComingSoonSection() {
             onLoad={() => setImageLoaded(true)}
             onError={(e) => {
               console.error('Failed to load coming soon image:', e)
-              // Try fallback image
+              // Try fallback image if we haven't already
               if (comingSoonImage !== '/uploads/ComingSoon.jpg') {
                 setComingSoonImage('/uploads/ComingSoon.jpg')
+                setComingSoonImageMobile('/uploads/ComingSoon-mobile.jpg')
+              } else {
+                // If even the fallback fails, show a placeholder
+                setImageLoaded(true)
               }
             }}
           />
@@ -91,13 +98,21 @@ export default function ComingSoonSection() {
 
       {/* Content Container - Always show since we have static image */}
       <div className="relative z-40 w-full h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="text-center text-white max-w-4xl mx-auto">
+        <div className="text-center text-white max-w-4xl mx-auto animate-pulse">
           {/* The COMING SOON text is in your image, so we don't add it here */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-4 leading-tight tracking-wide">
+            COMING SOON
+          </h1>
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-6">
+            <span className="block text-white">
+              NEW TRUCK LAUNCHING
+            </span>
+          </h2>
         </div>
       </div>
 
       {/* Scroll indicator - Always show since we have static image */}
-      <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-1/2 transform -translate-x-1/2 z-40">
+      {/* <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-1/2 transform -translate-x-1/2 z-40">
         <button 
           className="cursor-pointer animate-bounce flex flex-col items-center group"
           onClick={scrollToNext}
@@ -113,7 +128,7 @@ export default function ComingSoonSection() {
             </div>
           </div>
         </button>
-      </div>
+      </div> */}
     </section>
   )
 }

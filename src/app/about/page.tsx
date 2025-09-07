@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 import { 
   Shield, 
   Clock, 
@@ -11,6 +10,8 @@ import {
   Target,
   Handshake
 } from 'lucide-react'
+import { useJsonData } from '@/lib/data-loader'
+import type { CompanyInfoConfig } from '@/types/data-config'
 
 // Note: metadata moved to layout.tsx since this is now a client component
 
@@ -43,14 +44,6 @@ interface CompanyValue {
   order: number
 }
 
-interface TeamMember {
-  id: string
-  name: string
-  position: string
-  description: string
-  image: string | null
-  order: number
-}
 
 interface Certification {
   id: string
@@ -64,17 +57,18 @@ interface Certification {
 export default function AboutPage() {
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null)
   const [values, setValues] = useState<CompanyValue[]>([])
-  const [team, setTeam] = useState<TeamMember[]>([])
   const [certifications, setCertifications] = useState<Certification[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  
+  // Load fallback data from JSON
+  const { data: fallbackData, loading: fallbackLoading } = useJsonData<CompanyInfoConfig>('fallback/company-info.json')
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [companyRes, valuesRes, teamRes, certsRes] = await Promise.all([
+        const [companyRes, valuesRes, certsRes] = await Promise.all([
           fetch('/api/company-info'),
           fetch('/api/company-values'),
-          fetch('/api/team-members'),
           fetch('/api/certifications')
         ])
 
@@ -88,62 +82,30 @@ export default function AboutPage() {
           setValues(valuesData)
         }
 
-        if (teamRes.ok) {
-          const teamData = await teamRes.json()
-          setTeam(teamData)
-        }
-
         if (certsRes.ok) {
           const certsData = await certsRes.json()
           setCertifications(certsData)
         }
       } catch (error) {
         console.error('Error fetching about page data:', error)
-        // Provide fallback data if API fails
-        setCompanyInfo({
-          companyName: 'EVTL',
-          companyDescription: 'For over 25 years, we\'ve been the trusted partner for businesses seeking premium commercial vehicles. Our commitment to excellence drives everything we do.',
-          storyTitle: 'Our Story',
-          storyParagraph1: 'Founded in 1998, EVTL began as a small family business with a simple mission: to provide high-quality commercial vehicles to businesses that demand excellence. What started as a modest dealership has grown into one of the region\'s most trusted commercial vehicle providers.',
-          storyParagraph2: 'Over the years, we\'ve built our reputation on three core principles: quality vehicles, exceptional service, and honest business practices. Our experienced team understands that choosing the right commercial vehicle is crucial for your business success.',
-          storyParagraph3: 'Today, we continue to evolve with the industry, embracing new technologies and sustainable practices while maintaining the personal touch and attention to detail that our customers have come to expect.',
-          missionTitle: 'Our Mission',
-          missionText: 'To empower businesses with premium commercial vehicles and exceptional service, enabling them to achieve their goals while building long-lasting partnerships based on trust and mutual success.',
-          visionTitle: 'Our Vision',
-          visionText: 'To be the leading commercial vehicle provider, recognized for our commitment to quality, innovation, and customer satisfaction, while contributing to sustainable transportation solutions for future generations.'
-        })
-        
-        setValues([
-          { id: '1', title: 'Quality Assurance', description: 'Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage to ensure your peace of mind.', iconName: 'Shield', order: 1 },
-          { id: '2', title: 'Trust & Integrity', description: 'We build lasting relationships through honest dealings, transparent pricing, and reliable service that you can count on.', iconName: 'Handshake', order: 2 },
-          { id: '3', title: 'Timely Service', description: 'We understand your business needs. Our quick processing and delivery services keep your operations running smoothly.', iconName: 'Clock', order: 3 },
-          { id: '4', title: 'Customer First', description: '24/7 customer support and personalized service ensure that your experience with us exceeds expectations every time.', iconName: 'Heart', order: 4 }
-        ])
-        
-        setTeam([
-          { id: '1', name: 'Michael Chen', position: 'Founder & CEO', description: '25+ years in commercial vehicle industry', image: null, order: 1 },
-          { id: '2', name: 'Sarah Johnson', position: 'Head of Sales', description: 'Expert in fleet management solutions', image: null, order: 2 },
-          { id: '3', name: 'David Rodriguez', position: 'Service Director', description: 'Certified mechanical engineer & service expert', image: null, order: 3 },
-          { id: '4', name: 'Emily Zhang', position: 'Finance Manager', description: 'Specializes in commercial vehicle financing', image: null, order: 4 }
-        ])
-        
-        setCertifications([
-          { id: '1', name: 'Better Business Bureau A+ Rating', order: 1 },
-          { id: '2', name: 'Commercial Vehicle Dealer License', order: 2 },
-          { id: '3', name: 'ISO 9001:2015 Quality Management', order: 3 },
-          { id: '4', name: 'Green Business Certification', order: 4 },
-          { id: '5', name: 'Industry Association Member', order: 5 },
-          { id: '6', name: 'Customer Excellence Award 2023', order: 6 }
-        ])
+        // Use fallback data from JSON if available
+        if (fallbackData) {
+          setCompanyInfo(fallbackData.companyInfo)
+          setValues(fallbackData.values)
+          setCertifications(fallbackData.certifications)
+        }
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchData()
-  }, [])
+    // Only start fetching after fallback data is loaded (or failed to load)
+    if (!fallbackLoading) {
+      fetchData()
+    }
+  }, [fallbackData, fallbackLoading])
 
-  if (isLoading) {
+  if (isLoading || fallbackLoading) {
     return (
       <div className="min-h-screen pt-20 bg-background">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -185,7 +147,41 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Our Story */}
+     
+
+      {/* Mission & Vision */}
+      <section className="py-20 bg-gray-400/30">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+              Mission & Vision
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Target className="h-8 w-8 text-accent" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{companyInfo.missionTitle}</h3>
+              <p className="text-gray-600 leading-relaxed">
+                {companyInfo.missionText}
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Star className="h-8 w-8 text-accent" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{companyInfo.visionTitle}</h3>
+              <p className="text-gray-600 leading-relaxed">
+                {companyInfo.visionText}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+       {/* Our Story */}
       <section className="py-20">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -221,40 +217,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Mission & Vision */}
-      <section className="py-20 bg-gray-400/30">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Mission & Vision
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Target className="h-8 w-8 text-accent" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">{companyInfo.missionTitle}</h3>
-              <p className="text-gray-600 leading-relaxed">
-                {companyInfo.missionText}
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Star className="h-8 w-8 text-accent" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">{companyInfo.visionTitle}</h3>
-              <p className="text-gray-600 leading-relaxed">
-                {companyInfo.visionText}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Our Values */}
-      <section className="py-20">
+      {/* <section className="py-20">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
@@ -282,52 +246,11 @@ export default function AboutPage() {
             })}
           </div>
         </div>
-      </section>
+      </section> */}
 
-
-      {/* Team */}
-      <section className="py-20">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Meet Our Team
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our experienced professionals are dedicated to helping you find the perfect commercial vehicle for your business needs.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member) => (
-              <div key={member.id} className="text-center">
-                <div className="relative aspect-square mb-6 rounded-lg overflow-hidden">
-                  {member.image ? (
-                    <Image
-                      src={member.image}
-                      alt={member.name}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                      <div className="text-center text-gray-500">
-                        <div className="text-4xl mb-2">👤</div>
-                        <div className="text-sm font-medium">No Photo</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
-                <p className="text-gray-900 font-medium mb-3">{member.position}</p>
-                <p className="text-gray-600 text-sm">{member.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Certifications */}
-      <section className="py-20 bg-gray-400/30">
+      {/* <section className="py-20 bg-gray-400/30">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
@@ -347,10 +270,10 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
-      <section className="py-20">
+      {/* <section className="py-20">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-accent/10 border border-accent/20 rounded-2xl p-12 text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
@@ -375,7 +298,7 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   )
 }

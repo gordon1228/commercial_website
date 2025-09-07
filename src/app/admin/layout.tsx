@@ -18,24 +18,55 @@ import {
   Clock,
   Home,
   Phone,
-  KeyRound
+  KeyRound,
+  BarChart3,
+  MessageCircle,
+  Eye
 } from 'lucide-react'
+import { useJsonData } from '@/lib/data-loader'
+import type { AdminNavigationConfig } from '@/types/data-config'
 
-const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { name: 'Homepage', href: '/admin/homepage', icon: Home },
-  { name: 'Trucks', href: '/admin/vehicles', icon: Car },
-  { name: 'Categories', href: '/admin/categories', icon: FolderOpen },
-  { name: 'Users', href: '/admin/users', icon: Users },
-  { name: 'Inquiries', href: '/admin/inquiries', icon: MessageSquare },
-  { name: 'Contact Info', href: '/admin/contact-info', icon: Phone },
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
-]
+// Icon mapping for dynamic rendering
+const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
+  BarChart3,
+  LayoutDashboard,
+  Car,
+  FolderOpen,
+  MessageCircle,
+  MessageSquare,
+  Users,
+  Home,
+  Phone,
+  Settings,
+  Eye
+}
+
+// Fallback navigation data
+const defaultNavigation: AdminNavigationConfig = {
+  navigationItems: [
+    { id: 'dashboard', name: 'Dashboard', href: '/admin', icon: 'BarChart3', roles: ['ADMIN', 'MANAGER', 'USER'] },
+    { id: 'vehicles', name: 'Vehicles', href: '/admin/vehicles', icon: 'Car', roles: ['ADMIN', 'MANAGER'] },
+    { id: 'categories', name: 'Categories', href: '/admin/categories', icon: 'FolderOpen', roles: ['ADMIN', 'MANAGER'] },
+    { id: 'inquiries', name: 'Inquiries', href: '/admin/inquiries', icon: 'MessageCircle', roles: ['ADMIN', 'MANAGER', 'USER'] },
+    { id: 'users', name: 'Users', href: '/admin/users', icon: 'Users', roles: ['ADMIN', 'MANAGER'] },
+    { id: 'homepage', name: 'Homepage', href: '/admin/homepage', icon: 'Home', roles: ['ADMIN', 'MANAGER'] },
+    { id: 'contact-info', name: 'Contact Info', href: '/admin/contact-info', icon: 'Phone', roles: ['ADMIN', 'MANAGER'] },
+    { id: 'settings', name: 'Settings', href: '/admin/settings', icon: 'Settings', roles: ['ADMIN', 'MANAGER'] },
+    { id: 'preview', name: 'Preview', href: '/admin/preview', icon: 'Eye', roles: ['ADMIN', 'MANAGER'] }
+  ]
+}
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  
+  // Load navigation from JSON
+  const { data: navigationConfig } = useJsonData<AdminNavigationConfig>(
+    'admin/navigation.json',
+    defaultNavigation
+  )
+  
   // Track user activity for session management
   const [, setLastActivity] = useState(Date.now())
 
@@ -149,24 +180,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           
           <nav className="mt-8">
-            {navigation
+            {navigationConfig?.navigationItems
               .filter((item) => {
                 // Show different navigation items based on user role
                 const userRole = session?.user?.role
-                if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-                  return true // Show all navigation items
-                } else if (userRole === 'USER') {
-                  return item.href === '/admin/inquiries' // Only show inquiries for regular users
-                }
-                return false
+                if (!userRole) return false
+                return item.roles.includes(userRole)
               })
               .map((item) => {
-                const Icon = item.icon
+                const Icon = iconMap[item.icon] || iconMap.LayoutDashboard
                 const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
                 
                 return (
                   <Link
-                    key={item.name}
+                    key={item.id}
                     href={item.href}
                     className={`${
                       isActive
@@ -224,22 +251,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main content */}
       <div className="flex-1 overflow-hidden">
-        {/* Top bar */}
-        <div className="bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between h-16 px-6">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="text-gray-500 hover:text-gray-600 md:hidden"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-            
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-600">
-                Welcome back, {session?.user?.email || 'Admin'}
-              </div>
-            </div>
-          </div>
+        {/* Mobile menu button */}
+        <div className="md:hidden p-4">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="text-gray-500 hover:text-gray-600"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
         </div>
 
         {/* Page content */}

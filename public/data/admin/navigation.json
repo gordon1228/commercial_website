@@ -1,0 +1,67 @@
+{
+  "navigationItems": [
+    {
+      "id": "dashboard",
+      "name": "Dashboard",
+      "href": "/admin",
+      "icon": "BarChart3",
+      "roles": ["ADMIN", "MANAGER", "USER"]
+    },
+    {
+      "id": "vehicles",
+      "name": "Vehicles",
+      "href": "/admin/vehicles",
+      "icon": "Car",
+      "roles": ["ADMIN", "MANAGER"]
+    },
+    {
+      "id": "categories",
+      "name": "Categories",
+      "href": "/admin/categories",
+      "icon": "FolderOpen",
+      "roles": ["ADMIN", "MANAGER"]
+    },
+    {
+      "id": "inquiries",
+      "name": "Inquiries",
+      "href": "/admin/inquiries",
+      "icon": "MessageCircle",
+      "roles": ["ADMIN", "MANAGER", "USER"]
+    },
+    {
+      "id": "users",
+      "name": "Users",
+      "href": "/admin/users",
+      "icon": "Users",
+      "roles": ["ADMIN", "MANAGER"]
+    },
+    {
+      "id": "homepage",
+      "name": "Homepage",
+      "href": "/admin/homepage",
+      "icon": "Home",
+      "roles": ["ADMIN", "MANAGER"]
+    },
+    {
+      "id": "contact-info",
+      "name": "Contact Info",
+      "href": "/admin/contact-info",
+      "icon": "Phone",
+      "roles": ["ADMIN", "MANAGER"]
+    },
+    {
+      "id": "settings",
+      "name": "Settings",
+      "href": "/admin/settings",
+      "icon": "Settings",
+      "roles": ["ADMIN", "MANAGER"]
+    },
+    {
+      "id": "preview",
+      "name": "Preview",
+      "href": "/admin/preview",
+      "icon": "Eye",
+      "roles": ["ADMIN", "MANAGER"]
+    }
+  ]
+}

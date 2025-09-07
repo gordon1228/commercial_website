@@ -1,0 +1,457 @@
+{
+  "users": [
+    {
+      "id": "clx123admin456",
+      "email": "admin@elitefleet.com",
+      "password": "$2b$10$haY5olp/wh4hgR4SP69hXO4MTA5uRJz4Fw1xqlqn41b7LNAJQ3QUC",
+      "role": "ADMIN",
+      "createdAt": "2025-09-03T09:32:46.183Z",
+      "updatedAt": "2025-09-03T09:39:20.741Z"
+    },
+    {
+      "id": "cmf5p78me0000v5zcaxjoux9s",
+      "email": "admin2@evtl.com",
+      "password": "$2b$12$/Al0mpmWnPvHodqz40Pnl.8TQHEp.Nb74eVa/XI2sMIxL9gYDkNZG",
+      "role": "USER",
+      "createdAt": "2025-09-04T17:46:44.199Z",
+      "updatedAt": "2025-09-04T17:46:44.199Z"
+    },
+    {
+      "id": "cmf5p7vpz0001v5zc9nlbafne",
+      "email": "admin3@evtl.com",
+      "password": "$2b$12$uA20VFWF3wj1zgrWpMgdL.lqnWHnQPSgbVwJT6CL/4TSvaCFK8JCa",
+      "role": "MANAGER",
+      "createdAt": "2025-09-04T17:47:14.135Z",
+      "updatedAt": "2025-09-04T17:47:14.135Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat1",
+      "name": "Trucks",
+      "slug": "trucks",
+      "description": "Heavy-duty commercial trucks for logistics and transportation",
+      "image": "/uploads/9720853c-fb5a-4ff8-9057-c17e1eb1e785.jpeg",
+      "active": true,
+      "createdAt": "2025-09-03T09:32:46.183Z",
+      "updatedAt": "2025-09-06T12:54:45.284Z"
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "cmf3xoh4i0001v5bg8i0sd9lm",
+      "name": "Truck 1",
+      "slug": "truck-1",
+      "description": "Truck 1",
+      "price": 12000,
+      "images": [
+        "/uploads/bb478356-26ec-47c1-9938-80aa761b65fe.jpeg",
+        "/uploads/e8ef911c-cf7c-4f1f-a545-e70c3733fcfd.jpeg",
+        "/uploads/962818e8-390f-4d5f-b960-7651d1c8dffd.jpeg",
+        "/uploads/16e4e6a2-85f0-4dcc-9d09-b4bf8f69aa50.jpg"
+      ],
+      "specs": {
+        "abs": "Standard",
+        "esc": "AdvanceTrac ESC",
+        "tcs": "TCS Standard",
+        "fuel": "15",
+        "brakes": "Vented disc brakes",
+        "engine": "6.7L Power Stroke V8 Turbo Diesel",
+        "rating": "5 Stars",
+        "safety": "Blind spot monitoring, lane departure warning, adaptive cruise control",
+        "torque": "1050 lb",
+        "weight": "7,494 lbs",
+        "airbags": "Dual-stage frontal airbags, side-curtain airbags",
+        "comfort": "Heated & ventilated seats, power-adjustable driver seat",
+        "legRoom": "40.8 inches (front), 43.6 inches (rear)",
+        "storage": "Multiple compartments, under-seat storage, center console",
+        "capacity": "5 seats",
+        "features": [],
+        "interior": "Premium materials, soft-touch panels",
+        "dashboard": "Digital instrument cluster with customizable display",
+        "seatbelts": "3-point safety belts with pre-tensioners",
+        "cabinSpace": "Spacious crew cab",
+        "compliance": "FMVSS, NHTSA, IIHS certified",
+        "drivetrain": "4WD",
+        "horsepower": "475",
+        "technology": "FordPass Connect, over-the-air updates, wireless charging",
+        "upholstery": "Leather-appointed seats",
+        "crumpleZones": "Advanced crumple zones front & rear",
+        "displacement": "6.7 L",
+        "fuelCapacity": "40 Gallons",
+        "infotainment": "12-inch touchscreen with Apple CarPlay & Android Auto",
+        "safetyRating": "5-Star NHTSA",
+        "transmission": "10 - Speed Automatic",
+        "reinforcement": "High-strength steel frame with side-impact beams",
+        "airConditioning": "Dual-zone automatic climate control",
+        "seatingCapacity": "5"
+      },
+      "status": "AVAILABLE",
+      "featured": true,
+      "active": true,
+      "categoryId": "cat1",
+      "createdAt": "2025-09-03T12:08:32.946Z",
+      "updatedAt": "2025-09-05T07:25:22.578Z",
+      "year": 2024,
+      "make": "Isuzu",
+      "fuelType": "Electric",
+      "transmission": null
+    },
+    {
+      "id": "cmf6ih77q0001v5fcdaqzn5he",
+      "name": "Truck 2",
+      "slug": "truck-2",
+      "description": "Truck 2",
+      "price": 12000,
+      "images": [
+        "/uploads/f862d7f8-42dd-4e09-a86a-76956e945192.png"
+      ],
+      "specs": {
+        "abs": "",
+        "esc": "",
+        "tcs": "",
+        "fuel": "",
+        "brakes": "",
+        "engine": "",
+        "rating": "",
+        "safety": "",
+        "torque": "",
+        "weight": "",
+        "airbags": "",
+        "comfort": "",
+        "legRoom": "",
+        "storage": "",
+        "capacity": "",
+        "features": [],
+        "interior": "",
+        "dashboard": "",
+        "seatbelts": "",
+        "cabinSpace": "",
+        "compliance": "",
+        "drivetrain": "",
+        "horsepower": "",
+        "technology": "",
+        "upholstery": "",
+        "crumpleZones": "",
+        "displacement": "",
+        "fuelCapacity": "",
+        "infotainment": "",
+        "safetyRating": "",
+        "transmission": "",
+        "reinforcement": "",
+        "airConditioning": "",
+        "seatingCapacity": ""
+      },
+      "status": "AVAILABLE",
+      "featured": false,
+      "active": true,
+      "categoryId": "cat1",
+      "createdAt": "2025-09-05T07:26:17.798Z",
+      "updatedAt": "2025-09-05T07:26:17.798Z",
+      "year": 2025,
+      "make": "Ford",
+      "fuelType": "Electric",
+      "transmission": "Manual"
+    }
+  ],
+  "inquiries": [
+    {
+      "id": "cmf5q43r30001v58808jtkxh3",
+      "vehicleId": null,
+      "userId": "cmf5p78me0000v5zcaxjoux9s",
+      "customerName": "kwang zhi yang",
+      "email": "gordonkwang1228@gmail.com",
+      "phone": "113728933",
+      "message": "hello\n\nInquiry Type: quote\nCompany: abc\nVehicle Interest: trucks\nPreferred Contact: email",
+      "notes": null,
+      "status": "NEW",
+      "createdAt": "2025-09-04T18:12:17.535Z",
+      "updatedAt": "2025-09-05T00:56:56.942Z"
+    },
+    {
+      "id": "cmf5qejjm0001v5g8trahxdso",
+      "vehicleId": null,
+      "userId": "cmf5p78me0000v5zcaxjoux9s",
+      "customerName": "kwang zhi yang",
+      "email": "gordonkwang1228@gmail.com",
+      "phone": "113728933",
+      "message": "asd\n\nInquiry Type: general\nCompany: abc\nVehicle Interest: trucks\nPreferred Contact: email",
+      "notes": null,
+      "status": "NEW",
+      "createdAt": "2025-09-04T18:20:24.562Z",
+      "updatedAt": "2025-09-05T00:56:55.363Z"
+    }
+  ],
+  "homepageContent": [
+    {
+      "id": "default",
+      "heroTitle": "Premium Commercial",
+      "heroSubtitle": "Vehicles",
+      "heroDescription": "Discover EVTL fleet solutions built for businesses that demand excellence, reliability, and uncompromising quality.",
+      "heroButtonPrimary": "Explore Fleet",
+      "heroButtonSecondary": "Get Quote",
+      "happyClients": 25,
+      "yearsExperience": 10,
+      "satisfactionRate": 95,
+      "partnersTitle": "Trusted by Industry Leaders",
+      "partnersDescription": "We partner with the world's most respected commercial vehicle manufacturers to bring you unparalleled quality and reliability.",
+      "feature1Title": "Quality Guarantee",
+      "feature1Description": "Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.",
+      "feature2Title": "Fast Delivery",
+      "feature2Description": "Quick processing and delivery to get your business moving without unnecessary delays.",
+      "feature3Title": "24/7 Support",
+      "feature3Description": "Round-the-clock customer support to assist you with any questions or concerns.",
+      "comingSoonImage": "/uploads/Gemini_Generated_Image_hx6xx4hx6xx4hx6x.png",
+      "comingSoonImageAlt": "Coming Soon",
+      "createdAt": "2025-09-03T09:32:46.183Z",
+      "updatedAt": "2025-09-06T09:00:27.080Z",
+      "showComingSoonSection": true,
+      "showHeroSection": true,
+      "showVehicleCategories": true,
+      "showFeaturedVehicles": true,
+      "showTrustSection": true
+    }
+  ],
+  "companyInfo": [
+    {
+      "id": "cmf5mmhuf0000v504ebnuq1fk",
+      "companyName": "EVTL",
+      "companyDescription": "For over 25 years, we've been the trusted partner for businesses seeking premium commercial trucks. Our commitment to excellence drives everything we do.",
+      "foundedYear": 1998,
+      "totalVehiclesSold": 2500,
+      "totalHappyCustomers": 850,
+      "totalYearsExp": 25,
+      "satisfactionRate": 98,
+      "storyTitle": "Our Story",
+      "storyParagraph1": "Founded in 1998, EVTL began as a small family business with a simple mission: to provide high-quality commercial trucks to businesses that demand excellence. What started as a modest dealership has grown into one of the region's most trusted commercial truck providers.",
+      "storyParagraph2": "Over the years, we've built our reputation on three core principles: quality trucks, exceptional service, and honest business practices. Our experienced team understands that choosing the right commercial truck is crucial for your business success.",
+      "storyParagraph3": "Today, we continue to evolve with the industry, embracing new technologies and sustainable practices while maintaining the personal touch and attention to detail that our customers have come to expect.",
+      "missionTitle": "Our Mission",
+      "missionText": "To empower businesses with premium commercial trucks and exceptional service, enabling them to achieve their goals while building long-lasting partnerships based on trust and mutual success.",
+      "visionTitle": "Our Vision",
+      "visionText": "To be the leading commercial truck provider, recognized for our commitment to quality, innovation, and customer satisfaction, while contributing to sustainable transportation solutions for future generations.",
+      "createdAt": "2025-09-04T16:34:37.143Z",
+      "updatedAt": "2025-09-04T16:34:37.143Z"
+    }
+  ],
+  "companyValues": [
+    {
+      "id": "value-1",
+      "title": "Quality Assurance",
+      "description": "Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage to ensure your peace of mind.",
+      "iconName": "Shield",
+      "order": 1,
+      "active": true,
+      "createdAt": "2025-09-04T17:01:45.637Z",
+      "updatedAt": "2025-09-04T17:01:45.637Z"
+    },
+    {
+      "id": "value-2",
+      "title": "Trust & Integrity",
+      "description": "We build lasting relationships through honest dealings, transparent pricing, and reliable service that you can count on.",
+      "iconName": "Handshake",
+      "order": 2,
+      "active": true,
+      "createdAt": "2025-09-04T17:01:45.735Z",
+      "updatedAt": "2025-09-04T17:01:45.735Z"
+    },
+    {
+      "id": "value-3",
+      "title": "Timely Service",
+      "description": "We understand your business needs. Our quick processing and delivery services keep your operations running smoothly.",
+      "iconName": "Clock",
+      "order": 3,
+      "active": true,
+      "createdAt": "2025-09-04T17:01:45.829Z",
+      "updatedAt": "2025-09-04T17:01:45.829Z"
+    },
+    {
+      "id": "value-4",
+      "title": "Customer First",
+      "description": "24/7 customer support and personalized service ensure that your experience with us exceeds expectations every time.",
+      "iconName": "Heart",
+      "order": 4,
+      "active": true,
+      "createdAt": "2025-09-04T17:01:45.915Z",
+      "updatedAt": "2025-09-04T17:01:45.915Z"
+    }
+  ],
+  "certifications": [
+    {
+      "id": "cert-1",
+      "name": "Malaysia Commercial Vehicle Association Member",
+      "order": 1,
+      "active": true,
+      "createdAt": "2025-09-04T17:01:46.379Z",
+      "updatedAt": "2025-09-04T17:01:46.379Z"
+    },
+    {
+      "id": "cert-2",
+      "name": "ISO 9001:2015 Quality Management Certification",
+      "order": 2,
+      "active": true,
+      "createdAt": "2025-09-04T17:01:46.470Z",
+      "updatedAt": "2025-09-04T17:01:46.470Z"
+    },
+    {
+      "id": "cert-3",
+      "name": "Green Business Certification Malaysia",
+      "order": 3,
+      "active": true,
+      "createdAt": "2025-09-04T17:01:46.561Z",
+      "updatedAt": "2025-09-04T17:01:46.561Z"
+    },
+    {
+      "id": "cert-4",
+      "name": "Better Business Bureau A+ Rating",
+      "order": 4,
+      "active": true,
+      "createdAt": "2025-09-04T17:01:46.653Z",
+      "updatedAt": "2025-09-04T17:01:46.653Z"
+    },
+    {
+      "id": "cert-5",
+      "name": "Sustainable Transportation Excellence Award 2023",
+      "order": 5,
+      "active": true,
+      "createdAt": "2025-09-04T17:01:46.742Z",
+      "updatedAt": "2025-09-04T17:01:46.742Z"
+    },
+    {
+      "id": "cert-6",
+      "name": "Customer Excellence Recognition 2024",
+      "order": 6,
+      "active": true,
+      "createdAt": "2025-09-04T17:01:46.845Z",
+      "updatedAt": "2025-09-04T17:01:46.845Z"
+    }
+  ],
+  "contactInfo": [
+    {
+      "id": "default-contact-info",
+      "salesPhone": "+010 339 1414",
+      "servicePhone": "+016 332 2349",
+      "financePhone": "+016 332 2349",
+      "salesEmail": "sales@evtl.com.my",
+      "serviceEmail": "service@evtl.com.my",
+      "supportEmail": "support@evtl.com.my",
+      "address": "3-20 Level 3 MKH Boulevard, Jalan Changkat",
+      "city": "Kajang",
+      "directions": "EVTL Trucks Office",
+      "mondayToFriday": "9:00 AM - 6:00 PM",
+      "saturday": "9:00 AM - 1:00 PM",
+      "sunday": "Closed",
+      "createdAt": "2025-09-04T16:26:08.469Z",
+      "updatedAt": "2025-09-05T05:25:51.218Z",
+      "siteName": "EVTL",
+      "emailNotifications": true,
+      "systemNotifications": true,
+      "maintenanceMode": false,
+      "state": "Selangor",
+      "postcode": "43000",
+      "country": "Malaysia",
+      "companyDescription": "EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.",
+      "facebookUrl": "",
+      "twitterUrl": "",
+      "instagramUrl": "",
+      "linkedinUrl": "",
+      "privacyPolicyUrl": "/privacy",
+      "termsOfServiceUrl": "/terms"
+    }
+  ],
+  "technologyContent": [
+    {
+      "id": "e8cae29b-ca61-4d59-a62c-562905a224e9",
+      "heroTitle": "Next-Generation Electric Truck Technology",
+      "heroSubtitle": "Advanced electric vehicle technology designed for commercial success and environmental sustainability",
+      "heroBackgroundImage": "/uploads/Technology_background.png",
+      "heroBackgroundImageAlt": "Electric Truck Technology Background",
+      "section1Title": "Advanced Battery Technology",
+      "section1Description": "Our cutting-edge battery systems provide exceptional range and durability for commercial applications.",
+      "section2Title": "Smart Fleet Management",
+      "section2Description": "Integrated IoT solutions for real-time monitoring, maintenance prediction, and route optimization.",
+      "section3Title": "Rapid Charging Infrastructure",
+      "section3Description": "Fast-charging capabilities designed to minimize downtime and maximize operational efficiency.",
+      "section4Title": "Sustainable Manufacturing",
+      "section4Description": "Eco-friendly production processes that reduce environmental impact while maintaining quality.",
+      "createdAt": "2025-09-06T18:52:23.503Z",
+      "updatedAt": "2025-09-06T18:52:23.503Z"
+    }
+  ],
+  "technologyFeatures": [
+    {
+      "id": "277a5029-4610-4255-86b8-9941951c5bfb",
+      "title": "High-Capacity Battery",
+      "description": "State-of-the-art lithium-ion battery technology with extended range capabilities",
+      "iconName": "Battery",
+      "order": 1,
+      "active": true,
+      "createdAt": "2025-09-06T18:52:23.503Z",
+      "updatedAt": "2025-09-06T18:52:23.503Z"
+    },
+    {
+      "id": "3d562065-c2dd-4d33-8993-72ff8e22c483",
+      "title": "Fast Charging",
+      "description": "Rapid charging infrastructure supporting 80% charge in 30 minutes",
+      "iconName": "Zap",
+      "order": 2,
+      "active": true,
+      "createdAt": "2025-09-06T18:52:23.503Z",
+      "updatedAt": "2025-09-06T18:52:23.503Z"
+    },
+    {
+      "id": "dc947b24-13fd-4e5d-bbcd-616c7a052d76",
+      "title": "Smart Fleet Management",
+      "description": "AI-powered fleet management system for optimal route planning and vehicle monitoring",
+      "iconName": "Smartphone",
+      "order": 3,
+      "active": true,
+      "createdAt": "2025-09-06T18:52:23.503Z",
+      "updatedAt": "2025-09-06T18:52:23.503Z"
+    },
+    {
+      "id": "fb9da091-0f7f-46ef-b036-bf712745e909",
+      "title": "Regenerative Braking",
+      "description": "Energy recovery system that extends battery life and improves efficiency",
+      "iconName": "RotateCcw",
+      "order": 4,
+      "active": true,
+      "createdAt": "2025-09-06T18:52:23.503Z",
+      "updatedAt": "2025-09-06T18:52:23.503Z"
+    },
+    {
+      "id": "53dc277a-b386-4e67-b8ed-4e28feba6dd5",
+      "title": "Predictive Maintenance",
+      "description": "Advanced diagnostics system that predicts maintenance needs before issues occur",
+      "iconName": "Settings",
+      "order": 5,
+      "active": true,
+      "createdAt": "2025-09-06T18:52:23.503Z",
+      "updatedAt": "2025-09-06T18:52:23.503Z"
+    },
+    {
+      "id": "64c419df-a671-43f2-b354-2ff152fdc765",
+      "title": "Zero Emissions",
+      "description": "Completely electric drivetrain producing zero direct emissions",
+      "iconName": "Leaf",
+      "order": 6,
+      "active": true,
+      "createdAt": "2025-09-06T18:52:23.503Z",
+      "updatedAt": "2025-09-06T18:52:23.503Z"
+    }
+  ],
+  "exportDate": "2025-09-07T08:22:22.569Z",
+  "totalRecords": {
+    "users": 3,
+    "categories": 1,
+    "vehicles": 2,
+    "inquiries": 2,
+    "homepageContent": 1,
+    "companyInfo": 1,
+    "companyValues": 4,
+    "certifications": 6,
+    "contactInfo": 1,
+    "technologyContent": 1,
+    "technologyFeatures": 6
+  }
+}

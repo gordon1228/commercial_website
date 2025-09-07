@@ -213,24 +213,24 @@ export default function AdminPreviewVehicleDetailPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setShowAdminOverlay(false)}
-                  className="text-white border-white hover:bg-white hover:text-blue-600"
+                  className="text-black border-white hover:bg-white hover:text-blue-600"
                 >
                   Hide Admin Bar
                 </Button>
                 <Link href={`/vehicles/${vehicle.slug}`} target="_blank">
-                  <Button variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-blue-600">
+                  <Button variant="outline" size="sm" className="text-black border-white hover:bg-white hover:text-blue-600">
                     <ExternalLink className="h-4 w-4 mr-2" />
                     View Live
                   </Button>
                 </Link>
                 <Link href={`/admin/vehicles/edit/${vehicle.id}`}>
-                  <Button variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-blue-600">
+                  <Button variant="outline" size="sm" className="text-black border-white hover:bg-white hover:text-blue-600">
                     <Edit className="h-4 w-4 mr-2" />
                     Edit Vehicle
                   </Button>
                 </Link>
                 <Link href="/admin/vehicles">
-                  <Button variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-blue-600">
+                  <Button variant="outline" size="sm" className="text-black border-white hover:bg-white hover:text-blue-600">
                     Back to Admin
                   </Button>
                 </Link>

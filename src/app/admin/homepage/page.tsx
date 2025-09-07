@@ -20,6 +20,7 @@ interface HomepageContent {
   heroButtonSecondary: string
   // Coming Soon Section
   comingSoonImage: string
+  comingSoonImageMobile?: string
 }
 
 export default function AdminHomepagePage() {
@@ -210,17 +211,31 @@ export default function AdminHomepagePage() {
           <p className="text-sm text-gray-600">Manage the coming soon section background image</p>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div>
-            <ImageSelector
-              value={content.comingSoonImage || ''}
-              onChange={(value) => updateContent('comingSoonImage', value)}
-              label="Coming Soon Background Image"
-              placeholder="No image selected for coming soon section"
-              folder="uploads"
-            />
-            <p className="text-xs text-gray-500 mt-2">
-              This image will be displayed as the background of the coming soon section on the homepage.
-            </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <ImageSelector
+                value={content.comingSoonImage || ''}
+                onChange={(value) => updateContent('comingSoonImage', value)}
+                label="Coming Soon Desktop Image"
+                placeholder="No desktop image selected"
+                folder="uploads"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Optimal size: 1920x1080 (landscape). Used for desktop and tablet devices.
+              </p>
+            </div>
+            <div>
+              <ImageSelector
+                value={content.comingSoonImageMobile || ''}
+                onChange={(value) => updateContent('comingSoonImageMobile', value)}
+                label="Coming Soon Mobile Image"
+                placeholder="No mobile image selected (will use desktop)"
+                folder="uploads"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Optimal size: 750x1334 (portrait). Used for mobile devices. If not set, desktop image will be used.
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

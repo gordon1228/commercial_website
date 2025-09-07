@@ -1,0 +1,45 @@
+{
+  "contactInfo": {
+    "salesPhone": "+1 (555) 123-4567",
+    "servicePhone": "+1 (555) 123-4568",
+    "financePhone": "+1 (555) 123-4569",
+    "salesEmail": "sales@elitefleet.com",
+    "serviceEmail": "service@elitefleet.com",
+    "supportEmail": "support@elitefleet.com",
+    "address": "123 Business Avenue",
+    "city": "Commercial District",
+    "state": "NY",
+    "postcode": "10001",
+    "country": "United States",
+    "directions": "Near Metro Station",
+    "mondayToFriday": "8:00 AM - 6:00 PM",
+    "saturday": "9:00 AM - 4:00 PM",
+    "sunday": "Closed"
+  },
+  "contactServices": [
+    {
+      "icon": "MessageCircle",
+      "title": "General Inquiry",
+      "description": "Questions about our vehicles or services",
+      "color": "bg-blue-600/20 text-blue-400"
+    },
+    {
+      "icon": "Calculator",
+      "title": "Get Quote",
+      "description": "Request pricing for specific vehicles",
+      "color": "bg-green-600/20 text-green-400"
+    },
+    {
+      "icon": "Calendar",
+      "title": "Schedule Visit",
+      "description": "Book an appointment to view vehicles",
+      "color": "bg-purple-600/20 text-purple-400"
+    },
+    {
+      "icon": "User",
+      "title": "Sales Support",
+      "description": "Speak with our sales team",
+      "color": "bg-orange-600/20 text-orange-400"
+    }
+  ]
+}

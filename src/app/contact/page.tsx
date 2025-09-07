@@ -18,6 +18,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { useJsonData } from '@/lib/data-loader'
+import type { ContactInfoConfig } from '@/types/data-config'
 
 interface ContactInfo {
   salesPhone: string
@@ -64,26 +66,14 @@ const services = [
   }
 ]
 
-function ContactForm() {
+function WhatsAppContact() {
   const searchParams = useSearchParams()
   const vehicleSlug = searchParams?.get('vehicle')
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    company: '',
-    inquiryType: vehicleSlug ? 'quote' : 'general',
-    vehicleInterest: vehicleSlug || '',
-    message: '',
-    preferredContact: 'email'
-  })
+  // Load fallback data from JSON
+  const { data: fallbackData, loading: fallbackLoading } = useJsonData<ContactInfoConfig>('fallback/contact-info.json')
 
   useEffect(() => {
     const fetchContactInfo = async () => {
@@ -95,280 +85,166 @@ function ContactForm() {
         }
       } catch (error) {
         console.error('Error fetching contact info:', error)
-        // Provide fallback data
-        setContactInfo({
-          salesPhone: '+1 (555) 123-4567',
-          servicePhone: '+1 (555) 123-4568',
-          financePhone: '+1 (555) 123-4569',
-          salesEmail: 'sales@elitefleet.com',
-          serviceEmail: 'service@elitefleet.com',
-          supportEmail: 'support@elitefleet.com',
-          address: '123 Business Avenue',
-          city: 'Commercial District',
-          state: 'NY',
-          postcode: '10001',
-          country: 'United States',
-          directions: 'Near Metro Station',
-          mondayToFriday: '8:00 AM - 6:00 PM',
-          saturday: '9:00 AM - 4:00 PM',
-          sunday: 'Closed'
-        })
+        // Use fallback data from JSON if available
+        if (fallbackData) {
+          setContactInfo(fallbackData.contactInfo)
+        }
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchContactInfo()
-  }, [])
+    // Only start fetching after fallback data is loaded (or failed to load)
+    if (!fallbackLoading) {
+      fetchContactInfo()
+    }
+  }, [fallbackData, fallbackLoading])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setSuccessMessage(null)
-    setIsSubmitting(true)
+  const getWhatsAppNumber = () => {
+    if (!contactInfo) return '+60103391414' // Default fallback
     
-    const submissionData = {
-      customerName: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      phone: formData.phone || undefined,
-      message: `${formData.message}\n\nInquiry Type: ${formData.inquiryType}\n${formData.company ? `Company: ${formData.company}\n` : ''}${formData.vehicleInterest ? `Vehicle Interest: ${formData.vehicleInterest}\n` : ''}Preferred Contact: ${formData.preferredContact}`,
-      vehicleId: null // General inquiry
+    // Clean phone number - remove spaces, dashes, parentheses
+    const cleanNumber = contactInfo.salesPhone.replace(/[\s\-\(\)]/g, '')
+    
+    // If it starts with +, use as is
+    if (cleanNumber.startsWith('+')) {
+      return cleanNumber
     }
-
-    try {
-      const response = await fetch('/api/inquiries', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(submissionData)
-      })
-
-      if (response.ok) {
-        setSuccessMessage('Inquiry submitted successfully! We will contact you within 24 hours.')
-        // Reset form
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          company: '',
-          inquiryType: 'general',
-          vehicleInterest: '',
-          message: '',
-          preferredContact: 'email'
-        })
-      } else {
-        const errorData = await response.json()
-        setError(errorData.error || 'Failed to submit inquiry')
-      }
-    } catch (err) {
-      console.error('Error submitting form:', err)
-      setError('Network error. Please try again.')
-    } finally {
-      setIsSubmitting(false)
+    
+    // If it starts with 0, replace with +60 (Malaysia)
+    if (cleanNumber.startsWith('0')) {
+      return '+60' + cleanNumber.substring(1)
     }
+    
+    // Otherwise assume it's a Malaysian number without country code
+    return '+60' + cleanNumber
   }
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+  const openWhatsApp = (inquiryType: string = 'general') => {
+    const phoneNumber = getWhatsAppNumber()
+    let message = `Hello! I'm interested in your commercial vehicles.`
+    
+    if (vehicleSlug) {
+      message = `Hello! I'm interested in the ${vehicleSlug.replace(/-/g, ' ')} vehicle.`
+    }
+    
+    // Add inquiry type context
+    switch (inquiryType) {
+      case 'quote':
+        message += ` I would like to request a quote.`
+        break
+      case 'visit':
+        message += ` I would like to schedule a visit to your showroom.`
+        break
+      case 'financing':
+        message += ` I would like to know about financing options.`
+        break
+      case 'service':
+        message += ` I need service support.`
+        break
+      default:
+        message += ` I would like more information about your services.`
+    }
+    
+    message += ` Thank you!`
+    
+    const encodedMessage = encodeURIComponent(message)
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`
+    
+    // Open WhatsApp in a new tab
+    window.open(whatsappUrl, '_blank')
   }
 
   return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Contact Form */}
+          {/* WhatsApp Contact Section */}
           <div className="lg:col-span-2">
             <Card className="bg-gray-100 border-gray-300">
               <CardHeader>
-                <CardTitle className="text-2xl text-gray-900">Send us a message</CardTitle>
+                <CardTitle className="text-2xl text-gray-900">Contact us on WhatsApp</CardTitle>
                 {vehicleSlug && (
                   <p className="text-gray-600">Inquiry about: {vehicleSlug.replace(/-/g, ' ')}</p>
                 )}
+                <p className="text-gray-600">Get instant response by chatting with us directly on WhatsApp</p>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Name Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        First Name *
-                      </label>
-                      <Input
-                        value={formData.firstName}
-                        onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Last Name *
-                      </label>
-                      <Input
-                        value={formData.lastName}
-                        onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
+              <CardContent className="space-y-6">
+                {/* Quick Contact Buttons */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {services.map((service, index) => {
+                    const IconComponent = service.icon
+                    const inquiryType = service.title === 'General Inquiry' ? 'general' : 
+                                      service.title === 'Get Quote' ? 'quote' :
+                                      service.title === 'Schedule Visit' ? 'visit' : 'service'
+                    
+                    return (
+                      <Button
+                        key={index}
+                        onClick={() => openWhatsApp(inquiryType)}
+                        variant="outline"
+                        className="h-auto p-4 flex flex-col items-center space-y-2 hover:bg-green-50 hover:border-green-300 border-2 transition-all duration-200"
+                      >
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${service.color}`}>
+                          <IconComponent className="h-5 w-5" />
+                        </div>
+                        <div className="text-center">
+                          <div className="font-semibold text-gray-900">{service.title}</div>
+                          <div className="text-xs text-gray-600">{service.description}</div>
+                        </div>
+                      </Button>
+                    )
+                  })}
+                </div>
 
-                  {/* Contact Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address *
-                      </label>
-                      <Input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
-                      </label>
-                      <Input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange('phone', e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Company */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Company Name
-                    </label>
-                    <Input
-                      value={formData.company}
-                      onChange={(e) => handleInputChange('company', e.target.value)}
-                    />
-                  </div>
-
-                  {/* Inquiry Type */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Inquiry Type *
-                    </label>
-                    <select 
-                      className="input w-full"
-                      value={formData.inquiryType}
-                      onChange={(e) => handleInputChange('inquiryType', e.target.value)}
-                      required
-                    >
-                      <option value="general">General Information</option>
-                      <option value="quote">Request Quote</option>
-                      <option value="visit">Schedule Visit</option>
-                      <option value="financing">Financing Options</option>
-                      <option value="service">Service Support</option>
-                    </select>
-                  </div>
-
-                  {/* Vehicle Interest */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Vehicle of Interest
-                    </label>
-                    <select 
-                      className="input w-full"
-                      value={formData.vehicleInterest}
-                      onChange={(e) => handleInputChange('vehicleInterest', e.target.value)}
-                    >
-                      <option value="">Select a vehicle type</option>
-                      <option value="trucks">Commercial Trucks</option>
-                      <option value="vans">Delivery Vans</option>
-                      <option value="buses">Passenger Buses</option>
-                      <option value="specialty">Specialty Vehicles</option>
-                    </select>
-                  </div>
-
-                  {/* Message */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Message *
-                    </label>
-                    <textarea
-                      className="input min-h-[120px] resize-none"
-                      value={formData.message}
-                      onChange={(e) => handleInputChange('message', e.target.value)}
-                      placeholder="Tell us about your needs, timeline, or any specific questions..."
-                      rows={5}
-                      required
-                    />
-                  </div>
-
-                  {/* Preferred Contact */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Preferred Contact Method
-                    </label>
-                    <div className="flex space-x-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="preferredContact"
-                          value="email"
-                          checked={formData.preferredContact === 'email'}
-                          onChange={(e) => handleInputChange('preferredContact', e.target.value)}
-                          className="mr-2"
-                        />
-                        <span className="text-gray-700">Email</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="preferredContact"
-                          value="phone"
-                          checked={formData.preferredContact === 'phone'}
-                          onChange={(e) => handleInputChange('preferredContact', e.target.value)}
-                          className="mr-2"
-                        />
-                        <span className="text-gray-700">Phone</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Success/Error Display */}
-                  {successMessage && (
-                    <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md">
-                      {successMessage}
-                    </div>
-                  )}
-                  {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md">
-                      {error}
-                    </div>
-                  )}
-
-                  {/* Submit Button */}
-                  <Button 
-                    type="submit" 
-                    size="lg" 
-                    className="w-full"
-                    disabled={isSubmitting}
+                {/* Main WhatsApp Button */}
+                <div className="text-center py-6 border-t border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Start a conversation</h3>
+                  <Button
+                    onClick={() => openWhatsApp()}
+                    size="lg"
+                    className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <LoadingSpinner size="sm" className="mr-2" />
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="h-4 w-4 mr-2" />
-                        Send Message
-                      </>
-                    )}
+                    <MessageCircle className="h-6 w-6 mr-3" />
+                    Chat on WhatsApp
                   </Button>
-                </form>
+                  <p className="text-sm text-gray-600 mt-3">
+                    Click to open WhatsApp and start chatting with our team
+                  </p>
+                </div>
+
+                {/* Benefits */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-900 mb-3">Why choose WhatsApp?</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div className="text-center">
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <MessageCircle className="h-4 w-4 text-green-600" />
+                      </div>
+                      <div className="font-medium text-gray-900">Instant Response</div>
+                      <div className="text-gray-600">Get replies within minutes</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Phone className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div className="font-medium text-gray-900">Easy to Use</div>
+                      <div className="text-gray-600">No forms to fill out</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Clock className="h-4 w-4 text-purple-600" />
+                      </div>
+                      <div className="font-medium text-gray-900">Available 24/7</div>
+                      <div className="text-gray-600">Message us anytime</div>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Contact Information */}
           <div className="space-y-6">
-            {isLoading ? (
+            {(isLoading || fallbackLoading) ? (
               <div className="animate-pulse space-y-4">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="bg-gray-200 h-32 rounded-lg" />
@@ -566,7 +442,7 @@ export default function ContactPage() {
         </div>
 
         <Suspense fallback={<div className="text-center py-8">Loading...</div>}>
-          <ContactForm />
+          <WhatsAppContact />
         </Suspense>
 
         {/* Map Placeholder */}

@@ -63,7 +63,7 @@ export default function Header() {
                 className="text-black hover:text-gray-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Trucks
+                Electric Trucks
               </Link>
               <Link 
                 href="/technology" 

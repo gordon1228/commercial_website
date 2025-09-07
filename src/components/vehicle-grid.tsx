@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Heart, Eye, Fuel, Users, Weight } from 'lucide-react'
@@ -9,6 +8,7 @@ import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 // import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { ErrorDisplay } from '@/components/ui/error-display'
+import ResponsiveImage from '@/components/ui/responsive-image'
 
 interface Vehicle {
   id: string
@@ -17,6 +17,7 @@ interface Vehicle {
   description?: string
   price: number
   images: string[]
+  mobileImages?: string[]
   specs: {
     fuel: string
     capacity: string
@@ -46,7 +47,9 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
   const [isSaved, setIsSaved] = useState(false)
   const [imageError, setImageError] = useState(false)
   const hasImage = vehicle.images?.[0] && vehicle.images[0].trim() !== ''
+  const hasMobileImage = vehicle.mobileImages?.[0] && vehicle.mobileImages[0].trim() !== ''
   const [imageSrc, setImageSrc] = useState(hasImage ? vehicle.images[0] : '')
+  const [mobileImageSrc, setMobileImageSrc] = useState(hasMobileImage ? vehicle.mobileImages[0] : '')
 
   useEffect(() => {
     // Check if vehicle is in favorites on component mount
@@ -58,6 +61,8 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
     // Reset image state when vehicle changes
     setImageError(false)
     const hasValidImage = vehicle.images?.[0] && vehicle.images[0].trim() !== ''
+    const hasValidMobileImage = vehicle.mobileImages?.[0] && vehicle.mobileImages[0].trim() !== ''
+    
     if (hasValidImage) {
       // Add timestamp to bust cache for updated images
       const cacheBustedSrc = `${vehicle.images[0]}?t=${new Date().getTime()}`
@@ -65,7 +70,14 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
     } else {
       setImageSrc('')
     }
-  }, [vehicle.images, vehicle.id])
+    
+    if (hasValidMobileImage) {
+      const cacheBustedMobileSrc = `${vehicle.mobileImages[0]}?t=${new Date().getTime()}`
+      setMobileImageSrc(cacheBustedMobileSrc)
+    } else {
+      setMobileImageSrc('')
+    }
+  }, [vehicle.images, vehicle.mobileImages, vehicle.id])
 
   const toggleFavorite = () => {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
@@ -89,8 +101,9 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
         {imageSrc && !imageError ? (
-          <Image
-            src={imageSrc}
+          <ResponsiveImage
+            desktopSrc={imageSrc}
+            mobileSrc={mobileImageSrc}
             alt={vehicle.name}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-110"

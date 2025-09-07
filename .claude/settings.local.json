@@ -147,7 +147,9 @@
       "Bash(npx next:*)",
       "Bash(npm uninstall:*)",
       "Bash(rd:*)",
-      "Bash(del test-image-cleanup.js)"
+      "Bash(del test-image-cleanup.js)",
+      "Bash(del update-coming-soon-image.js)",
+      "Bash(del test-db-schema.js)"
     ],
     "deny": [],
     "ask": []

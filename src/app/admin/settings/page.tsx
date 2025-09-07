@@ -8,35 +8,90 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 
+interface PhoneNumberParts {
+  countryCode: string
+  number: string
+}
+
+// Popular country codes for commercial businesses
+const COUNTRY_CODES = [
+  { code: '+60', country: 'Malaysia', flag: '🇲🇾' },
+  { code: '+65', country: 'Singapore', flag: '🇸🇬' },
+  { code: '+62', country: 'Indonesia', flag: '🇮🇩' },
+  { code: '+66', country: 'Thailand', flag: '🇹🇭' },
+  { code: '+84', country: 'Vietnam', flag: '🇻🇳' },
+  { code: '+63', country: 'Philippines', flag: '🇵🇭' },
+  { code: '+86', country: 'China', flag: '🇨🇳' },
+  { code: '+91', country: 'India', flag: '🇮🇳' },
+  { code: '+1', country: 'United States', flag: '🇺🇸' },
+  { code: '+44', country: 'United Kingdom', flag: '🇬🇧' },
+  { code: '+61', country: 'Australia', flag: '🇦🇺' },
+  { code: '+81', country: 'Japan', flag: '🇯🇵' },
+  { code: '+82', country: 'South Korea', flag: '🇰🇷' },
+]
+
 export default function SettingsPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [isSettingsLoading, setIsSettingsLoading] = useState(false)
   const [isPasswordLoading, setIsPasswordLoading] = useState(false)
+  const [isDataLoading, setIsDataLoading] = useState(true)
   const [settings, setSettings] = useState({
-    siteName: 'EVTL',
-    contactEmail: 'contact@EVTL.com',
-    supportPhone: '010-339-1414/+016-332-2349',
-    address: '3-20 Level 3 MKH Boulevard Jalan Changkat, 43000 Kajang Selangor Malaysia',
-    emailNotifications: true,
-    systemNotifications: true,
+    siteName: '',
+    contactEmail: '',
+    supportPhone: '',
+    address: '',
+    emailNotifications: false,
+    systemNotifications: false,
     maintenanceMode: false
   })
   
   const [footerSettings, setFooterSettings] = useState({
-    companyDescription: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.',
+    companyDescription: '',
     facebookUrl: '',
     twitterUrl: '',
     instagramUrl: '',
     linkedinUrl: '',
-    privacyPolicyUrl: '/privacy',
-    termsOfServiceUrl: '/terms'
+    privacyPolicyUrl: '',
+    termsOfServiceUrl: ''
   })
   const [profileForm, setProfileForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   })
+
+  // Phone number parsing and formatting
+  const parsePhoneNumber = (fullNumber: string): PhoneNumberParts => {
+    const cleaned = fullNumber.replace(/[\s\-\(\)]/g, '')
+    
+    // Find matching country code
+    const matchingCode = COUNTRY_CODES.find(cc => cleaned.startsWith(cc.code))
+    
+    if (matchingCode) {
+      return {
+        countryCode: matchingCode.code,
+        number: cleaned.substring(matchingCode.code.length)
+      }
+    }
+    
+    // Default to Malaysia if no country code found
+    if (cleaned.startsWith('0')) {
+      return {
+        countryCode: '+60',
+        number: cleaned.substring(1)
+      }
+    }
+    
+    return {
+      countryCode: '+60',
+      number: cleaned
+    }
+  }
+  
+  const formatPhoneNumber = (countryCode: string, number: string): string => {
+    return countryCode + number.replace(/[\s\-\(\)]/g, '')
+  }
 
   useEffect(() => {
     if (status === 'loading') return
@@ -46,9 +101,14 @@ export default function SettingsPage() {
     }
     
     // Load settings from API
-    loadSettings()
-    loadFooterSettings()
+    loadInitialData()
   }, [session, status, router])
+
+  const loadInitialData = async () => {
+    setIsDataLoading(true)
+    await Promise.all([loadSettings(), loadFooterSettings()])
+    setIsDataLoading(false)
+  }
 
   const loadSettings = async () => {
     try {
@@ -92,6 +152,11 @@ export default function SettingsPage() {
 
   const handleSettingsChange = (field: string, value: string | boolean) => {
     setSettings(prev => ({ ...prev, [field]: value }))
+  }
+  
+  const updatePhoneNumber = (countryCode: string, number: string) => {
+    const formattedPhone = formatPhoneNumber(countryCode, number)
+    setSettings(prev => ({ ...prev, supportPhone: formattedPhone }))
   }
 
   const handleFooterSettingsChange = (field: string, value: string) => {
@@ -175,7 +240,7 @@ export default function SettingsPage() {
     }
   }
 
-  if (status === 'loading') {
+  if (status === 'loading' || isDataLoading) {
     return (
       <div className="px-6">
         <div className="animate-pulse">
@@ -238,11 +303,32 @@ export default function SettingsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Support Phone
                 </label>
-                <Input
-                  value={settings.supportPhone}
-                  onChange={(e) => handleSettingsChange('supportPhone', e.target.value)}
-                  placeholder="+1 (555) 123-4567"
-                />
+                <div className="flex gap-2">
+                  <select 
+                    className="w-32 px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={parsePhoneNumber(settings.supportPhone).countryCode} 
+                    onChange={(e) => {
+                      const parsed = parsePhoneNumber(settings.supportPhone)
+                      updatePhoneNumber(e.target.value, parsed.number)
+                    }}
+                  >
+                    {COUNTRY_CODES.map((cc) => (
+                      <option key={cc.code} value={cc.code}>
+                        {cc.flag} {cc.code} {cc.country}
+                      </option>
+                    ))}
+                  </select>
+                  <Input
+                    className="flex-1"
+                    value={parsePhoneNumber(settings.supportPhone).number}
+                    onChange={(e) => {
+                      const parsed = parsePhoneNumber(settings.supportPhone)
+                      updatePhoneNumber(parsed.countryCode, e.target.value)
+                    }}
+                    placeholder="123456789"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Full number: {settings.supportPhone}</p>
               </div>
               
               <div>

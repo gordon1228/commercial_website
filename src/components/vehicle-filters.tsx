@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { X, Filter } from 'lucide-react'
+import { useJsonData } from '@/lib/data-loader'
+import type { VehicleFiltersConfig } from '@/types/data-config'
 
 interface FilterState {
   category: string[]
@@ -26,38 +28,38 @@ interface Category {
   slug: string
 }
 
-const statusOptions = [
-  { id: 'AVAILABLE', label: 'Available' },
-  { id: 'RESERVED', label: 'Reserved' },
-  { id: 'SOLD', label: 'Sold' }
-]
-
-const fuelTypeOptions = [
-  { id: 'Electric', label: 'Electric' },
-  { id: 'Diesel', label: 'Diesel' },
-  { id: 'Gasoline', label: 'Gasoline' },
-  { id: 'Hybrid', label: 'Hybrid' },
-  { id: 'CNG', label: 'CNG' }
-]
-
-const transmissionOptions = [
-  { id: 'Manual', label: 'Manual' },
-  { id: 'Automatic', label: 'Automatic' },
-  { id: 'Semi-Automatic', label: 'Semi-Automatic' }
-]
-
-const makeOptions = [
-  { id: 'Ford', label: 'Ford' },
-  { id: 'Chevrolet', label: 'Chevrolet' },
-  { id: 'RAM', label: 'RAM' },
-  { id: 'GMC', label: 'GMC' },
-  { id: 'Isuzu', label: 'Isuzu' },
-  { id: 'Freightliner', label: 'Freightliner' },
-  { id: 'Volvo', label: 'Volvo' },
-  { id: 'Peterbilt', label: 'Peterbilt' },
-  { id: 'Kenworth', label: 'Kenworth' },
-  { id: 'Mack', label: 'Mack' }
-]
+// Fallback data in case JSON loading fails
+const defaultFiltersConfig: VehicleFiltersConfig = {
+  statusOptions: [
+    { id: 'AVAILABLE', label: 'Available' },
+    { id: 'RESERVED', label: 'Reserved' },
+    { id: 'SOLD', label: 'Sold' }
+  ],
+  fuelTypeOptions: [
+    { id: 'Electric', label: 'Electric' },
+    { id: 'Diesel', label: 'Diesel' },
+    { id: 'Gasoline', label: 'Gasoline' },
+    { id: 'Hybrid', label: 'Hybrid' },
+    { id: 'CNG', label: 'CNG' }
+  ],
+  transmissionOptions: [
+    { id: 'Manual', label: 'Manual' },
+    { id: 'Automatic', label: 'Automatic' },
+    { id: 'Semi-Automatic', label: 'Semi-Automatic' }
+  ],
+  makeOptions: [
+    { id: 'Ford', label: 'Ford' },
+    { id: 'Chevrolet', label: 'Chevrolet' },
+    { id: 'RAM', label: 'RAM' },
+    { id: 'GMC', label: 'GMC' },
+    { id: 'Isuzu', label: 'Isuzu' },
+    { id: 'Freightliner', label: 'Freightliner' },
+    { id: 'Volvo', label: 'Volvo' },
+    { id: 'Peterbilt', label: 'Peterbilt' },
+    { id: 'Kenworth', label: 'Kenworth' },
+    { id: 'Mack', label: 'Mack' }
+  ]
+}
 
 export default function VehicleFilters() {
   const router = useRouter()
@@ -65,6 +67,12 @@ export default function VehicleFilters() {
   const [isOpen, setIsOpen] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
+  
+  // Load filter configuration from JSON
+  const { data: filtersConfig } = useJsonData<VehicleFiltersConfig>(
+    'vehicle-filters.json',
+    defaultFiltersConfig
+  )
   
   const [filters, setFilters] = useState<FilterState>({
     category: searchParams.get('category')?.split(',') || [],
@@ -312,7 +320,7 @@ export default function VehicleFilters() {
         <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-700 mb-3">Availability</h4>
           <div className="space-y-2">
-            {statusOptions.map((status) => (
+            {filtersConfig?.statusOptions.map((status) => (
               <label key={status.id} className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -357,7 +365,7 @@ export default function VehicleFilters() {
         <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-700 mb-3">Make</h4>
           <div className="space-y-2 max-h-48 overflow-y-auto">
-            {makeOptions.map((make) => (
+            {filtersConfig?.makeOptions.map((make) => (
               <label key={make.id} className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -375,7 +383,7 @@ export default function VehicleFilters() {
         <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-700 mb-3">Fuel Type</h4>
           <div className="space-y-2">
-            {fuelTypeOptions.map((fuel) => (
+            {filtersConfig?.fuelTypeOptions.map((fuel) => (
               <label key={fuel.id} className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -393,7 +401,7 @@ export default function VehicleFilters() {
         <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-700 mb-3">Transmission</h4>
           <div className="space-y-2">
-            {transmissionOptions.map((transmission) => (
+            {filtersConfig?.transmissionOptions.map((transmission) => (
               <label key={transmission.id} className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -430,7 +438,7 @@ export default function VehicleFilters() {
                 )
               })}
               {filters.status.map((stat) => {
-                const status = statusOptions.find(s => s.id === stat)
+                const status = filtersConfig?.statusOptions.find(s => s.id === stat)
                 return (
                   <span
                     key={stat}
@@ -469,7 +477,7 @@ export default function VehicleFilters() {
                 </span>
               )}
               {filters.make.map((makeId) => {
-                const make = makeOptions.find(m => m.id === makeId)
+                const make = filtersConfig?.makeOptions.find(m => m.id === makeId)
                 return (
                   <span
                     key={makeId}
@@ -486,7 +494,7 @@ export default function VehicleFilters() {
                 )
               })}
               {filters.fuelType.map((fuelId) => {
-                const fuel = fuelTypeOptions.find(f => f.id === fuelId)
+                const fuel = filtersConfig?.fuelTypeOptions.find(f => f.id === fuelId)
                 return (
                   <span
                     key={fuelId}
@@ -503,7 +511,7 @@ export default function VehicleFilters() {
                 )
               })}
               {filters.transmission.map((transmissionId) => {
-                const transmission = transmissionOptions.find(t => t.id === transmissionId)
+                const transmission = filtersConfig?.transmissionOptions.find(t => t.id === transmissionId)
                 return (
                   <span
                     key={transmissionId}
