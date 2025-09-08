@@ -2,6 +2,9 @@ import { NextRequest } from 'next/server'
 import { healthCheck, getConnectionInfo, withRetry } from '@/lib/db-utils'
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 // GET /api/health - Database health check
 export const GET = createApiHandler(async (req: NextRequest) => {
   try {
