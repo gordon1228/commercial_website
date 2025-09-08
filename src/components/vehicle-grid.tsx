@@ -49,7 +49,7 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
   const hasImage = vehicle.images?.[0] && vehicle.images[0].trim() !== ''
   const hasMobileImage = vehicle.mobileImages?.[0] && vehicle.mobileImages[0].trim() !== ''
   const [imageSrc, setImageSrc] = useState(hasImage ? vehicle.images[0] : '')
-  const [mobileImageSrc, setMobileImageSrc] = useState(hasMobileImage ? vehicle.mobileImages[0] : '')
+  const [mobileImageSrc, setMobileImageSrc] = useState(hasMobileImage ? vehicle.mobileImages?.[0] || '' : '')
 
   useEffect(() => {
     // Check if vehicle is in favorites on component mount
@@ -72,7 +72,7 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
     }
     
     if (hasValidMobileImage) {
-      const cacheBustedMobileSrc = `${vehicle.mobileImages[0]}?t=${new Date().getTime()}`
+      const cacheBustedMobileSrc = `${vehicle.mobileImages?.[0] || ''}?t=${new Date().getTime()}`
       setMobileImageSrc(cacheBustedMobileSrc)
     } else {
       setMobileImageSrc('')

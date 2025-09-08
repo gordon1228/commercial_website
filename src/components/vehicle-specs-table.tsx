@@ -109,15 +109,56 @@ export default function VehicleSpecsTable({ specs, vehicleName }: VehicleSpecsPr
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
       {/* Header */}
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
-        <h3 className="text-2xl font-bold text-black flex items-center">
-          <Gauge className="h-7 w-7 mr-3 text-gray-600" />
-          {vehicleName} Specifications
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-4 sm:px-8 py-6 border-b border-gray-200">
+        <h3 className="text-xl sm:text-2xl font-bold text-black flex items-center">
+          <Gauge className="h-6 w-6 sm:h-7 sm:w-7 mr-2 sm:mr-3 text-gray-600" />
+          <span className="truncate">{vehicleName} Specifications</span>
         </h3>
-        <p className="text-gray-600 mt-2">Detailed technical specifications and features</p>
+        <p className="text-gray-600 mt-2 text-sm sm:text-base">Detailed technical specifications and features</p>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Mobile Layout (Cards) */}
+      <div className="block md:hidden">
+        <div className="divide-y divide-gray-100">
+          {populatedCategories.map((category, categoryIndex) => {
+            const Icon = category.icon
+            return (
+              <div key={categoryIndex} className="p-4">
+                {/* Category Header */}
+                <div className={`bg-gradient-to-r ${category.color} px-4 py-3 rounded-lg mb-4`}>
+                  <div className="flex items-center text-white">
+                    <Icon className="h-5 w-5 mr-2 flex-shrink-0" />
+                    <span className="text-base font-bold uppercase tracking-wide truncate">{category.title}</span>
+                  </div>
+                </div>
+                {/* Specification Items */}
+                <div className="space-y-3">
+                  {category.fields.map((field, fieldIndex) => (
+                    <div key={fieldIndex} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="font-semibold text-black text-sm flex-1 min-w-0">
+                          <div className="flex items-center">
+                            <span className="w-2 h-2 bg-gray-600 rounded-full mr-2 flex-shrink-0"></span>
+                            <span className="break-words">{field.label}</span>
+                          </div>
+                        </div>
+                        <div className="text-black text-sm flex-1 min-w-0">
+                          <div className="bg-white border border-gray-200 px-3 py-2 rounded-lg shadow-sm break-words text-right">
+                            {String(specs[field.key])}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Desktop Layout (Table) */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="bg-gradient-to-r from-gray-800 to-gray-900">
@@ -146,7 +187,7 @@ export default function VehicleSpecsTable({ specs, vehicleName }: VehicleSpecsPr
                   {/* Specification Rows */}
                   {category.fields.map((field, fieldIndex) => (
                     <tr key={fieldIndex} className="hover:bg-gray-50 transition-colors duration-200">
-                      <td className="sticky left-0 z-10 bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 font-semibold text-black border-r border-gray-200">
+                      <td className="px-6 py-4 font-semibold text-black border-r border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
                         <div className="flex items-center">
                           <span className="w-2 h-2 bg-gray-600 rounded-full mr-3"></span>
                           {field.label}

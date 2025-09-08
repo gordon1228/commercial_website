@@ -183,6 +183,20 @@ model Certification {
   @@map("certifications")
 }
 
+model Partner {
+  id        String   @id @default(cuid())
+  name      String
+  logo      String
+  website   String?
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order, active], map: "idx_partners_order_active")
+  @@map("partners")
+}
+
 model ContactInfo {
   id                  String   @id @default(cuid())
   salesPhone          String   @default("+1 (555) 123-4567")
