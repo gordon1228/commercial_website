@@ -3,6 +3,7 @@ import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { getAuthUrl } from './vercel-url'
 const prisma = new PrismaClient()
 
 export const authOptions: NextAuthOptions = {
@@ -94,36 +95,54 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     async redirect({ url, baseUrl }) {
-      // Handle Vercel environment - ensure proper baseUrl
-      const actualBaseUrl = process.env.NEXTAUTH_URL || baseUrl
+      // Use our smart URL detection that handles Vercel deployments
+      const actualBaseUrl = getAuthUrl()
       
-      console.log('NextAuth redirect:', { url, baseUrl, actualBaseUrl })
+      console.log('NextAuth redirect:', { 
+        url, 
+        baseUrl, 
+        actualBaseUrl,
+        NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+        VERCEL_URL: process.env.VERCEL_URL
+      })
       
-      // Handle post-login redirects
-      if (url.includes('/admin/login') || url === '/admin/login') {
-        return `${actualBaseUrl}/admin`
+      // Handle post-login redirects - be more specific
+      if (url === '/admin/login' || url.endsWith('/admin/login')) {
+        const redirectUrl = `${actualBaseUrl}/admin`
+        console.log('Post-login redirect to:', redirectUrl)
+        return redirectUrl
       }
       
-      // If it's a relative URL, make it absolute
+      // If it's a relative URL, make it absolute using actualBaseUrl
       if (url.startsWith('/')) {
-        return `${actualBaseUrl}${url}`
+        const redirectUrl = `${actualBaseUrl}${url}`
+        console.log('Relative URL redirect to:', redirectUrl)
+        return redirectUrl
       }
       
-      // Parse URL to check origin
+      // For absolute URLs, ensure they match our domain
       try {
         const urlObj = new URL(url)
         const baseUrlObj = new URL(actualBaseUrl)
         
         // If it's the same origin, allow it
         if (urlObj.origin === baseUrlObj.origin) {
+          console.log('Same origin redirect allowed:', url)
           return url
+        } else {
+          console.log('Different origin detected, redirecting to admin:', {
+            urlOrigin: urlObj.origin,
+            baseOrigin: baseUrlObj.origin
+          })
         }
       } catch (e) {
         console.error('URL parsing error:', e)
       }
       
-      // Default to admin dashboard
-      return `${actualBaseUrl}/admin`
+      // Default fallback to admin dashboard
+      const fallbackUrl = `${actualBaseUrl}/admin`
+      console.log('Fallback redirect to:', fallbackUrl)
+      return fallbackUrl
     },
   },
   pages: {
