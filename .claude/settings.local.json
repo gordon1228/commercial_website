@@ -153,7 +153,10 @@
       "Bash(del \"C:\\Users\\User\\Desktop\\commercial_website\\src\\components\\session-monitor.tsx\")",
       "Bash(del \"C:\\Users\\User\\Desktop\\commercial_website\\src\\components\\ui\\phone-input.tsx\")",
       "Bash(for file in \"C:\\Users\\User\\Desktop\\commercial_website\"/*.sql)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(del \"C:\\Users\\User\\Desktop\\commercial_website\\check-db.js\")",
+      "Bash(del check-db.js)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

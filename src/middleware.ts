@@ -132,6 +132,10 @@ export default withAuth(
           '/api/vehicles', // Allow vehicles listing for public
           '/api/vehicles/slug/',
           '/api/inquiries/vehicle',
+          '/api/homepage-content', // Allow homepage content for public homepage
+          '/api/technology-content', // Allow technology page content
+          '/api/technology-features', // Allow technology page features
+          '/api/partners', // Allow partners for trust section
           '/api/auth/'
         ]
         
