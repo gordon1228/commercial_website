@@ -36,26 +36,23 @@ export default function AdminLoginPage() {
         isProduction: process.env.NODE_ENV === 'production'
       })
       
-      // Immediate redirect without delay for better UX
-      let redirectUrl = '/admin'
-      
-      if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-        redirectUrl = callbackUrl
-        console.log('Redirecting ADMIN/MANAGER to:', redirectUrl)
-      } else if (userRole === 'USER') {
-        redirectUrl = '/admin/inquiries'
-        console.log('Redirecting USER to inquiries')
-      }
-      
-      // Use router.push for client-side navigation, fallback to window.location
-      try {
-        // First try Next.js router for better UX
-        window.history.pushState(null, '', redirectUrl)
-        window.location.reload()
-      } catch (error) {
-        console.log('Router navigation failed, using window.location:', error)
-        // Fallback to window.location
-        window.location.href = redirectUrl
+      // Only redirect if we're actually on the login page to prevent loops
+      if (typeof window !== 'undefined' && window.location.pathname === '/admin/login') {
+        let redirectUrl = '/admin'
+        
+        if (userRole === 'ADMIN' || userRole === 'MANAGER') {
+          redirectUrl = callbackUrl
+          console.log('Redirecting ADMIN/MANAGER to:', redirectUrl)
+        } else if (userRole === 'USER') {
+          redirectUrl = '/admin/inquiries'
+          console.log('Redirecting USER to inquiries')
+        }
+        
+        // Slight delay to ensure session is properly set in middleware
+        setTimeout(() => {
+          console.log('Executing redirect to:', redirectUrl)
+          window.location.replace(redirectUrl)
+        }, 100)
       }
     }
   }, [status, session, callbackUrl])
@@ -111,22 +108,25 @@ export default function AdminLoginPage() {
   // Add failsafe redirect timer - must be before any conditional returns
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.role) {
-      // Failsafe: Force redirect after 3 seconds if still showing redirect screen
-      const failsafeTimer = setTimeout(() => {
-        console.log('Failsafe redirect triggered after 3 seconds')
-        const userRole = session.user.role
-        let redirectUrl = '/admin'
-        
-        if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-          redirectUrl = callbackUrl
-        } else if (userRole === 'USER') {
-          redirectUrl = '/admin/inquiries'
-        }
-        
-        window.location.replace(redirectUrl)
-      }, 3000)
+      // Only set failsafe if we're on the login page
+      if (typeof window !== 'undefined' && window.location.pathname === '/admin/login') {
+        // Failsafe: Force redirect after 5 seconds if still showing redirect screen
+        const failsafeTimer = setTimeout(() => {
+          console.log('Failsafe redirect triggered after 5 seconds')
+          const userRole = session.user.role
+          let redirectUrl = '/admin'
+          
+          if (userRole === 'ADMIN' || userRole === 'MANAGER') {
+            redirectUrl = callbackUrl
+          } else if (userRole === 'USER') {
+            redirectUrl = '/admin/inquiries'
+          }
+          
+          window.location.replace(redirectUrl)
+        }, 5000)
 
-      return () => clearTimeout(failsafeTimer)
+        return () => clearTimeout(failsafeTimer)
+      }
     }
   }, [status, session, callbackUrl])
 

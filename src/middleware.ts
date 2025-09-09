@@ -79,7 +79,9 @@ export default withAuth(
           pathname, 
           hasToken: !!token,
           role: token?.role,
-          origin: req.nextUrl.origin 
+          email: token?.email,
+          origin: req.nextUrl.origin,
+          userAgent: req.headers.get('user-agent')?.substring(0, 100)
         })
         
         // Allow all public pages (non-admin, non-protected-api)
