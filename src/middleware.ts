@@ -1,5 +1,6 @@
 import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
+import { decode } from 'next-auth/jwt'
 
 // Rate limiting store (in production, use Redis)
 const rateLimit = new Map()
@@ -22,6 +23,24 @@ function rateLimiter(ip: string, limit: number = 10, windowMs: number = 60000) {
   rateLimit.set(ip, requests)
   
   return true
+}
+
+// Helper function to manually decode session token when withAuth fails to parse it
+async function getTokenFromCookie(req: any) {
+  try {
+    const sessionCookie = req.cookies.get('next-auth.session-token')?.value
+    if (!sessionCookie) return null
+    
+    const token = await decode({
+      token: sessionCookie,
+      secret: process.env.NEXTAUTH_SECRET!,
+    })
+    
+    return token
+  } catch (error) {
+    console.error('Error decoding session token:', error)
+    return null
+  }
 }
 
 export default withAuth(
@@ -74,16 +93,24 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token, req }) => {
+      authorized: async ({ token, req }) => {
         const { pathname } = req.nextUrl
         const sessionCookie = req.cookies.get('next-auth.session-token')?.value
         
+        // If no token but session cookie exists, try to decode it manually
+        let actualToken = token
+        if (!token && sessionCookie) {
+          console.log('No token but session cookie exists, trying manual decode...')
+          actualToken = await getTokenFromCookie(req)
+        }
+        
         console.log('Authorization check:', { 
           pathname, 
-          hasToken: !!token,
-          role: token?.role,
-          email: token?.email,
+          hasToken: !!actualToken,
+          role: actualToken?.role,
+          email: actualToken?.email,
           sessionCookie: sessionCookie ? 'exists' : 'none',
+          tokenSource: token ? 'withAuth' : (actualToken ? 'manual' : 'none'),
           timestamp: new Date().toISOString()
         })
         
@@ -120,12 +147,7 @@ export default withAuth(
           }
           
           // For all other admin routes, require authentication
-          if (!token) {
-            // Check if there's a session cookie but no token yet (timing issue)
-            if (sessionCookie) {
-              console.log('Session cookie exists but no token yet, allowing access (timing):', pathname)
-              return true // Temporary allow while session is being processed
-            }
+          if (!actualToken) {
             console.log('No token found, denying access to:', pathname)
             return false
           }
@@ -133,26 +155,27 @@ export default withAuth(
           // Check role-based access
           // ADMIN and MANAGER: full access to all admin routes
           // USER: only access to inquiries page
-          if (token.role === 'ADMIN' || token.role === 'MANAGER') {
+          if (actualToken.role === 'ADMIN' || actualToken.role === 'MANAGER') {
             console.log('Admin/Manager access granted to:', pathname)
             return true
           }
           
-          if (token.role === 'USER' && (pathname === '/admin/inquiries' || pathname.startsWith('/admin/profile'))) {
+          if (actualToken.role === 'USER' && (pathname === '/admin/inquiries' || pathname.startsWith('/admin/profile'))) {
             console.log('User access granted to:', pathname)
             return true
           }
           
-          console.log('Access denied for role:', token.role, 'to:', pathname)
+          console.log('Access denied for role:', actualToken.role, 'to:', pathname)
           return false
         }
         
         // All other API routes require authentication
         if (pathname.startsWith('/api/')) {
-          if (!token) {
+          if (!actualToken) {
             console.log('No token found, denying API access to:', pathname)
             return false
           }
+          console.log('API access granted with token role:', actualToken.role, 'to:', pathname)
           return true
         }
         
