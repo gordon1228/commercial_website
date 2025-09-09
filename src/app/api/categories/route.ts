@@ -42,10 +42,9 @@ export const GET = createApiHandler(async (req, { session }) => {
 
 // POST /api/categories - Create a new category
 export const POST = createApiHandler(async (req, { body }) => {
-  const { name, description, image } = body as {
+  const { name, description } = body as {
     name: string;
     description?: string;
-    image?: string;
   }
 
   if (!name) {
@@ -72,7 +71,6 @@ export const POST = createApiHandler(async (req, { body }) => {
       name,
       slug,
       description,
-      image,
       active: true // New categories are active by default
     }
   })

@@ -35,6 +35,7 @@ A modern, full-stack commercial vehicle showcase platform built with Next.js 14,
 - **NextAuth.js** - Authentication and session management
 - **Prisma ORM** - Type-safe database operations
 - **PostgreSQL** - Robust relational database (Neon)
+- **Vercel Blob Storage** - Cloud file storage for images
 
 ### Security & Validation
 - **Zod** - Runtime type validation
@@ -89,22 +90,26 @@ commercial_website/
 
 3. **Environment Configuration**
    
-   Copy the `.env` file and update with your values:
+   Create a `.env` file and update with your values:
    ```bash
-   # Database
+   # Database - Using Neon PostgreSQL (Serverless)
    DATABASE_URL="postgresql://username:password@host:port/database"
    
-   # NextAuth
+   # NextAuth Configuration
    NEXTAUTH_URL="http://localhost:3000"
-   NEXTAUTH_SECRET="your-secret-key"
+   NEXTAUTH_SECRET="your-secret-key-here"
    
-   # Application
+   # Application Settings
    NEXT_PUBLIC_APP_URL="http://localhost:3000"
    NODE_ENV="development"
+   NEXT_TELEMETRY_DISABLED=1
    
-   # File Upload
+   # File Upload Settings
    MAX_FILE_SIZE=10485760
    ALLOWED_FILE_TYPES="image/jpeg,image/png,image/webp"
+   
+   # Vercel Blob Storage (for file uploads)
+   BLOB_READ_WRITE_TOKEN="your-vercel-blob-token-here"
    ```
 
 4. **Database Setup**
@@ -175,19 +180,33 @@ npm run typecheck    # Run TypeScript compiler check
    - Import your repository to Vercel
    - Vercel will auto-detect Next.js configuration
 
-2. **Environment Variables**
+2. **Set up Vercel Blob Storage**
+   - Go to Vercel Dashboard → Storage tab
+   - Create a new Blob store
+   - Connect it to your project
+   - This automatically adds `BLOB_READ_WRITE_TOKEN` to your environment
+
+3. **Environment Variables**
    Set the following in Vercel dashboard:
    ```
-   DATABASE_URL=your_production_database_url
-   NEXTAUTH_URL=https://your-app-name.vercel.app
-   NEXTAUTH_SECRET=your_production_secret
-   NEXT_PUBLIC_APP_URL=https://your-app-name.vercel.app
+   DATABASE_URL=your_neon_database_url
+   NEXTAUTH_URL=https://your-custom-domain.vercel.app
+   NEXTAUTH_SECRET=your_production_secret_key
+   NEXT_PUBLIC_APP_URL=https://your-custom-domain.vercel.app
    NODE_ENV=production
+   NEXT_TELEMETRY_DISABLED=1
+   MAX_FILE_SIZE=10485760
+   ALLOWED_FILE_TYPES="image/jpeg,image/png,image/webp"
    ```
 
-3. **Database**
-   - Ensure your production database is accessible
-   - Run migrations: `npx prisma db push`
+4. **Database Setup**
+   - Ensure your Neon PostgreSQL database is accessible
+   - Database migrations run automatically during build: `prisma db push`
+   - Seed data is applied via build script
+
+5. **Custom Domain (Optional)**
+   - Add your custom domain in Vercel dashboard
+   - Update `NEXTAUTH_URL` to match your custom domain
 
 ### Other Platforms
 
@@ -203,6 +222,11 @@ The application can be deployed to any platform supporting Node.js:
 - `GET /api/vehicles` - List all vehicles
 - `GET /api/vehicles/slug/[slug]` - Get vehicle by slug
 - `GET /api/categories` - List categories
+- `GET /api/homepage-content` - Get homepage content
+- `GET /api/company-info` - Get company information
+- `GET /api/contact-info` - Get contact information
+- `GET /api/technology-content` - Get technology page content
+- `GET /api/technology-features` - Get technology features
 - `POST /api/inquiries/vehicle` - Submit vehicle inquiry
 
 ### Admin Endpoints (Authenticated)
@@ -211,6 +235,7 @@ The application can be deployed to any platform supporting Node.js:
 - `PUT /api/vehicles/[id]` - Update vehicle
 - `DELETE /api/vehicles/[id]` - Delete vehicle
 - `GET /api/inquiries` - List inquiries
+- `POST /api/upload` - Upload images to Vercel Blob Storage
 
 ## 🎨 Customization
 
@@ -226,8 +251,9 @@ The application can be deployed to any platform supporting Node.js:
 
 ### Images
 - Upload via admin panel
-- Stored in `public/uploads/`
-- Automatic optimization and resizing
+- Stored in Vercel Blob Storage (cloud-based)
+- Automatic CDN delivery and optimization
+- Public URLs for fast global access
 
 ## 🔒 Security Features
 
@@ -257,6 +283,20 @@ For support, please contact:
 - Email: support@elitefleet.com
 - Documentation: [Project Wiki](link-to-wiki)
 - Issues: [GitHub Issues](link-to-issues)
+
+## ⚠️ Important Notes
+
+### Production Checklist
+- [ ] Change default admin password (`admin@elitefleet.com` / `admin123`)
+- [ ] Set up Vercel Blob Storage for file uploads
+- [ ] Configure custom domain and update `NEXTAUTH_URL`
+- [ ] Set production-ready `NEXTAUTH_SECRET`
+- [ ] Verify all environment variables in Vercel dashboard
+
+### Known Issues & Solutions
+- **File uploads fail in production**: Ensure Vercel Blob Storage is set up
+- **Login redirects to wrong URL**: Update `NEXTAUTH_URL` to match your domain
+- **Different images for logged-in users**: Check API middleware public routes
 
 ## 📈 Roadmap
 

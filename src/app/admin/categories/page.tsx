@@ -7,15 +7,12 @@ import { Plus, Edit2, Trash2, Save, X, Power, PowerOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import ImageSelector from '@/components/ui/image-selector'
-import Image from 'next/image'
 
 interface Category {
   id: string
   name: string
   slug: string
   description?: string
-  image?: string
   active: boolean
   _count?: {
     vehicles: number
@@ -32,8 +29,7 @@ export default function CategoriesPage() {
   const [isCreating, setIsCreating] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
-    image: ''
+    description: ''
   })
 
   useEffect(() => {
@@ -76,8 +72,7 @@ export default function CategoriesPage() {
         },
         body: JSON.stringify({
           name: formData.name.trim(),
-          description: formData.description.trim() || undefined,
-          image: formData.image.trim() || undefined
+          description: formData.description.trim() || undefined
         }),
       })
 
@@ -99,8 +94,7 @@ export default function CategoriesPage() {
     setEditingId(category.id)
     setFormData({
       name: category.name,
-      description: category.description || '',
-      image: category.image || ''
+      description: category.description || ''
     })
     setIsCreating(true)
   }
@@ -166,7 +160,7 @@ export default function CategoriesPage() {
   }
 
   const resetForm = () => {
-    setFormData({ name: '', description: '', image: '' })
+    setFormData({ name: '', description: '' })
     setEditingId(null)
     setIsCreating(false)
   }
@@ -239,15 +233,6 @@ export default function CategoriesPage() {
                 />
               </div>
 
-              <div>
-                <ImageSelector
-                  value={formData.image}
-                  onChange={(value) => setFormData({ ...formData, image: value })}
-                  label="Category Image"
-                  placeholder="Select an image for this category"
-                  folder="uploads"
-                />
-              </div>
 
               <div className="flex gap-2">
                 <Button type="submit" className="flex items-center gap-2">
@@ -281,24 +266,6 @@ export default function CategoriesPage() {
                   key={category.id}
                   className={`flex items-center gap-4 p-4 border border-gray-200 rounded-lg ${!category.active ? 'opacity-60 bg-gray-50' : ''}`}
                 >
-                  {/* Category Image */}
-                  <div className="flex-shrink-0">
-                    {category.image ? (
-                      <div className="w-16 h-16 relative rounded-lg overflow-hidden">
-                        <Image
-                          src={category.image}
-                          alt={category.name}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <span className="text-gray-400 text-xs text-center">No Image</span>
-                      </div>
-                    )}
-                  </div>
 
                   {/* Category Info */}
                   <div className="flex-1">

@@ -42,7 +42,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json()
-    const { name, description, image } = body
+    const { name, description } = body
 
     if (!name || name.trim() === '') {
       return NextResponse.json(
@@ -94,8 +94,7 @@ export async function PUT(
       data: {
         name: name.trim(),
         slug,
-        description: description?.trim() || null,
-        image: image?.trim() || null
+        description: description?.trim() || null
       },
       include: {
         _count: {
