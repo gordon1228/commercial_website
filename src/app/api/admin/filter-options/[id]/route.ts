@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 import { prisma } from '@/lib/prisma'
 
 // PUT /api/admin/filter-options/[id] - Update filter option
-export const PUT = createApiHandler(async (req: NextRequest, { body, params }: { body: any, params: { id: string } }) => {
+export const PUT = createApiHandler(async (req: NextRequest, context: any) => {
+  const { body, params } = context
   const { type, value, label, order, active } = body as {
     type?: string
     value?: string
@@ -62,7 +63,8 @@ export const PUT = createApiHandler(async (req: NextRequest, { body, params }: {
 })
 
 // DELETE /api/admin/filter-options/[id] - Delete filter option
-export const DELETE = createApiHandler(async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const DELETE = createApiHandler(async (req: NextRequest, context: any) => {
+  const { params } = context
   const filterOption = await prisma.filterOption.findUnique({
     where: { id: params.id }
   })
@@ -83,7 +85,8 @@ export const DELETE = createApiHandler(async (req: NextRequest, { params }: { pa
 })
 
 // PATCH /api/admin/filter-options/[id]/toggle - Toggle active status
-export const PATCH = createApiHandler(async (req: NextRequest, { params }: { params: { id: string } }) => {
+export const PATCH = createApiHandler(async (req: NextRequest, context: any) => {
+  const { params } = context
   const filterOption = await prisma.filterOption.findUnique({
     where: { id: params.id }
   })

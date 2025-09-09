@@ -74,7 +74,12 @@ export default function FiltersPage() {
       const url = editingId ? `/api/admin/filter-options/${editingId}` : '/api/admin/filter-options'
       const method = editingId ? 'PUT' : 'POST'
 
-      const body: any = {
+      const body: {
+        type: string
+        value: string
+        label: string
+        order?: number
+      } = {
         type: formData.type,
         value: formData.value.trim(),
         label: formData.label.trim(),

@@ -1,4 +1,4 @@
-import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
+import { createApiHandler, apiResponse } from '@/lib/api-handler'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/filter-options - Get filter options by type

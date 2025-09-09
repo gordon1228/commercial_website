@@ -59,12 +59,11 @@ export async function GET() {
     //   }
     // })
 
-    // Get category images
+    // Get categories (no image field anymore)
     const categories = await prisma.category.findMany({
       select: {
         id: true,
-        name: true,
-        image: true
+        name: true
       }
     })
 
@@ -166,22 +165,7 @@ export async function GET() {
     //   }
     // })
 
-    // Add category images
-    categories.forEach(category => {
-      if (category.image) {
-        const imageUrl = category.image
-        if (!imageUsageMap.has(imageUrl)) {
-          imageUsageMap.set(imageUrl, [])
-        }
-        
-        imageUsageMap.get(imageUrl)!.push({
-          type: 'category',
-          id: category.id,
-          name: category.name,
-          context: 'Category Image'
-        })
-      }
-    })
+    // Categories no longer have images (removed for simplicity)
 
     // Convert map to array of usage objects
     const imageUsages: ImageUsage[] = Array.from(imageUsageMap.entries()).map(([url, usedIn]) => ({
