@@ -81,6 +81,7 @@ export default withAuth(
           role: token?.role,
           email: token?.email,
           origin: req.nextUrl.origin,
+          sessionCookie: req.cookies.get('next-auth.session-token')?.value ? 'exists' : 'none',
           userAgent: req.headers.get('user-agent')?.substring(0, 100)
         })
         

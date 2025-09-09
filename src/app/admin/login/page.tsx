@@ -41,18 +41,18 @@ export default function AdminLoginPage() {
         let redirectUrl = '/admin'
         
         if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-          redirectUrl = callbackUrl
+          redirectUrl = callbackUrl === '/admin/login' ? '/admin' : callbackUrl
           console.log('Redirecting ADMIN/MANAGER to:', redirectUrl)
         } else if (userRole === 'USER') {
           redirectUrl = '/admin/inquiries'
           console.log('Redirecting USER to inquiries')
         }
         
-        // Slight delay to ensure session is properly set in middleware
+        // Longer delay to ensure session cookie is properly set and middleware recognizes it
         setTimeout(() => {
           console.log('Executing redirect to:', redirectUrl)
-          window.location.replace(redirectUrl)
-        }, 100)
+          window.location.href = redirectUrl // Use href instead of replace to allow back navigation
+        }, 500) // Increased timeout
       }
     }
   }, [status, session, callbackUrl])
@@ -86,9 +86,12 @@ export default function AdminLoginPage() {
         setError('Invalid email or password')
         setIsLoading(false)
       } else if (result?.ok) {
-        // Don't redirect immediately, let the useEffect handle it after session updates
+        // Login successful - wait a bit longer for session to be set
         console.log('Login successful, waiting for session update...')
-        // The useEffect above will handle the redirect once session is updated
+        setTimeout(() => {
+          // Force a hard refresh to ensure session is recognized by middleware
+          window.location.href = callbackUrl === '/admin/login' ? '/admin' : callbackUrl
+        }, 1000)
       } else {
         setError('Login failed. Please try again.')
         setIsLoading(false)
@@ -110,20 +113,20 @@ export default function AdminLoginPage() {
     if (status === 'authenticated' && session?.user?.role) {
       // Only set failsafe if we're on the login page
       if (typeof window !== 'undefined' && window.location.pathname === '/admin/login') {
-        // Failsafe: Force redirect after 5 seconds if still showing redirect screen
+        // Failsafe: Force redirect after 8 seconds if still showing redirect screen
         const failsafeTimer = setTimeout(() => {
-          console.log('Failsafe redirect triggered after 5 seconds')
+          console.log('Failsafe redirect triggered after 8 seconds')
           const userRole = session.user.role
           let redirectUrl = '/admin'
           
           if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-            redirectUrl = callbackUrl
+            redirectUrl = callbackUrl === '/admin/login' ? '/admin' : callbackUrl
           } else if (userRole === 'USER') {
             redirectUrl = '/admin/inquiries'
           }
           
-          window.location.replace(redirectUrl)
-        }, 5000)
+          window.location.href = redirectUrl
+        }, 8000) // Increased from 5 seconds
 
         return () => clearTimeout(failsafeTimer)
       }

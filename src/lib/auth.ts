@@ -159,10 +159,10 @@ export const authOptions: NextAuthOptions = {
         NODE_ENV: process.env.NODE_ENV
       })
       
-      // Handle post-login redirects - be more specific
-      if (url === '/admin/login' || url.endsWith('/admin/login')) {
+      // Handle post-login redirects - be more specific and avoid loops
+      if (url === '/admin/login' || url.endsWith('/admin/login') || url.includes('login')) {
         const redirectUrl = `${actualBaseUrl}/admin`
-        console.log('Post-login redirect to:', redirectUrl)
+        console.log('Post-login redirect to admin dashboard:', redirectUrl)
         return redirectUrl
       }
       
