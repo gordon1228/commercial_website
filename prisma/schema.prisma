@@ -56,7 +56,6 @@ model Vehicle {
   description  String?
   price        Float
   images       String[]
-  mobileImages String[]  @default([])
   specs        Json?
   status       Status    @default(AVAILABLE)
   featured     Boolean   @default(false)
@@ -68,6 +67,7 @@ model Vehicle {
   make         String?   @default("Isuzu") @db.VarChar(255)
   fuelType     String?   @default("Electric") @db.VarChar(255)
   transmission String?
+  mobileImages String[]  @default([])
   inquiries    Inquiry[]
   category     Category  @relation(fields: [categoryId], references: [id])
 
@@ -118,7 +118,6 @@ model HomepageContent {
   feature3Title         String   @default("24/7 Support")
   feature3Description   String   @default("Round-the-clock customer support to assist you with any questions or concerns.")
   comingSoonImage       String   @default("/images/comming soon.jpg")
-  comingSoonImageMobile String?  @default("/images/comming-soon-mobile.jpg")
   comingSoonImageAlt    String   @default("Coming Soon")
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
@@ -127,11 +126,11 @@ model HomepageContent {
   showVehicleCategories Boolean? @default(true)
   showFeaturedVehicles  Boolean? @default(true)
   showTrustSection      Boolean? @default(true)
+  comingSoonImageMobile String?  @default("/images/comming-soon-mobile.jpg")
 
   @@index([updatedAt], map: "idx_homepage_content_updated_at")
   @@map("homepage_content")
 }
-
 
 model CompanyInfo {
   id                  String   @id @default(cuid())
@@ -170,7 +169,6 @@ model CompanyValue {
   @@map("company_values")
 }
 
-
 model Certification {
   id        String   @id @default(cuid())
   name      String
@@ -181,20 +179,6 @@ model Certification {
 
   @@index([order, active], map: "idx_certifications_order_active")
   @@map("certifications")
-}
-
-model Partner {
-  id        String   @id @default(cuid())
-  name      String
-  logo      String
-  website   String?
-  active    Boolean  @default(true)
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([order, active], map: "idx_partners_order_active")
-  @@map("partners")
 }
 
 model ContactInfo {

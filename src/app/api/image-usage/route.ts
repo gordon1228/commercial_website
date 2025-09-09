@@ -49,14 +49,15 @@ export async function GET() {
       }
     })
 
-    // Get partner logos
-    const partners = await prisma.partner.findMany({
-      select: {
-        id: true,
-        name: true,
-        logo: true
-      }
-    })
+    // Get partner logos (if partner table exists)
+    // Note: Partner table may not exist in current schema
+    // const partners = await prisma.partner.findMany({
+    //   select: {
+    //     id: true,
+    //     name: true,
+    //     logo: true
+    //   }
+    // })
 
     // Get category images
     const categories = await prisma.category.findMany({
@@ -148,22 +149,22 @@ export async function GET() {
       }
     }
 
-    // Add partner logos
-    partners.forEach(partner => {
-      if (partner.logo) {
-        const imageUrl = partner.logo
-        if (!imageUsageMap.has(imageUrl)) {
-          imageUsageMap.set(imageUrl, [])
-        }
-        
-        imageUsageMap.get(imageUrl)!.push({
-          type: 'partner',
-          id: partner.id,
-          name: partner.name,
-          context: 'Partner Logo'
-        })
-      }
-    })
+    // Add partner logos (if partner table exists)
+    // partners.forEach(partner => {
+    //   if (partner.logo) {
+    //     const imageUrl = partner.logo
+    //     if (!imageUsageMap.has(imageUrl)) {
+    //       imageUsageMap.set(imageUrl, [])
+    //     }
+    //     
+    //     imageUsageMap.get(imageUrl)!.push({
+    //       type: 'partner',
+    //       id: partner.id,
+    //       name: partner.name,
+    //       context: 'Partner Logo'
+    //     })
+    //   }
+    // })
 
     // Add category images
     categories.forEach(category => {

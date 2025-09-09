@@ -391,10 +391,10 @@ export function ImageUpload({
                                       <Cpu className="h-3 w-3" />
                                     ) : use.type === 'homepage' ? (
                                       <Home className="h-3 w-3" />
-                                    ) : use.type === 'partner' ? (
-                                      <Users className="h-3 w-3" />
                                     ) : use.type === 'category' ? (
                                       <Folder className="h-3 w-3" />
+                                    ) : use.type === 'partner' ? (
+                                      <Users className="h-3 w-3" />
                                     ) : (
                                       <ImageIcon className="h-3 w-3" />
                                     )}

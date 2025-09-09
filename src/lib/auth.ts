@@ -155,7 +155,8 @@ export const authOptions: NextAuthOptions = {
         baseUrl, 
         actualBaseUrl,
         NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-        VERCEL_URL: process.env.VERCEL_URL
+        VERCEL_URL: process.env.VERCEL_URL,
+        NODE_ENV: process.env.NODE_ENV
       })
       
       // Handle post-login redirects - be more specific
@@ -172,19 +173,23 @@ export const authOptions: NextAuthOptions = {
         return redirectUrl
       }
       
-      // For absolute URLs, ensure they match our domain
+      // For absolute URLs, ensure they match our domain or allow same-origin
       try {
         const urlObj = new URL(url)
         const baseUrlObj = new URL(actualBaseUrl)
         
-        // If it's the same origin, allow it
-        if (urlObj.origin === baseUrlObj.origin) {
-          console.log('Same origin redirect allowed:', url)
+        // If it's the same origin or a Vercel deployment URL, allow it
+        const isVercelUrl = url.includes('vercel.app') || url.includes(process.env.VERCEL_URL || '')
+        const isSameOrigin = urlObj.origin === baseUrlObj.origin
+        
+        if (isSameOrigin || (process.env.NODE_ENV === 'production' && isVercelUrl)) {
+          console.log('Same origin or Vercel redirect allowed:', { url, isSameOrigin, isVercelUrl })
           return url
         } else {
           console.log('Different origin detected, redirecting to admin:', {
             urlOrigin: urlObj.origin,
-            baseOrigin: baseUrlObj.origin
+            baseOrigin: baseUrlObj.origin,
+            isVercelUrl
           })
         }
       } catch (e) {

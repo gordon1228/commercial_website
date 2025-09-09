@@ -28,20 +28,35 @@ export default function AdminLoginPage() {
     if (status === 'authenticated' && session?.user?.role) {
       const userRole = session.user.role
       
-      console.log('Authentication status changed:', { status, userRole, callbackUrl })
+      console.log('Authentication status changed:', { 
+        status, 
+        userRole, 
+        callbackUrl,
+        currentUrl: typeof window !== 'undefined' ? window.location.href : 'undefined',
+        isProduction: process.env.NODE_ENV === 'production'
+      })
       
-      // Add a small delay to ensure session is fully established
-      const timer = setTimeout(() => {
-        if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-          console.log('Redirecting ADMIN/MANAGER to:', callbackUrl)
-          window.location.href = callbackUrl // Use window.location for more reliable redirect
-        } else if (userRole === 'USER') {
-          console.log('Redirecting USER to inquiries')
-          window.location.href = '/admin/inquiries' // Use window.location for more reliable redirect
-        }
-      }, 500) // 500ms delay
-
-      return () => clearTimeout(timer)
+      // Immediate redirect without delay for better UX
+      let redirectUrl = '/admin'
+      
+      if (userRole === 'ADMIN' || userRole === 'MANAGER') {
+        redirectUrl = callbackUrl
+        console.log('Redirecting ADMIN/MANAGER to:', redirectUrl)
+      } else if (userRole === 'USER') {
+        redirectUrl = '/admin/inquiries'
+        console.log('Redirecting USER to inquiries')
+      }
+      
+      // Use router.push for client-side navigation, fallback to window.location
+      try {
+        // First try Next.js router for better UX
+        window.history.pushState(null, '', redirectUrl)
+        window.location.reload()
+      } catch (error) {
+        console.log('Router navigation failed, using window.location:', error)
+        // Fallback to window.location
+        window.location.href = redirectUrl
+      }
     }
   }, [status, session, callbackUrl])
 
@@ -102,6 +117,28 @@ export default function AdminLoginPage() {
     )
   }
 
+  // Add failsafe redirect timer
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user?.role) {
+      // Failsafe: Force redirect after 3 seconds if still showing redirect screen
+      const failsafeTimer = setTimeout(() => {
+        console.log('Failsafe redirect triggered after 3 seconds')
+        const userRole = session.user.role
+        let redirectUrl = '/admin'
+        
+        if (userRole === 'ADMIN' || userRole === 'MANAGER') {
+          redirectUrl = callbackUrl
+        } else if (userRole === 'USER') {
+          redirectUrl = '/admin/inquiries'
+        }
+        
+        window.location.replace(redirectUrl)
+      }, 3000)
+
+      return () => clearTimeout(failsafeTimer)
+    }
+  }, [status, session, callbackUrl])
+
   // Don't show login form if already authenticated with valid role
   if (status === 'authenticated' && ['ADMIN', 'MANAGER', 'USER'].includes(session?.user?.role)) {
     return (
@@ -111,7 +148,7 @@ export default function AdminLoginPage() {
           <p className="text-gray-700 font-medium mb-2">Login Successful!</p>
           <p className="text-gray-600 text-sm">Redirecting you to the admin dashboard...</p>
           <p className="text-gray-500 text-xs mt-4">
-            If this takes too long, <button onClick={() => window.location.href = '/admin'} className="text-blue-600 underline">click here</button>
+            If this takes too long, <button onClick={() => window.location.replace('/admin')} className="text-blue-600 underline">click here</button>
           </p>
         </div>
       </div>
