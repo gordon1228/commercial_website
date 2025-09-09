@@ -1,6 +1,7 @@
 import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
 import { decode } from 'next-auth/jwt'
+import { NextRequest } from 'next/server'
 
 // Rate limiting store (in production, use Redis)
 const rateLimit = new Map()
@@ -26,7 +27,7 @@ function rateLimiter(ip: string, limit: number = 10, windowMs: number = 60000) {
 }
 
 // Helper function to manually decode session token when withAuth fails to parse it
-async function getTokenFromCookie(req: any) {
+async function getTokenFromCookie(req: NextRequest) {
   try {
     const sessionCookie = req.cookies.get('next-auth.session-token')?.value
     if (!sessionCookie) return null
