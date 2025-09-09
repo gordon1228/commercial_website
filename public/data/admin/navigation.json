@@ -50,6 +50,13 @@
       "roles": ["ADMIN", "MANAGER"]
     },
     {
+      "id": "technology",
+      "name": "Technology",
+      "href": "/admin/technology",
+      "icon": "Cpu",
+      "roles": ["ADMIN", "MANAGER"]
+    },
+    {
       "id": "settings",
       "name": "Settings",
       "href": "/admin/settings",

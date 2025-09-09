@@ -14,18 +14,3 @@ export function formatPrice(price: number): string {
   }).format(price)
 }
 
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w ]+/g, '')
-    .replace(/ +/g, '-')
-    .trim()
-}
-
-export function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(date)
-}

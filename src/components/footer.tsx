@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react'
+import { usePreview } from '@/contexts/preview-context'
 
 interface Category {
   id: string
@@ -38,6 +39,7 @@ interface ContactInfo {
 export default function Footer() {
   const [categories, setCategories] = useState<Category[]>([])
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
+  const { isMobilePreview, isTabletPreview } = usePreview()
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -72,10 +74,23 @@ export default function Footer() {
     fetchContactInfo()
   }, [])
 
+  // Get mobile-optimized classes based on preview mode
+  const getFooterClasses = () => {
+    if (isMobilePreview) {
+      return 'grid grid-cols-1 gap-6' // Simplified mobile layout for preview
+    }
+    if (isTabletPreview) {
+      return 'grid grid-cols-1 sm:grid-cols-2 gap-6' // Tablet layout
+    }
+    return 'grid grid-cols-1 md:grid-cols-4 gap-8' // Standard responsive layout
+  }
+
   return (
     <footer className="bg-black border-t border-secondary/10">
-      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className={`max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 ${
+        isMobilePreview ? 'py-8' : 'py-12'
+      }`}>
+        <div className={getFooterClasses()}>
           {/* Company Info */}
           <div className="space-y-4">
             <h3 className="text-xl font-display font-bold text-white">EVTL</h3>
@@ -176,12 +191,20 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-secondary/10">
-          <div className="flex flex-col sm:flex-row justify-between items-center">
+        <div className={`${
+          isMobilePreview ? 'mt-8 pt-6' : 'mt-12 pt-8'
+        } border-t border-secondary/10`}>
+          <div className={`${
+            isMobilePreview 
+              ? 'flex flex-col space-y-4 text-left' 
+              : 'flex flex-col sm:flex-row justify-between items-center'
+          }`}>
             <p className="text-muted-foreground text-sm">
               © 2024 EVTL. All rights reserved.
             </p>
-            <div className="flex space-x-6 mt-4 sm:mt-0">
+            <div className={`flex space-x-6 ${
+              isMobilePreview ? 'mt-0' : 'mt-4 sm:mt-0'
+            }`}>
               <Link href={contactInfo?.privacyPolicyUrl || '/privacy'} className="text-muted-foreground hover:text-accent text-sm transition-colors">
                 Privacy Policy
               </Link>

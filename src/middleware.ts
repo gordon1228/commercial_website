@@ -1,7 +1,5 @@
 import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
-// import type { NextRequest } from 'next/server'
-// import { getSecureHeaders } from '@/lib/security'
 
 // Rate limiting store (in production, use Redis)
 const rateLimit = new Map()

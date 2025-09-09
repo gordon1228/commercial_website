@@ -129,25 +129,3 @@ export function useJsonData<T>(path: string, fallbackData?: T): DataLoaderResult
   return state
 }
 
-// Utility function to preload data (useful for critical data)
-export function preloadJsonData<T>(path: string): Promise<T> {
-  return loadJsonData<T>(path)
-}
-
-// Clear cache function (useful for development/testing)
-export function clearDataCache(): void {
-  dataCache.clear()
-}
-
-// Specific hooks for our data types
-export function useVehicleFilters() {
-  return useJsonData('vehicle-filters.json')
-}
-
-export function useCompanyInfoFallback() {
-  return useJsonData('fallback/company-info.json')
-}
-
-export function useContactInfoFallback() {
-  return useJsonData('fallback/contact-info.json')
-}

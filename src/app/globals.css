@@ -46,12 +46,15 @@
 .force-mobile-layout .block.sm\:hidden,
 .force-mobile-layout .block.md\:hidden,
 .force-mobile-layout .block.lg\:hidden,
-.force-mobile-layout .block.xl\:hidden,
+.force-mobile-layout .block.xl\:hidden {
+  display: block !important;
+}
+
 .force-mobile-layout .flex.sm\:hidden,
 .force-mobile-layout .flex.md\:hidden,
 .force-mobile-layout .flex.lg\:hidden,
 .force-mobile-layout .flex.xl\:hidden {
-  display: block !important;
+  display: flex !important;
 }
 
 /* Navigation specific overrides for mobile */
@@ -63,11 +66,61 @@
   display: block !important;
 }
 
+/* Mobile filter specific overrides */
+.force-mobile-layout .lg\:hidden {
+  display: block !important;
+}
+
+.force-mobile-layout .hidden.lg\:block {
+  display: none !important;
+}
+
+/* When mobile filters are toggled open */
+.force-mobile-layout .lg\:block {
+  display: none !important;
+}
+
+/* Vehicle page layout fixes for mobile preview */
+.force-mobile-layout .lg\:grid {
+  display: block !important;
+}
+
+.force-mobile-layout .lg\:grid-cols-4 {
+  grid-template-columns: none !important;
+}
+
+.force-mobile-layout .lg\:col-span-1,
+.force-mobile-layout .lg\:col-span-3 {
+  grid-column: auto !important;
+}
+
+.force-mobile-layout .lg\:gap-8 {
+  gap: 1.5rem !important;
+}
+
+.force-mobile-layout .mt-8.lg\:mt-0 {
+  margin-top: 1.5rem !important;
+}
+
+/* Grid layout overrides - more precise mobile behavior */
 .force-mobile-layout .grid-cols-1.sm\:grid-cols-2,
-.force-mobile-layout .grid-cols-1.md\:grid-cols-2,
+.force-mobile-layout .grid-cols-1.md\:grid-cols-2 {
+  grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+}
+
+.force-mobile-layout .grid-cols-1.md\:grid-cols-3,
+.force-mobile-layout .grid-cols-1.md\:grid-cols-4 {
+  grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+}
+
 .force-mobile-layout .grid-cols-1.lg\:grid-cols-2,
 .force-mobile-layout .grid-cols-1.lg\:grid-cols-3,
 .force-mobile-layout .grid-cols-1.lg\:grid-cols-4 {
+  grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+}
+
+.force-mobile-layout .grid-cols-2.md\:grid-cols-3,
+.force-mobile-layout .grid-cols-2.md\:grid-cols-4 {
   grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
 }
 
@@ -180,15 +233,31 @@
   font-size: 1.25rem !important; /* text-xl */
 }
 
-/* Mobile spacing overrides */
+/* Mobile spacing overrides - better mobile simulation */
 .force-mobile-layout .space-x-8 > * + *,
-.force-mobile-layout .space-x-6 > * + * {
+.force-mobile-layout .space-x-12 > * + * {
   margin-left: 1rem !important;
 }
 
+.force-mobile-layout .space-x-6 > * + * {
+  margin-left: 0.75rem !important;
+}
+
+.force-mobile-layout .space-x-4 > * + * {
+  margin-left: 0.5rem !important;
+}
+
 .force-mobile-layout .space-y-8 > * + *,
+.force-mobile-layout .space-y-12 > * + * {
+  margin-top: 1.5rem !important;
+}
+
 .force-mobile-layout .space-y-6 > * + * {
   margin-top: 1rem !important;
+}
+
+.force-mobile-layout .space-y-4 > * + * {
+  margin-top: 0.75rem !important;
 }
 
 /* Hide mobile menu button in mobile preview since navigation is hidden anyway */
@@ -225,6 +294,44 @@ body:has(.admin-preview-toolbar) .pt-20 {
 .force-tablet-layout .min-h-screen.pt-20,
 body:has(.admin-preview-toolbar) .min-h-screen.pt-20 {
   padding-top: 0 !important;
+}
+
+/* Footer specific mobile layout improvements */
+.force-mobile-layout footer .grid.grid-cols-1.md\:grid-cols-4 {
+  grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  gap: 1.5rem !important;
+}
+
+.force-mobile-layout footer .gap-8 {
+  gap: 1.5rem !important;
+}
+
+.force-mobile-layout footer .space-y-4 > * + * {
+  margin-top: 1rem !important;
+}
+
+.force-mobile-layout footer .space-y-3 > * + * {
+  margin-top: 0.75rem !important;
+}
+
+.force-mobile-layout footer .flex.space-x-4 > * + * {
+  margin-left: 0.75rem !important;
+}
+
+.force-mobile-layout footer .flex.space-x-6 > * + * {
+  margin-left: 1rem !important;
+}
+
+.force-mobile-layout footer .flex-col.sm\:flex-row {
+  flex-direction: column !important;
+}
+
+.force-mobile-layout footer .items-center.sm\:items-center {
+  align-items: flex-start !important;
+}
+
+.force-mobile-layout footer .text-center.sm\:text-left {
+  text-align: left !important;
 }
 
 @layer components {

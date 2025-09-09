@@ -7,13 +7,10 @@
     "build": "prisma db pull && prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
-    "db:seed-from-supabase": "tsx prisma/seed-from-supabase.ts",
-    "db:seed-export": "node prisma/seed-from-export.js",
-    "db:reset": "prisma migrate reset && npm run db:seed",
-    "db:reset-with-data": "prisma migrate reset && npm run db:seed-export",
-    "db:reset-with-supabase": "prisma migrate reset && npm run db:seed-from-supabase"
+    "db:reset": "prisma migrate reset && npm run db:seed"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
@@ -26,7 +23,6 @@
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "isomorphic-dompurify": "^2.26.0",
     "lucide-react": "^0.542.0",
     "next": "14.2.32",
     "next-auth": "^4.24.11",

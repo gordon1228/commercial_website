@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { X, Filter } from 'lucide-react'
 import { useJsonData } from '@/lib/data-loader'
+import { usePreview } from '@/contexts/preview-context'
 import type { VehicleFiltersConfig } from '@/types/data-config'
 
 interface FilterState {
@@ -64,6 +65,7 @@ const defaultFiltersConfig: VehicleFiltersConfig = {
 export default function VehicleFilters() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { isMobilePreview } = usePreview()
   const [isOpen, setIsOpen] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
@@ -209,10 +211,30 @@ export default function VehicleFilters() {
     filters.yearMax ||
     filters.make.length > 0
 
+  // Get mobile toggle visibility classes
+  const getMobileToggleClasses = () => {
+    if (isMobilePreview) {
+      return 'block mb-6' // Always show in mobile preview
+    }
+    return 'lg:hidden mb-6' // Standard responsive behavior
+  }
+
+  // Get filter panel classes
+  const getFilterPanelClasses = () => {
+    if (isMobilePreview) {
+      return `bg-white rounded-lg p-6 border border-gray-200 shadow-sm ${
+        isOpen ? 'block' : 'hidden'
+      }`
+    }
+    return `lg:block bg-white rounded-lg p-6 border border-gray-200 shadow-sm ${
+      isOpen ? 'block' : 'hidden'
+    }`
+  }
+
   return (
     <>
       {/* Mobile filter toggle */}
-      <div className="lg:hidden mb-6">
+      <div className={getMobileToggleClasses()}>
         <Button
           variant="secondary"
           onClick={() => setIsOpen(!isOpen)}
@@ -235,10 +257,7 @@ export default function VehicleFilters() {
       </div>
 
       {/* Filter panel */}
-      <div className={`
-        lg:block bg-white rounded-lg p-6 border border-gray-200 shadow-sm
-        ${isOpen ? 'block' : 'hidden'}
-      `}>
+      <div className={getFilterPanelClasses()}>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
           {hasActiveFilters && (

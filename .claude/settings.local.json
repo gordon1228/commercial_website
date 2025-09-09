@@ -149,7 +149,11 @@
       "Bash(rd:*)",
       "Bash(del test-image-cleanup.js)",
       "Bash(del update-coming-soon-image.js)",
-      "Bash(del test-db-schema.js)"
+      "Bash(del test-db-schema.js)",
+      "Bash(del \"C:\\Users\\User\\Desktop\\commercial_website\\src\\components\\session-monitor.tsx\")",
+      "Bash(del \"C:\\Users\\User\\Desktop\\commercial_website\\src\\components\\ui\\phone-input.tsx\")",
+      "Bash(for file in \"C:\\Users\\User\\Desktop\\commercial_website\"/*.sql)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
