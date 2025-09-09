@@ -23,7 +23,8 @@ import {
   MessageCircle,
   Eye,
   Image,
-  Cpu
+  Cpu,
+  Filter
 } from 'lucide-react'
 import { useJsonData } from '@/lib/data-loader'
 import type { AdminNavigationConfig } from '@/types/data-config'
@@ -42,7 +43,8 @@ const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = 
   Cpu,
   Image,
   Settings,
-  Eye
+  Eye,
+  Filter
 }
 
 // Fallback navigation data
