@@ -28,18 +28,22 @@ export default function AdminLoginPage() {
     if (status === 'authenticated' && session?.user?.role) {
       const userRole = session.user.role
       
-      // Prevent redirect loops by checking current path
-      if (typeof window !== 'undefined' && window.location.pathname === '/admin/login') {
+      console.log('Authentication status changed:', { status, userRole, callbackUrl })
+      
+      // Add a small delay to ensure session is fully established
+      const timer = setTimeout(() => {
         if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-          console.log('Already authenticated, redirecting to:', callbackUrl, 'Role:', userRole)
-          router.push(callbackUrl)
+          console.log('Redirecting ADMIN/MANAGER to:', callbackUrl)
+          window.location.href = callbackUrl // Use window.location for more reliable redirect
         } else if (userRole === 'USER') {
-          console.log('USER authenticated, redirecting to inquiries. Role:', userRole)
-          router.push('/admin/inquiries')
+          console.log('Redirecting USER to inquiries')
+          window.location.href = '/admin/inquiries' // Use window.location for more reliable redirect
         }
-      }
+      }, 500) // 500ms delay
+
+      return () => clearTimeout(timer)
     }
-  }, [status, session, callbackUrl, router])
+  }, [status, session, callbackUrl])
 
   // Show error messages from URL params
   useEffect(() => {
@@ -55,6 +59,8 @@ export default function AdminLoginPage() {
     setError('')
 
     try {
+      console.log('Attempting login with:', { email: formData.email, callbackUrl })
+      
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
@@ -62,12 +68,15 @@ export default function AdminLoginPage() {
         callbackUrl: callbackUrl
       })
 
+      console.log('Login result:', result)
+
       if (result?.error) {
         setError('Invalid email or password')
         setIsLoading(false)
       } else if (result?.ok) {
-        // Use router.push for better Next.js compatibility
-        router.push(result.url || callbackUrl)
+        // Don't redirect immediately, let the useEffect handle it after session updates
+        console.log('Login successful, waiting for session update...')
+        // The useEffect above will handle the redirect once session is updated
       } else {
         setError('Login failed. Please try again.')
         setIsLoading(false)
@@ -97,9 +106,13 @@ export default function AdminLoginPage() {
   if (status === 'authenticated' && ['ADMIN', 'MANAGER', 'USER'].includes(session?.user?.role)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Redirecting to admin dashboard...</p>
+        <div className="text-center max-w-md">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-700 font-medium mb-2">Login Successful!</p>
+          <p className="text-gray-600 text-sm">Redirecting you to the admin dashboard...</p>
+          <p className="text-gray-500 text-xs mt-4">
+            If this takes too long, <button onClick={() => window.location.href = '/admin'} className="text-blue-600 underline">click here</button>
+          </p>
         </div>
       </div>
     )

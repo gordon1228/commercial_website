@@ -69,3 +69,48 @@ export async function GET(request: Request) {
     )
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const fileName = searchParams.get('file')
+    const folder = searchParams.get('folder') || 'uploads'
+    
+    if (!fileName) {
+      return NextResponse.json({ error: 'File name is required' }, { status: 400 })
+    }
+    
+    // Define the file path
+    const filePath = path.join(process.cwd(), 'public', folder, fileName)
+    
+    // Check if file exists
+    try {
+      await fs.access(filePath)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      return NextResponse.json({ error: 'File not found' }, { status: 404 })
+    }
+    
+    // Validate that it's an image file
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
+    const ext = path.extname(fileName).toLowerCase()
+    if (!imageExtensions.includes(ext)) {
+      return NextResponse.json({ error: 'File is not an image' }, { status: 400 })
+    }
+    
+    // Delete the file
+    await fs.unlink(filePath)
+    
+    return NextResponse.json({ 
+      success: true, 
+      message: `File ${fileName} deleted successfully` 
+    })
+    
+  } catch (error) {
+    console.error('Error deleting file:', error)
+    return NextResponse.json(
+      { error: 'Failed to delete file', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}

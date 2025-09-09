@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 // import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { useJsonData } from '@/lib/data-loader'
 import type { ContactInfoConfig } from '@/types/data-config'
+import { LocationMap } from '@/components/ui/location-map'
 
 interface ContactInfo {
   salesPhone: string
@@ -445,27 +446,36 @@ export default function ContactPage() {
           <WhatsAppContact />
         </Suspense>
 
-        {/* Map Placeholder */}
+        {/* Interactive Map */}
         <div className="mt-16">
-          <Card className="bg-gray-100 border-gray-300">
-            <CardContent className="p-0">
-              <div className="aspect-[21/9] bg-gray-200 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Visit Our Showroom</h3>
-                  <p className="text-gray-600">
-                    {contactInfo ? 
-                      `${contactInfo.address}, ${contactInfo.city}, ${contactInfo.state} ${contactInfo.postcode}, ${contactInfo.country}` : 
-                      '123 Business Avenue, Commercial District, NY 10001, United States'
-                    }
-                  </p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Interactive map would be embedded here
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="mb-6 text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Find Us</h2>
+            <p className="text-gray-600">Visit our showroom or get directions to our location</p>
+          </div>
+          
+          {contactInfo ? (
+            <LocationMap
+              address={contactInfo.address}
+              city={contactInfo.city}
+              state={contactInfo.state}
+              postcode={contactInfo.postcode}
+              country={contactInfo.country}
+              businessName="EVTL"
+              phone={contactInfo.salesPhone}
+              className="shadow-lg"
+            />
+          ) : (
+            <LocationMap
+              address="123 Business Avenue"
+              city="Commercial District"
+              state="NY"
+              postcode="10001"
+              country="United States"
+              businessName="EVTL"
+              phone="+1 (555) 123-4567"
+              className="shadow-lg"
+            />
+          )}
         </div>
       </div>
     </div>

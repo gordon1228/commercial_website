@@ -4,7 +4,25 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { getAuthUrl } from './vercel-url'
-const prisma = new PrismaClient()
+
+// Configure Prisma with basic settings (timeout handled by wrapper function)
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL
+    }
+  }
+})
+
+// Timeout wrapper utility
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => 
+      setTimeout(() => reject(new Error(errorMessage)), timeoutMs)
+    )
+  ])
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -20,32 +38,54 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          const user = await prisma.user.findUnique({
-            where: {
-              email: credentials.email.toLowerCase().trim()
-            }
-          })
+          // Wrap the entire auth process with 30-second timeout
+          return await withTimeout(
+            (async () => {
+              // Database query with timeout
+              const user = await withTimeout(
+                prisma.user.findUnique({
+                  where: {
+                    email: credentials.email.toLowerCase().trim()
+                  }
+                }),
+                10000, // 10 seconds for DB query
+                'Database query timeout'
+              )
 
-          if (!user) {
-            throw new Error('Invalid email or password')
-          }
+              if (!user) {
+                throw new Error('Invalid email or password')
+              }
 
-          const isPasswordValid = await bcrypt.compare(
-            credentials.password,
-            user.password
+              // Password comparison with timeout
+              const isPasswordValid = await withTimeout(
+                bcrypt.compare(credentials.password, user.password),
+                5000, // 5 seconds for password comparison
+                'Password verification timeout'
+              )
+
+              if (!isPasswordValid) {
+                throw new Error('Invalid email or password')
+              }
+
+              return {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+              }
+            })(),
+            30000, // 30 seconds total timeout
+            'Authentication timeout - please try again'
           )
-
-          if (!isPasswordValid) {
-            throw new Error('Invalid email or password')
-          }
-
-          return {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-          }
         } catch (error) {
           console.error('Auth error:', error)
+          
+          // Provide specific error messages for timeouts
+          if (error instanceof Error) {
+            if (error.message.includes('timeout')) {
+              throw new Error('Authentication timed out - please try again')
+            }
+          }
+          
           throw new Error('Authentication failed')
         }
       }
@@ -85,6 +125,18 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token && token.email) {
+        // Check if token has expired (additional safety check)
+        const currentTime = Math.floor(Date.now() / 1000)
+        if (token.exp && typeof token.exp === 'number' && token.exp < currentTime) {
+          console.log('Token expired:', { exp: token.exp, current: currentTime })
+          // Return empty session to force re-authentication
+          return {
+            ...session,
+            user: undefined,
+            expires: new Date(0).toISOString() // Set expired date
+          }
+        }
+
         session.user = {
           ...session.user,
           id: token.id as string,

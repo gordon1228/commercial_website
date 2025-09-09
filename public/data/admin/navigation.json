@@ -57,6 +57,13 @@
       "roles": ["ADMIN", "MANAGER"]
     },
     {
+      "id": "media",
+      "name": "Media",
+      "href": "/admin/media",
+      "icon": "Image",
+      "roles": ["ADMIN", "MANAGER"]
+    },
+    {
       "id": "settings",
       "name": "Settings",
       "href": "/admin/settings",

@@ -21,7 +21,9 @@ import {
   KeyRound,
   BarChart3,
   MessageCircle,
-  Eye
+  Eye,
+  Image,
+  Cpu
 } from 'lucide-react'
 import { useJsonData } from '@/lib/data-loader'
 import type { AdminNavigationConfig } from '@/types/data-config'
@@ -37,6 +39,8 @@ const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = 
   Users,
   Home,
   Phone,
+  Cpu,
+  Image,
   Settings,
   Eye
 }
@@ -51,6 +55,8 @@ const defaultNavigation: AdminNavigationConfig = {
     { id: 'users', name: 'Users', href: '/admin/users', icon: 'Users', roles: ['ADMIN', 'MANAGER'] },
     { id: 'homepage', name: 'Homepage', href: '/admin/homepage', icon: 'Home', roles: ['ADMIN', 'MANAGER'] },
     { id: 'contact-info', name: 'Contact Info', href: '/admin/contact-info', icon: 'Phone', roles: ['ADMIN', 'MANAGER'] },
+    { id: 'technology', name: 'Technology', href: '/admin/technology', icon: 'Cpu', roles: ['ADMIN', 'MANAGER'] },
+    { id: 'media', name: 'Media', href: '/admin/media', icon: 'Image', roles: ['ADMIN', 'MANAGER'] },
     { id: 'settings', name: 'Settings', href: '/admin/settings', icon: 'Settings', roles: ['ADMIN', 'MANAGER'] },
     { id: 'preview', name: 'Preview', href: '/admin/preview', icon: 'Eye', roles: ['ADMIN', 'MANAGER'] }
   ]
