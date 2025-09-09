@@ -108,16 +108,7 @@ export default function AdminLoginPage() {
     if (error) setError('') // Clear error when user starts typing
   }
 
-  // Show loading state while checking session
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    )
-  }
-
-  // Add failsafe redirect timer
+  // Add failsafe redirect timer - must be before any conditional returns
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.role) {
       // Failsafe: Force redirect after 3 seconds if still showing redirect screen
@@ -138,6 +129,15 @@ export default function AdminLoginPage() {
       return () => clearTimeout(failsafeTimer)
     }
   }, [status, session, callbackUrl])
+
+  // Show loading state while checking session
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    )
+  }
 
   // Don't show login form if already authenticated with valid role
   if (status === 'authenticated' && ['ADMIN', 'MANAGER', 'USER'].includes(session?.user?.role)) {
