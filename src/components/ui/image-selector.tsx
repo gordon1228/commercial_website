@@ -77,6 +77,7 @@ export default function ImageSelector({
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
+        credentials: 'include', // Include session cookies for authentication
       })
 
       if (response.ok) {
@@ -85,14 +86,21 @@ export default function ImageSelector({
         onChange(data.url) // Set the newly uploaded image as selected
         await fetchImages() // Refresh the images list
         setShowSelector(false) // Close the selector
+        console.log('Image uploaded successfully:', data.url)
       } else {
-        console.error('Failed to upload image')
-        alert('Failed to upload image. Please try again.')
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('Failed to upload image:', response.status, errorData)
+        
+        let errorMessage = 'Failed to upload image. Please try again.'
+        if (errorData.error) {
+          errorMessage = errorData.error
+        }
+        
+        alert(errorMessage)
       }
     } catch (error) {
       console.error('Error uploading image:', error)
-      alert('Error uploading image. Please try again.')
-
+      alert('Network error while uploading image. Please check your connection and try again.')
     } finally {
       setIsUploading(false)
     }
