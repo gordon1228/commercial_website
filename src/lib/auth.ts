@@ -150,55 +150,52 @@ export const authOptions: NextAuthOptions = {
       // Use our smart URL detection that handles Vercel deployments
       const actualBaseUrl = getAuthUrl()
       
-      console.log('NextAuth redirect:', { 
+      console.log('NextAuth redirect callback:', { 
         url, 
         baseUrl, 
         actualBaseUrl,
-        NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-        VERCEL_URL: process.env.VERCEL_URL,
-        NODE_ENV: process.env.NODE_ENV
+        timestamp: new Date().toISOString()
       })
       
-      // Handle post-login redirects - be more specific and avoid loops
-      if (url === '/admin/login' || url.endsWith('/admin/login') || url.includes('login')) {
+      // Prevent redirect loops by avoiding login page redirects
+      if (url.includes('/admin/login') || url.endsWith('/login')) {
         const redirectUrl = `${actualBaseUrl}/admin`
-        console.log('Post-login redirect to admin dashboard:', redirectUrl)
+        console.log('Preventing login loop, redirecting to:', redirectUrl)
         return redirectUrl
       }
       
-      // If it's a relative URL, make it absolute using actualBaseUrl
+      // Handle callback URL from query parameters
+      if (url.startsWith('/admin') && url !== '/admin/login') {
+        const redirectUrl = `${actualBaseUrl}${url}`
+        console.log('Admin page redirect to:', redirectUrl)
+        return redirectUrl
+      }
+      
+      // Handle relative URLs
       if (url.startsWith('/')) {
         const redirectUrl = `${actualBaseUrl}${url}`
         console.log('Relative URL redirect to:', redirectUrl)
         return redirectUrl
       }
       
-      // For absolute URLs, ensure they match our domain or allow same-origin
+      // For absolute URLs, validate domain
       try {
         const urlObj = new URL(url)
         const baseUrlObj = new URL(actualBaseUrl)
         
-        // If it's the same origin or a Vercel deployment URL, allow it
-        const isVercelUrl = url.includes('vercel.app') || url.includes(process.env.VERCEL_URL || '')
-        const isSameOrigin = urlObj.origin === baseUrlObj.origin
-        
-        if (isSameOrigin || (process.env.NODE_ENV === 'production' && isVercelUrl)) {
-          console.log('Same origin or Vercel redirect allowed:', { url, isSameOrigin, isVercelUrl })
+        // Allow same origin or Vercel URLs
+        if (urlObj.origin === baseUrlObj.origin || 
+            (process.env.NODE_ENV === 'production' && url.includes('vercel.app'))) {
+          console.log('Same origin redirect allowed:', url)
           return url
-        } else {
-          console.log('Different origin detected, redirecting to admin:', {
-            urlOrigin: urlObj.origin,
-            baseOrigin: baseUrlObj.origin,
-            isVercelUrl
-          })
         }
       } catch (e) {
-        console.error('URL parsing error:', e)
+        console.error('URL parsing error in redirect:', e)
       }
       
-      // Default fallback to admin dashboard
+      // Default fallback - always redirect to admin dashboard after login
       const fallbackUrl = `${actualBaseUrl}/admin`
-      console.log('Fallback redirect to:', fallbackUrl)
+      console.log('Default fallback redirect to:', fallbackUrl)
       return fallbackUrl
     },
   },

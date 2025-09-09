@@ -26,11 +26,14 @@ function rateLimiter(ip: string, limit: number = 10, windowMs: number = 60000) {
 
 export default withAuth(
   function middleware(req) {
-
+    const pathname = req.nextUrl.pathname
+    const token = req.nextauth.token
+    
     console.log('Middleware:', {
-      pathname: req.nextUrl.pathname,
-      token: req.nextauth.token ? 'exists' : 'none',
-      role: req.nextauth.token?.role
+      pathname,
+      token: token ? 'exists' : 'none',
+      role: token?.role,
+      timestamp: new Date().toISOString()
     })
     
     const response = NextResponse.next()
@@ -52,7 +55,6 @@ export default withAuth(
     }
 
     // Rate limiting for API routes
-    const pathname = req.nextUrl.pathname
     if (pathname.startsWith('/api/')) {
       const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'
       
@@ -74,15 +76,15 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl
+        const sessionCookie = req.cookies.get('next-auth.session-token')?.value
         
         console.log('Authorization check:', { 
           pathname, 
           hasToken: !!token,
           role: token?.role,
           email: token?.email,
-          origin: req.nextUrl.origin,
-          sessionCookie: req.cookies.get('next-auth.session-token')?.value ? 'exists' : 'none',
-          userAgent: req.headers.get('user-agent')?.substring(0, 100)
+          sessionCookie: sessionCookie ? 'exists' : 'none',
+          timestamp: new Date().toISOString()
         })
         
         // Allow all public pages (non-admin, non-protected-api)
@@ -119,6 +121,11 @@ export default withAuth(
           
           // For all other admin routes, require authentication
           if (!token) {
+            // Check if there's a session cookie but no token yet (timing issue)
+            if (sessionCookie) {
+              console.log('Session cookie exists but no token yet, allowing access (timing):', pathname)
+              return true // Temporary allow while session is being processed
+            }
             console.log('No token found, denying access to:', pathname)
             return false
           }

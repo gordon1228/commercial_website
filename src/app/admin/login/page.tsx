@@ -23,39 +23,14 @@ export default function AdminLoginPage() {
   // Get callback URL from query params or default to /admin
   const callbackUrl = searchParams?.get('callbackUrl') || '/admin'
 
-  // If already logged in, redirect based on role
+  // Handle authenticated users - but let NextAuth redirect callback handle it primarily
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.role) {
-      const userRole = session.user.role
-      
-      console.log('Authentication status changed:', { 
-        status, 
-        userRole, 
-        callbackUrl,
-        currentUrl: typeof window !== 'undefined' ? window.location.href : 'undefined',
-        isProduction: process.env.NODE_ENV === 'production'
-      })
-      
-      // Only redirect if we're actually on the login page to prevent loops
-      if (typeof window !== 'undefined' && window.location.pathname === '/admin/login') {
-        let redirectUrl = '/admin'
-        
-        if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-          redirectUrl = callbackUrl === '/admin/login' ? '/admin' : callbackUrl
-          console.log('Redirecting ADMIN/MANAGER to:', redirectUrl)
-        } else if (userRole === 'USER') {
-          redirectUrl = '/admin/inquiries'
-          console.log('Redirecting USER to inquiries')
-        }
-        
-        // Longer delay to ensure session cookie is properly set and middleware recognizes it
-        setTimeout(() => {
-          console.log('Executing redirect to:', redirectUrl)
-          window.location.href = redirectUrl // Use href instead of replace to allow back navigation
-        }, 500) // Increased timeout
-      }
+      console.log('User already authenticated, letting NextAuth handle redirect')
+      // Remove client-side redirect logic to prevent conflicts with NextAuth redirect callback
+      // NextAuth redirect callback will handle the redirect after successful login
     }
-  }, [status, session, callbackUrl])
+  }, [status, session])
 
   // Show error messages from URL params
   useEffect(() => {
@@ -73,29 +48,17 @@ export default function AdminLoginPage() {
     try {
       console.log('Attempting login with:', { email: formData.email, callbackUrl })
       
-      const result = await signIn('credentials', {
+      // Use NextAuth's built-in redirect to prevent client-side conflicts
+      await signIn('credentials', {
         email: formData.email,
         password: formData.password,
-        redirect: false,
-        callbackUrl: callbackUrl
+        redirect: true, // Let NextAuth handle the redirect completely
+        callbackUrl: callbackUrl === '/admin/login' ? '/admin' : callbackUrl
       })
 
-      console.log('Login result:', result)
-
-      if (result?.error) {
-        setError('Invalid email or password')
-        setIsLoading(false)
-      } else if (result?.ok) {
-        // Login successful - wait a bit longer for session to be set
-        console.log('Login successful, waiting for session update...')
-        setTimeout(() => {
-          // Force a hard refresh to ensure session is recognized by middleware
-          window.location.href = callbackUrl === '/admin/login' ? '/admin' : callbackUrl
-        }, 1000)
-      } else {
-        setError('Login failed. Please try again.')
-        setIsLoading(false)
-      }
+      // If we reach this point, there was an error (NextAuth would have redirected on success)
+      setError('Login failed. Please try again.')
+      setIsLoading(false)
     } catch (error) {
       console.error('Login error:', error)
       setError('An unexpected error occurred. Please try again.')
@@ -108,30 +71,7 @@ export default function AdminLoginPage() {
     if (error) setError('') // Clear error when user starts typing
   }
 
-  // Add failsafe redirect timer - must be before any conditional returns
-  useEffect(() => {
-    if (status === 'authenticated' && session?.user?.role) {
-      // Only set failsafe if we're on the login page
-      if (typeof window !== 'undefined' && window.location.pathname === '/admin/login') {
-        // Failsafe: Force redirect after 8 seconds if still showing redirect screen
-        const failsafeTimer = setTimeout(() => {
-          console.log('Failsafe redirect triggered after 8 seconds')
-          const userRole = session.user.role
-          let redirectUrl = '/admin'
-          
-          if (userRole === 'ADMIN' || userRole === 'MANAGER') {
-            redirectUrl = callbackUrl === '/admin/login' ? '/admin' : callbackUrl
-          } else if (userRole === 'USER') {
-            redirectUrl = '/admin/inquiries'
-          }
-          
-          window.location.href = redirectUrl
-        }, 8000) // Increased from 5 seconds
-
-        return () => clearTimeout(failsafeTimer)
-      }
-    }
-  }, [status, session, callbackUrl])
+  // Removed failsafe redirect to prevent conflicts with NextAuth
 
   // Show loading state while checking session
   if (status === 'loading') {
@@ -142,17 +82,14 @@ export default function AdminLoginPage() {
     )
   }
 
-  // Don't show login form if already authenticated with valid role
-  if (status === 'authenticated' && ['ADMIN', 'MANAGER', 'USER'].includes(session?.user?.role)) {
+  // Don't show login form if already authenticated - let NextAuth handle redirect
+  if (status === 'authenticated' && session?.user?.role) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center max-w-md">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-700 font-medium mb-2">Login Successful!</p>
-          <p className="text-gray-600 text-sm">Redirecting you to the admin dashboard...</p>
-          <p className="text-gray-500 text-xs mt-4">
-            If this takes too long, <button onClick={() => window.location.replace('/admin')} className="text-blue-600 underline">click here</button>
-          </p>
+          <p className="text-gray-700 font-medium mb-2">Already logged in!</p>
+          <p className="text-gray-600 text-sm">Redirecting to dashboard...</p>
         </div>
       </div>
     )
