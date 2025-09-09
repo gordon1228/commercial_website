@@ -51,6 +51,7 @@ const defaultNavigation: AdminNavigationConfig = {
     { id: 'dashboard', name: 'Dashboard', href: '/admin', icon: 'BarChart3', roles: ['ADMIN', 'MANAGER', 'USER'] },
     { id: 'vehicles', name: 'Vehicles', href: '/admin/vehicles', icon: 'Car', roles: ['ADMIN', 'MANAGER'] },
     { id: 'categories', name: 'Categories', href: '/admin/categories', icon: 'FolderOpen', roles: ['ADMIN', 'MANAGER'] },
+    { id: 'filters', name: 'Vehicle Filters', href: '/admin/filters', icon: 'Filter', roles: ['ADMIN'] },
     { id: 'inquiries', name: 'Inquiries', href: '/admin/inquiries', icon: 'MessageCircle', roles: ['ADMIN', 'MANAGER', 'USER'] },
     { id: 'users', name: 'Users', href: '/admin/users', icon: 'Users', roles: ['ADMIN', 'MANAGER'] },
     { id: 'homepage', name: 'Homepage', href: '/admin/homepage', icon: 'Home', roles: ['ADMIN', 'MANAGER'] },

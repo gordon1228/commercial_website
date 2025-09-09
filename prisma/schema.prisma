@@ -248,6 +248,21 @@ model TechnologyFeature {
   @@map("technology_features")
 }
 
+model FilterOption {
+  id        String   @id @default(cuid())
+  type      String   // 'make' or 'fuelType'
+  value     String   // The actual value (e.g., 'Ford', 'Electric')
+  label     String   // Display name (e.g., 'Ford', 'Electric')
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([type, value], map: "unique_type_value")
+  @@index([type, active, order], map: "idx_filter_options_type_active_order")
+  @@map("filter_options")
+}
+
 enum Role {
   ADMIN
   MANAGER

@@ -29,24 +29,29 @@ interface Category {
   slug: string
 }
 
-// Fallback data in case JSON loading fails
-const defaultFiltersConfig: VehicleFiltersConfig = {
+// Fallback data for static filters (status and transmission)
+const staticFiltersConfig = {
   statusOptions: [
     { id: 'AVAILABLE', label: 'Available' },
     { id: 'RESERVED', label: 'Reserved' },
     { id: 'SOLD', label: 'Sold' }
   ],
+  transmissionOptions: [
+    { id: 'Manual', label: 'Manual' },
+    { id: 'Automatic', label: 'Automatic' },
+    { id: 'Semi-Automatic', label: 'Semi-Automatic' }
+  ]
+}
+
+// Default fallback for dynamic filters
+const defaultFiltersConfig: VehicleFiltersConfig = {
+  ...staticFiltersConfig,
   fuelTypeOptions: [
     { id: 'Electric', label: 'Electric' },
     { id: 'Diesel', label: 'Diesel' },
     { id: 'Gasoline', label: 'Gasoline' },
     { id: 'Hybrid', label: 'Hybrid' },
     { id: 'CNG', label: 'CNG' }
-  ],
-  transmissionOptions: [
-    { id: 'Manual', label: 'Manual' },
-    { id: 'Automatic', label: 'Automatic' },
-    { id: 'Semi-Automatic', label: 'Semi-Automatic' }
   ],
   makeOptions: [
     { id: 'Ford', label: 'Ford' },
@@ -69,12 +74,27 @@ export default function VehicleFilters() {
   const [isOpen, setIsOpen] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
+  const [dynamicFilters, setDynamicFilters] = useState<{
+    makeOptions: Array<{id: string, label: string}>
+    fuelTypeOptions: Array<{id: string, label: string}>
+  }>({
+    makeOptions: [],
+    fuelTypeOptions: []
+  })
+  const [isLoadingFilters, setIsLoadingFilters] = useState(true)
   
-  // Load filter configuration from JSON
-  const { data: filtersConfig } = useJsonData<VehicleFiltersConfig>(
+  // Load static filter configuration from JSON (status, transmission)
+  const { data: staticConfig } = useJsonData<VehicleFiltersConfig>(
     'vehicle-filters.json',
     defaultFiltersConfig
   )
+  
+  // Combine static and dynamic filters
+  const filtersConfig = staticConfig ? {
+    ...staticConfig,
+    makeOptions: dynamicFilters.makeOptions.length > 0 ? dynamicFilters.makeOptions : staticConfig.makeOptions || [],
+    fuelTypeOptions: dynamicFilters.fuelTypeOptions.length > 0 ? dynamicFilters.fuelTypeOptions : staticConfig.fuelTypeOptions || []
+  } : defaultFiltersConfig
   
   const [filters, setFilters] = useState<FilterState>({
     category: searchParams.get('category')?.split(',') || [],
@@ -108,6 +128,30 @@ export default function VehicleFilters() {
     }
 
     fetchCategories()
+  }, [])
+
+  // Fetch dynamic filter options from database
+  useEffect(() => {
+    const fetchDynamicFilters = async () => {
+      try {
+        const response = await fetch('/api/filter-options')
+        if (response.ok) {
+          const data = await response.json()
+          setDynamicFilters({
+            makeOptions: data.make || [],
+            fuelTypeOptions: data.fuelType || []
+          })
+        } else {
+          console.error('Failed to fetch filter options')
+        }
+      } catch (error) {
+        console.error('Error fetching filter options:', error)
+      } finally {
+        setIsLoadingFilters(false)
+      }
+    }
+
+    fetchDynamicFilters()
   }, [])
 
   // Update filters when URL search params change
@@ -384,17 +428,28 @@ export default function VehicleFilters() {
         <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-700 mb-3">Make</h4>
           <div className="space-y-2 max-h-48 overflow-y-auto">
-            {filtersConfig?.makeOptions.map((make) => (
-              <label key={make.id} className="flex items-center space-x-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={filters.make.includes(make.id)}
-                  onChange={() => toggleMake(make.id)}
-                  className="rounded border-gray-300 text-gray-600"
-                />
-                <span className="text-gray-700 text-sm">{make.label}</span>
-              </label>
-            ))}
+            {isLoadingFilters ? (
+              <div className="animate-pulse space-y-2">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <div key={i} className="flex items-center space-x-3">
+                    <div className="w-4 h-4 bg-gray-200 rounded" />
+                    <div className="h-4 bg-gray-200 rounded w-20" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              filtersConfig?.makeOptions.map((make) => (
+                <label key={make.id} className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={filters.make.includes(make.id)}
+                    onChange={() => toggleMake(make.id)}
+                    className="rounded border-gray-300 text-gray-600"
+                  />
+                  <span className="text-gray-700 text-sm">{make.label}</span>
+                </label>
+              ))
+            )}
           </div>
         </div>
 
@@ -402,17 +457,28 @@ export default function VehicleFilters() {
         <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-700 mb-3">Fuel Type</h4>
           <div className="space-y-2">
-            {filtersConfig?.fuelTypeOptions.map((fuel) => (
-              <label key={fuel.id} className="flex items-center space-x-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={filters.fuelType.includes(fuel.id)}
-                  onChange={() => toggleFuelType(fuel.id)}
-                  className="rounded border-gray-300 text-gray-600"
-                />
-                <span className="text-gray-700 text-sm">{fuel.label}</span>
-              </label>
-            ))}
+            {isLoadingFilters ? (
+              <div className="animate-pulse space-y-2">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="flex items-center space-x-3">
+                    <div className="w-4 h-4 bg-gray-200 rounded" />
+                    <div className="h-4 bg-gray-200 rounded w-16" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              filtersConfig?.fuelTypeOptions.map((fuel) => (
+                <label key={fuel.id} className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={filters.fuelType.includes(fuel.id)}
+                    onChange={() => toggleFuelType(fuel.id)}
+                    className="rounded border-gray-300 text-gray-600"
+                  />
+                  <span className="text-gray-700 text-sm">{fuel.label}</span>
+                </label>
+              ))
+            )}
           </div>
         </div>
 
