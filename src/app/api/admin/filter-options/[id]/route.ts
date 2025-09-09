@@ -2,19 +2,28 @@ import { NextRequest } from 'next/server'
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
 import { prisma } from '@/lib/prisma'
 
+interface UpdateFilterOptionBody {
+  type?: string
+  value?: string
+  label?: string
+  order?: number
+  active?: boolean
+}
+
 // PUT /api/admin/filter-options/[id] - Update filter option
-export const PUT = createApiHandler(async (req: NextRequest, context: any) => {
+export const PUT = createApiHandler(async (req: NextRequest, context: { 
+  params?: Record<string, string | string[]>
+  body?: UpdateFilterOptionBody 
+}) => {
   const { body, params } = context
-  const { type, value, label, order, active } = body as {
-    type?: string
-    value?: string
-    label?: string
-    order?: number
-    active?: boolean
+  if (!params?.id) {
+    return apiError('Missing filter option ID', 400)
   }
   
+  const { type, value, label, order, active } = body || {}
+  
   const filterOption = await prisma.filterOption.findUnique({
-    where: { id: params.id }
+    where: { id: params.id as string }
   })
   
   if (!filterOption) {
@@ -35,7 +44,7 @@ export const PUT = createApiHandler(async (req: NextRequest, context: any) => {
       where: {
         type: finalType,
         value: finalValue,
-        id: { not: params.id }
+        id: { not: params.id as string }
       }
     })
     
@@ -45,7 +54,7 @@ export const PUT = createApiHandler(async (req: NextRequest, context: any) => {
   }
   
   const updatedFilterOption = await prisma.filterOption.update({
-    where: { id: params.id },
+    where: { id: params.id as string },
     data: {
       ...(type && { type }),
       ...(value && { value: value.trim() }),
@@ -63,10 +72,15 @@ export const PUT = createApiHandler(async (req: NextRequest, context: any) => {
 })
 
 // DELETE /api/admin/filter-options/[id] - Delete filter option
-export const DELETE = createApiHandler(async (req: NextRequest, context: any) => {
+export const DELETE = createApiHandler(async (req: NextRequest, context: { 
+  params?: Record<string, string | string[]> 
+}) => {
   const { params } = context
+  if (!params?.id) {
+    return apiError('Missing filter option ID', 400)
+  }
   const filterOption = await prisma.filterOption.findUnique({
-    where: { id: params.id }
+    where: { id: params.id as string }
   })
   
   if (!filterOption) {
@@ -74,7 +88,7 @@ export const DELETE = createApiHandler(async (req: NextRequest, context: any) =>
   }
   
   await prisma.filterOption.delete({
-    where: { id: params.id }
+    where: { id: params.id as string }
   })
   
   return apiResponse({ message: 'Filter option deleted successfully' })
@@ -85,10 +99,15 @@ export const DELETE = createApiHandler(async (req: NextRequest, context: any) =>
 })
 
 // PATCH /api/admin/filter-options/[id]/toggle - Toggle active status
-export const PATCH = createApiHandler(async (req: NextRequest, context: any) => {
+export const PATCH = createApiHandler(async (req: NextRequest, context: { 
+  params?: Record<string, string | string[]> 
+}) => {
   const { params } = context
+  if (!params?.id) {
+    return apiError('Missing filter option ID', 400)
+  }
   const filterOption = await prisma.filterOption.findUnique({
-    where: { id: params.id }
+    where: { id: params.id as string }
   })
   
   if (!filterOption) {
@@ -96,7 +115,7 @@ export const PATCH = createApiHandler(async (req: NextRequest, context: any) => 
   }
   
   const updatedFilterOption = await prisma.filterOption.update({
-    where: { id: params.id },
+    where: { id: params.id as string },
     data: { active: !filterOption.active }
   })
   

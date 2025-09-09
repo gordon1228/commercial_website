@@ -59,14 +59,8 @@ export async function GET() {
     //   }
     // })
 
-    // Get categories (no image field anymore)
-    const categories = await prisma.category.findMany({
-      select: {
-        id: true,
-        name: true
-      }
-    })
-
+    // Categories no longer have images (removed for simplicity)
+    
     // Build usage map
     const imageUsageMap = new Map<string, ImageUsage['usedIn']>()
 
