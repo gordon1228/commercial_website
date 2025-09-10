@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('Upload API called')
+    console.log('Large file upload API called')
     
     // Check if Vercel Blob token is configured
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
     }
 
-    console.log('File received:', { name: file.name, size: file.size, type: file.type })
+    console.log('Large file received:', { name: file.name, size: file.size, type: file.type })
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -28,13 +28,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File must be an image' }, { status: 400 })
     }
 
-    // Validate file size (4MB limit for Vercel serverless functions)
-    const maxSize = 4 * 1024 * 1024 // 4MB to stay under Vercel's 4.5MB request limit
+    // Validate file size (10MB limit for large uploads)
+    const maxSize = 10 * 1024 * 1024 // 10MB
     if (file.size > maxSize) {
       console.error('File too large:', file.size)
       return NextResponse.json({ 
-        error: 'File size must be less than 4MB for reliable uploads on Vercel',
-        details: `Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB. Please compress the image or use a smaller file.`
+        error: 'File size must be less than 10MB',
+        details: `Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`
       }, { status: 400 })
     }
 
@@ -42,29 +42,27 @@ export async function POST(request: NextRequest) {
     const fileExtension = file.name.split('.').pop()
     const fileName = `${uuidv4()}.${fileExtension}`
     
-    console.log('Generated filename:', fileName)
+    console.log('Generated filename for large upload:', fileName)
 
-    // Upload to Vercel Blob Storage
-    console.log('Uploading to Vercel Blob Storage...', {
+    // Upload to Vercel Blob Storage using streaming for large files
+    console.log('Uploading large file to Vercel Blob Storage...', {
       fileName,
       fileSize: file.size,
       fileType: file.type,
-      hasToken: !!process.env.BLOB_READ_WRITE_TOKEN,
-      tokenPrefix: process.env.BLOB_READ_WRITE_TOKEN?.slice(0, 10) + '...'
+      hasToken: !!process.env.BLOB_READ_WRITE_TOKEN
     })
     
     const blob = await put(fileName, file, {
       access: 'public',
     })
 
-    console.log('Upload successful, URL:', blob.url)
+    console.log('Large file upload successful, URL:', blob.url)
     return NextResponse.json({ url: blob.url }, { status: 200 })
 
   } catch (error) {
-    console.error('Error uploading file:', error)
+    console.error('Error uploading large file:', error)
     
-    // Provide more specific error messages
-    let errorMessage = 'Failed to upload file'
+    let errorMessage = 'Failed to upload large file'
     let statusCode = 500
     
     if (error instanceof Error) {

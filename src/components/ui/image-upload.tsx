@@ -46,6 +46,25 @@ export function ImageUpload({
   const [imageUsages, setImageUsages] = useState<ImageUsageData[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const handleUploadError = async (response: Response, fileName: string): Promise<string> => {
+    let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+    try {
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.includes('application/json')) {
+        const error = await response.json()
+        errorMessage = error.error || error.message || errorMessage
+      } else {
+        const textError = await response.text()
+        if (textError && !textError.includes('<html')) {
+          errorMessage = textError
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing error response:', e)
+    }
+    return errorMessage
+  }
+
   const handleFileUpload = useCallback(async (files: File[]) => {
     if (files.length === 0) return
 
@@ -55,38 +74,26 @@ export function ImageUpload({
     for (const file of files) {
       if (file.type.startsWith('image/')) {
         try {
-          // Upload file to server
+          let result: { url: string }
+
+          // Use direct upload for smaller files, large file endpoint for bigger files
+          const uploadEndpoint = file.size <= 4 * 1024 * 1024 ? '/api/upload' : '/api/upload-url'
+          
           const formData = new FormData()
           formData.append('file', file)
 
-          const response = await fetch('/api/upload', {
+          const response = await fetch(uploadEndpoint, {
             method: 'POST',
             body: formData,
           })
 
           if (response.ok) {
-            const result = await response.json()
-            newImages.push(result.url)
+            result = await response.json()
           } else {
-            let errorMessage = `HTTP ${response.status}: ${response.statusText}`
-            try {
-              const contentType = response.headers.get('content-type')
-              if (contentType && contentType.includes('application/json')) {
-                const error = await response.json()
-                errorMessage = error.error || error.message || errorMessage
-              } else {
-                const textError = await response.text()
-                if (textError && !textError.includes('<html')) {
-                  errorMessage = textError
-                }
-              }
-            } catch (e) {
-              // Use the fallback message if parsing fails
-              console.error('Error parsing error response:', e)
-            }
-            console.error('Upload error:', errorMessage)
-            alert(`Failed to upload ${file.name}: ${errorMessage}`)
+            throw new Error(await handleUploadError(response, file.name))
           }
+
+          newImages.push(result.url)
         } catch (error) {
           console.error('Error uploading file:', error)
           alert(`Failed to upload ${file.name}: ${error}`)

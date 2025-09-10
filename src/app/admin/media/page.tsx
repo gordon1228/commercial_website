@@ -72,7 +72,10 @@ export default function MediaPage() {
         const formData = new FormData()
         formData.append('file', file)
 
-        const response = await fetch('/api/upload', {
+        // Use appropriate endpoint based on file size
+        const uploadEndpoint = file.size <= 4 * 1024 * 1024 ? '/api/upload' : '/api/upload-url'
+        
+        const response = await fetch(uploadEndpoint, {
           method: 'POST',
           body: formData,
         })
@@ -81,6 +84,23 @@ export default function MediaPage() {
           successCount++
         } else {
           errorCount++
+          // Get detailed error information
+          let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+          try {
+            const contentType = response.headers.get('content-type')
+            if (contentType && contentType.includes('application/json')) {
+              const errorData = await response.json()
+              errorMessage = errorData.error || errorData.message || errorMessage
+            } else {
+              const textError = await response.text()
+              if (textError && !textError.includes('<html')) {
+                errorMessage = textError
+              }
+            }
+          } catch (parseError) {
+            console.error('Error parsing error response:', parseError)
+          }
+          console.error(`Upload error for ${file.name}:`, errorMessage)
         }
       } catch (error) {
         errorCount++

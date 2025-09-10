@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth'
 
 export async function GET() {
   try {
+    console.log('GET /api/technology-content called')
     let content = await prisma.technologyContent.findFirst()
     
     if (!content) {
@@ -26,9 +27,17 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
+    console.log('PUT /api/technology-content called')
     const session = await getServerSession(authOptions)
+    console.log('Session in technology-content PUT:', {
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      role: session?.user?.role,
+      email: session?.user?.email
+    })
     
     if (!session?.user || !['ADMIN', 'MANAGER'].includes(session.user.role)) {
+      console.log('Unauthorized access attempt to technology-content PUT')
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
