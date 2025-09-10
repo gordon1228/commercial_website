@@ -7,13 +7,30 @@ import { ChevronLeft, ChevronRight, Fuel, Users, Weight } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
-import type { VehicleCardData } from '@/types/vehicle'
+interface Vehicle {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  price: number
+  images: string[]
+  specs: {
+    fuel: string
+    capacity: string
+    weight: string
+  }
+  status: string
+  category: {
+    id: string
+    name: string
+  }
+}
 
 
 export default function FeaturedVehicles() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
-  const [vehicles, setVehicles] = useState<VehicleCardData[]>([])
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {

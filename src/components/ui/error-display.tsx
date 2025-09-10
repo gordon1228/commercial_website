@@ -10,10 +10,6 @@ interface ErrorDisplayProps {
   onRetry?: () => void
   showHomeLink?: boolean
   className?: string
-  // Enhanced props from types/components
-  error?: string | Error
-  retry?: () => void
-  showDetails?: boolean
 }
 
 export function ErrorDisplay({ 

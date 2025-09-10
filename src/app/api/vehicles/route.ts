@@ -1,9 +1,6 @@
 // src/app/api/vehicles/route.ts
 // Vehicle management API routes
 import { createApiHandler, apiResponse, apiError } from '@/lib/api-handler'
-import type { CreateVehicleData } from '@/types/vehicle'
-import { vehicleQuerySchema, createVehicleSchema } from '@/types/validation'
-import { CacheInvalidator } from '@/lib/cache'
 
 // GET /api/vehicles - Get all vehicles with optional filtering
 export const GET = createApiHandler(async (req, { session }) => {
@@ -24,8 +21,7 @@ export const GET = createApiHandler(async (req, { session }) => {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    // Calculate pagination offset
-    const offset = (page - 1) * limit
+    const skip = (page - 1) * limit
 
     // Build where clause for filtering
     const where: Record<string, unknown> = {}
@@ -103,29 +99,53 @@ export const GET = createApiHandler(async (req, { session }) => {
       where.make = { in: makes }
     }
 
-    // Note: OrderBy is handled in VehicleQueries.getVehicles method
+    // Build orderBy clause
+    let orderBy: Record<string, 'asc' | 'desc'> = { name: 'asc' }
+    switch (sortBy) {
+      case 'price-low':
+        orderBy = { price: 'asc' }
+        break
+      case 'price-high':
+        orderBy = { price: 'desc' }
+        break
+      case 'newest':
+      case 'recent':
+        orderBy = { createdAt: 'desc' }
+        break
+      case 'oldest':
+        orderBy = { createdAt: 'asc' }
+        break
+    }
 
-    // Use optimized query from database-queries module
-    const { VehicleQueries } = await import('@/lib/database-queries')
-    const result = await VehicleQueries.getVehicles({
-      page,
-      limit,
-      category,
-      status,
-      search,
-      priceMin: priceMin ? parseFloat(priceMin) : undefined,
-      priceMax: priceMax ? parseFloat(priceMax) : undefined,
-      fuelType,
-      transmission,
-      yearMin: yearMin ? parseInt(yearMin) : undefined,
-      yearMax: yearMax ? parseInt(yearMax) : undefined,
-      make,
-      featured: featured === 'true',
-      sortBy,
-      isAdmin
+    // Direct Prisma call to avoid hanging with withRetry
+    const { prisma } = await import('@/lib/prisma')
+    const [vehicles, totalCount] = await Promise.all([
+      prisma.vehicle.findMany({
+        where,
+        orderBy,
+        skip,
+        take: limit,
+        include: {
+          category: {
+            select: { id: true, name: true }
+          },
+          _count: {
+            select: { inquiries: true }
+          }
+        }
+      }),
+      prisma.vehicle.count({ where })
+    ])
+
+    const response = apiResponse({
+      vehicles,
+      pagination: {
+        page,
+        limit,
+        total: totalCount,
+        pages: Math.ceil(totalCount / limit)
+      }
     })
-
-    const response = apiResponse(result)
     
     // Add cache-control headers for admin endpoints
     if (process.env.NODE_ENV === 'development') {
@@ -136,16 +156,29 @@ export const GET = createApiHandler(async (req, { session }) => {
     
     return response
 }, {
-  rateLimit: 'api',
-  validateQuery: vehicleQuerySchema
+  rateLimit: 'api'
 })
 
+interface VehicleCreateBody {
+  name: string;
+  description?: string;
+  price: number;
+  categoryId: string;
+  year: number;
+  make: string;
+  fuelType: string;
+  transmission?: string;
+  specs?: Record<string, unknown>;
+  images?: string[];
+  features?: string[];
+  status?: 'AVAILABLE' | 'SOLD' | 'RESERVED';
+  featured?: boolean;
+}
 
 // POST /api/vehicles - Create a new vehicle  
-export const POST = createApiHandler<CreateVehicleData>(async (req, { body }) => {
-    if (!body) {
-        return apiError('Request body is required', 400)
-    }
+export const POST = createApiHandler(async (req) => {
+    // Parse request body manually since no validation schema provided
+    const body = await req.json() as VehicleCreateBody
     
     const {
       name,
@@ -158,12 +191,10 @@ export const POST = createApiHandler<CreateVehicleData>(async (req, { body }) =>
       transmission,
       specs, // Updated to match frontend field name
       images,
+      features,
       status = 'AVAILABLE',
       featured = false
     } = body
-    
-    // Extract features from body if provided (backward compatibility)
-    const features = 'features' in body ? (body as CreateVehicleData & { features?: string[] }).features : undefined
 
     // Validate required fields
     if (!name || !price || !categoryId || !year || !make || !fuelType || !transmission) {
@@ -216,13 +247,9 @@ export const POST = createApiHandler<CreateVehicleData>(async (req, { body }) =>
       }
     })
 
-    // Invalidate related caches
-    CacheInvalidator.onVehicleChange(vehicle.id)
-    
     return apiResponse(vehicle, { status: 201 })
 }, {
   requireAuth: true,
   requireAdmin: true,
-  rateLimit: 'api',
-  validateBody: createVehicleSchema
+  rateLimit: 'api'
 })

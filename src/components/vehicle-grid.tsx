@@ -10,10 +10,40 @@ import { Button } from '@/components/ui/button'
 import { ErrorDisplay } from '@/components/ui/error-display'
 import ResponsiveImage from '@/components/ui/responsive-image'
 
-import type { VehicleCardData, VehicleListResponse } from '@/types/vehicle'
+interface Vehicle {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  price: number
+  images: string[]
+  mobileImages?: string[]
+  specs: {
+    fuel: string
+    capacity: string
+    weight: string
+    engine?: string
+    horsepower?: string
+  }
+  status: string
+  category: {
+    id: string
+    name: string
+  }
+}
+
+interface ApiResponse {
+  vehicles: Vehicle[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    pages: number
+  }
+}
 
 
-function VehicleCard({ vehicle }: { vehicle: VehicleCardData }) {
+function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
   const [isSaved, setIsSaved] = useState(false)
   const [imageError, setImageError] = useState(false)
   const hasImage = vehicle.images?.[0] && vehicle.images[0].trim() !== ''
@@ -167,7 +197,7 @@ function VehicleCard({ vehicle }: { vehicle: VehicleCardData }) {
 
 export default function VehicleGrid() {
   const searchParams = useSearchParams()
-  const [vehicles, setVehicles] = useState<VehicleCardData[]>([])
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [sortBy, setSortBy] = useState('name')
   const [viewCount, setViewCount] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
@@ -218,7 +248,7 @@ export default function VehicleGrid() {
           throw new Error('Failed to fetch vehicles')
         }
 
-        const data: VehicleListResponse = await response.json()
+        const data: ApiResponse = await response.json()
         setVehicles(data.vehicles)
         setViewCount(data.pagination.total)
       } catch (err) {
@@ -318,7 +348,7 @@ export default function VehicleGrid() {
                   throw new Error('Failed to fetch vehicles')
                 }
 
-                const data: VehicleListResponse = await response.json()
+                const data: ApiResponse = await response.json()
                 setVehicles(data.vehicles)
                 setViewCount(data.pagination.total)
               } catch (err) {
