@@ -148,9 +148,9 @@ export default function TechnologyPage() {
             {content.heroSubtitle}
           </p>
           <div className="mt-12">
-            <Button size="lg" asChild>
-              <Link href="/">View Our Fleet</Link>
-            </Button>
+            <Link href="/">
+              <Button size="lg">View Our Fleet</Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -324,12 +324,12 @@ export default function TechnologyPage() {
               Discover how our advanced electric truck technology can transform your business operations
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild>
-                <Link href="/">View Our Fleet</Link>
-              </Button>
-              <Button variant="secondary" size="lg" asChild>
-                <Link href="/contact">Schedule a Demo</Link>
-              </Button>
+              <Link href="/">
+                <Button size="lg">View Our Fleet</Button>
+              </Link>
+              <Link href="/contact">
+                <Button variant="secondary" size="lg">Schedule a Demo</Button>
+              </Link>
             </div>
           </div>
         </div>

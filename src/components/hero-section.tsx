@@ -64,12 +64,12 @@ export default function HeroSection() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Button size="lg" asChild className="text-lg px-8 py-4 h-14">
-              <Link href="/">{heroButtonPrimary}</Link>
-            </Button>
-            <Button variant="secondary" size="lg" asChild className="text-lg px-8 py-4 h-14">
-              <Link href="/contact">{heroButtonSecondary}</Link>
-            </Button>
+            <Link href="/">
+              <Button size="lg" className="text-lg px-8 py-4 h-14">{heroButtonPrimary}</Button>
+            </Link>
+            <Link href="/contact">
+              <Button variant="secondary" size="lg" className="text-lg px-8 py-4 h-14">{heroButtonSecondary}</Button>
+            </Link>
           </div>
         </div>
       </div>

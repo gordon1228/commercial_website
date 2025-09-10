@@ -186,12 +186,12 @@ export default function FeaturedVehicles() {
 
                       {/* CTA Buttons */}
                       <div className="flex flex-col sm:flex-row gap-4">
-                        <Button asChild className="flex-1">
-                          <Link href={`/vehicles/${vehicle.slug}`}>View Details</Link>
-                        </Button>
-                        <Button variant="secondary" asChild className="flex-1">
-                          <Link href={`/contact?vehicle=${vehicle.slug}`}>Get Quote</Link>
-                        </Button>
+                        <Link href={`/vehicles/${vehicle.slug}`} className="flex-1">
+                          <Button className="w-full">View Details</Button>
+                        </Link>
+                        <Link href={`/contact?vehicle=${vehicle.slug}`} className="flex-1">
+                          <Button variant="secondary" className="w-full">Get Quote</Button>
+                        </Link>
                       </div>
                     </div>
                   </div>

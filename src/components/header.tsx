@@ -33,12 +33,12 @@ export default function Header() {
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" asChild>
-              <Link href="/">Browse Fleet</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/contact">Get Quote</Link>
-            </Button>
+            <Link href="/">
+              <Button variant="ghost">Browse Fleet</Button>
+            </Link>
+            <Link href="/contact">
+              <Button>Get Quote</Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -87,12 +87,12 @@ export default function Header() {
                 Contact
               </Link>
               <div className="flex flex-col space-y-2 pt-4">
-                <Button variant="ghost" asChild>
-                  <Link href="/">Browse Fleet</Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/contact">Get Quote</Link>
-                </Button>
+                <Link href="/">
+                  <Button variant="ghost">Browse Fleet</Button>
+                </Link>
+                <Link href="/contact">
+                  <Button>Get Quote</Button>
+                </Link>
               </div>
             </nav>
           </div>

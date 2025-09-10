@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react'
 import { usePreview } from '@/contexts/preview-context'
 
-interface Category {
-  id: string
-  name: string
-  slug: string
-}
+// interface Category {
+//   id: string
+//   name: string
+//   slug: string
+// }
 
 interface ContactInfo {
   salesPhone: string
@@ -37,24 +37,24 @@ interface ContactInfo {
 }
 
 export default function Footer() {
-  const [categories, setCategories] = useState<Category[]>([])
+  // const [categories, setCategories] = useState<Category[]>([])
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
   const { isMobilePreview, isTabletPreview } = usePreview()
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch('/api/categories')
-        if (response.ok) {
-          const data = await response.json()
-          setCategories(data.slice(0, 3)) // Show only first 3 categories in footer
-        } else {
-          console.error('Failed to fetch categories')
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error)
-      }
-    }
+    // const fetchCategories = async () => {
+    //   try {
+    //     const response = await fetch('/api/categories')
+    //     if (response.ok) {
+    //       const data = await response.json()
+    //       setCategories(data.slice(0, 3)) // Show only first 3 categories in footer
+    //     } else {
+    //       console.error('Failed to fetch categories')
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching categories:', error)
+    //   }
+    // }
 
     const fetchContactInfo = async () => {
       try {
@@ -70,7 +70,7 @@ export default function Footer() {
       }
     }
 
-    fetchCategories()
+    // fetchCategories()
     fetchContactInfo()
   }, [])
 
