@@ -149,7 +149,7 @@ export default function TechnologyPage() {
           </p>
           <div className="mt-12">
             <Button size="lg" asChild>
-              <Link href="/vehicles">View Our Fleet</Link>
+              <Link href="/">View Our Fleet</Link>
             </Button>
           </div>
         </div>
@@ -325,7 +325,7 @@ export default function TechnologyPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
-                <Link href="/vehicles">View Our Fleet</Link>
+                <Link href="/">View Our Fleet</Link>
               </Button>
               <Button variant="secondary" size="lg" asChild>
                 <Link href="/contact">Schedule a Demo</Link>

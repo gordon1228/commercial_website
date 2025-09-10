@@ -156,7 +156,8 @@
       "Bash(done)",
       "Bash(del \"C:\\Users\\User\\Desktop\\commercial_website\\check-db.js\")",
       "Bash(del check-db.js)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(del check-company-info.js update-company-info.js)"
     ],
     "deny": [],
     "ask": []

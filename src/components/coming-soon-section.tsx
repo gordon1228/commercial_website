@@ -97,7 +97,7 @@ export default function ComingSoonSection() {
 
 
       {/* Content Container - Always show since we have static image */}
-      <div className="relative z-40 w-full h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="relative z-40 w-full h-full flex items-start justify-center px-4 sm:px-6 lg:px-8 pt-32 sm:pt-40 md:pt-48 lg:pt-56">
         <div className="text-center text-white max-w-4xl mx-auto animate-pulse">
           {/* The COMING SOON text is in your image, so we don't add it here */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-4 leading-tight tracking-wide">

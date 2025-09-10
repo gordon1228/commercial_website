@@ -127,7 +127,7 @@ export default function Footer() {
             <h4 className="text-lg font-semibold text-white">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/vehicles" className="text-muted-foreground hover:text-accent transition-colors">
+                <Link href="/" className="text-muted-foreground hover:text-accent transition-colors">
                   Browse Fleet
                 </Link>
               </li>
@@ -145,7 +145,7 @@ export default function Footer() {
           </div>
 
           {/* Vehicle Categories */}
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <h4 className="text-lg font-semibold text-white">Categories</h4>
             <ul className="space-y-2">
               {categories.length > 0 ? (
@@ -165,7 +165,7 @@ export default function Footer() {
                 </li>
               )}
             </ul>
-          </div>
+          </div> */}
 
           {/* Contact Info */}
           <div className="space-y-4">
@@ -173,7 +173,7 @@ export default function Footer() {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-accent" />
-                <span className="text-muted-foreground">{contactInfo?.salesPhone || '+1 (555) 123-4567'}</span>
+                <span className="text-muted-foreground">{contactInfo?.salesPhone || '+60103391414'}</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-accent" />
@@ -182,9 +182,9 @@ export default function Footer() {
               <div className="flex items-start space-x-3">
                 <MapPin className="h-4 w-4 text-accent mt-1" />
                 <span className="text-muted-foreground">
-                  {contactInfo?.address || '123 Business Avenue'}<br />
-                  {contactInfo?.city || 'Commercial District'}, {contactInfo?.state || 'NY'} {contactInfo?.postcode || '10001'}<br />
-                  {contactInfo?.country || 'United States'}
+                  {contactInfo?.address || '3-20 Level 3 MKH Boulevard, Jalan Changkat'}<br />
+                  {contactInfo?.city || 'Kajang'}, {contactInfo?.state || 'Selangor'} {contactInfo?.postcode || '43000'}<br />
+                  {contactInfo?.country || 'Malaysia'}
                 </span>
               </div>
             </div>
@@ -200,7 +200,7 @@ export default function Footer() {
               : 'flex flex-col sm:flex-row justify-between items-center'
           }`}>
             <p className="text-muted-foreground text-sm">
-              © 2024 EVTL. All rights reserved.
+              © 2025 EVTL. All rights reserved.
             </p>
             <div className={`flex space-x-6 ${
               isMobilePreview ? 'mt-0' : 'mt-4 sm:mt-0'

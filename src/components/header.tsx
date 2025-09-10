@@ -18,7 +18,7 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <Link href="/vehicles" className="text-black hover:text-gray-600 transition-colors">
+            <Link href="/" className="text-black hover:text-gray-600 transition-colors">
               Electric Trucks
             </Link>
             <Link href="/technology" className="text-black hover:text-gray-600 transition-colors">
@@ -34,7 +34,7 @@ export default function Header() {
 
           <div className="hidden md:flex items-center space-x-4">
             <Button variant="ghost" asChild>
-              <Link href="/vehicles">Browse Fleet</Link>
+              <Link href="/">Browse Fleet</Link>
             </Button>
             <Button asChild>
               <Link href="/contact">Get Quote</Link>
@@ -59,7 +59,7 @@ export default function Header() {
           <div className="md:hidden py-4 border-t border-gray-200">
             <nav className="flex flex-col space-y-4">
               <Link 
-                href="/vehicles" 
+                href="/" 
                 className="text-black hover:text-gray-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -88,7 +88,7 @@ export default function Header() {
               </Link>
               <div className="flex flex-col space-y-2 pt-4">
                 <Button variant="ghost" asChild>
-                  <Link href="/vehicles">Browse Fleet</Link>
+                  <Link href="/">Browse Fleet</Link>
                 </Button>
                 <Button asChild>
                   <Link href="/contact">Get Quote</Link>
