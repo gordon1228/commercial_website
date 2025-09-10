@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-// import { ChevronDown } from 'lucide-react'
 import ResponsiveImage from '@/components/ui/responsive-image'
 
 export default function ComingSoonSection() {
@@ -41,10 +40,6 @@ export default function ComingSoonSection() {
 
   const comingSoonImageAlt = 'EVTL Commercial Trucks - Coming Soon'
 
-  // const scrollToNext = () => {
-  //   const nextSection = document.getElementById('PremiumCommercial')
-  //   nextSection?.scrollIntoView({ behavior: 'smooth' })
-  // }
 
   // Don't render the image until we have the correct URL from the API
   if (!dataLoaded || !comingSoonImage) {
@@ -111,24 +106,6 @@ export default function ComingSoonSection() {
         </div>
       </div>
 
-      {/* Scroll indicator - Always show since we have static image */}
-      {/* <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-1/2 transform -translate-x-1/2 z-40">
-        <button 
-          className="cursor-pointer animate-bounce flex flex-col items-center group"
-          onClick={scrollToNext}
-          aria-label="Scroll to next section"
-          type="button"
-        >
-          <div className="text-center text-white group-hover:text-gray-200 transition-all duration-300">
-            <div className="text-xs sm:text-sm md:text-base mb-1 sm:mb-2 drop-shadow-lg font-medium tracking-wide">
-              Scroll to explore
-            </div>
-            <div className="flex justify-center">
-              <ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 drop-shadow-lg" />
-            </div>
-          </div>
-        </button>
-      </div> */}
     </section>
   )
 }

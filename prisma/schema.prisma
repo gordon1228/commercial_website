@@ -17,6 +17,9 @@ model User {
   inquiries Inquiry[]
   sessions  Session[]
 
+  @@index([role], map: "idx_users_role")
+  @@index([createdAt], map: "idx_users_created_at")
+  @@index([role, createdAt], map: "idx_users_role_created")
   @@map("users")
 }
 
@@ -31,6 +34,10 @@ model Session {
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "idx_sessions_user_id")
+  @@index([expiresAt], map: "idx_sessions_expires_at")
+  @@index([createdAt], map: "idx_sessions_created_at")
+  @@index([userId, expiresAt], map: "idx_sessions_user_expires")
   @@map("sessions")
 }
 
@@ -75,6 +82,16 @@ model Vehicle {
   @@index([featured], map: "idx_vehicles_featured")
   @@index([status], map: "idx_vehicles_status")
   @@index([status, active], map: "idx_vehicles_status_active")
+  @@index([active, categoryId, status], map: "idx_vehicles_active_category_status")
+  @@index([active, featured, createdAt], map: "idx_vehicles_active_featured_created")
+  @@index([price], map: "idx_vehicles_price")
+  @@index([year], map: "idx_vehicles_year")
+  @@index([make, active], map: "idx_vehicles_make_active")
+  @@index([fuelType, active], map: "idx_vehicles_fuel_type_active")
+  @@index([transmission, active], map: "idx_vehicles_transmission_active")
+  @@index([categoryId, active, status, createdAt], map: "idx_vehicles_category_active_status_created")
+  @@index([name], map: "idx_vehicles_name")
+  @@index([createdAt], map: "idx_vehicles_created_at")
   @@map("vehicles")
 }
 
@@ -95,6 +112,12 @@ model Inquiry {
 
   @@index([status], map: "idx_inquiries_status")
   @@index([vehicleId], map: "idx_inquiries_vehicle_id")
+  @@index([userId], map: "idx_inquiries_user_id")
+  @@index([createdAt], map: "idx_inquiries_created_at")
+  @@index([updatedAt], map: "idx_inquiries_updated_at")
+  @@index([status, createdAt], map: "idx_inquiries_status_created")
+  @@index([vehicleId, status], map: "idx_inquiries_vehicle_status")
+  @@index([email], map: "idx_inquiries_email")
   @@map("inquiries")
 }
 
@@ -250,9 +273,9 @@ model TechnologyFeature {
 
 model FilterOption {
   id        String   @id @default(cuid())
-  type      String   // 'make' or 'fuelType'
-  value     String   // The actual value (e.g., 'Ford', 'Electric')
-  label     String   // Display name (e.g., 'Ford', 'Electric')
+  type      String
+  value     String
+  label     String
   order     Int      @default(0)
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
