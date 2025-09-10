@@ -278,8 +278,8 @@ model FilterOption {
   label     String
   order     Int      @default(0)
   active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([type, value], map: "unique_type_value")
   @@index([type, active, order], map: "idx_filter_options_type_active_order")

@@ -46,7 +46,7 @@ export function ImageUpload({
   const [imageUsages, setImageUsages] = useState<ImageUsageData[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleUploadError = async (response: Response, fileName: string): Promise<string> => {
+  const handleUploadError = async (response: Response): Promise<string> => {
     let errorMessage = `HTTP ${response.status}: ${response.statusText}`
     try {
       const contentType = response.headers.get('content-type')
@@ -90,7 +90,7 @@ export function ImageUpload({
           if (response.ok) {
             result = await response.json()
           } else {
-            throw new Error(await handleUploadError(response, file.name))
+            throw new Error(await handleUploadError(response))
           }
 
           newImages.push(result.url)
