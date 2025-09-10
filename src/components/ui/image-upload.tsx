@@ -68,9 +68,24 @@ export function ImageUpload({
             const result = await response.json()
             newImages.push(result.url)
           } else {
-            const error = await response.json()
-            console.error('Upload error:', error)
-            alert(`Failed to upload ${file.name}: ${error.error}`)
+            let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+            try {
+              const contentType = response.headers.get('content-type')
+              if (contentType && contentType.includes('application/json')) {
+                const error = await response.json()
+                errorMessage = error.error || error.message || errorMessage
+              } else {
+                const textError = await response.text()
+                if (textError && !textError.includes('<html')) {
+                  errorMessage = textError
+                }
+              }
+            } catch (e) {
+              // Use the fallback message if parsing fails
+              console.error('Error parsing error response:', e)
+            }
+            console.error('Upload error:', errorMessage)
+            alert(`Failed to upload ${file.name}: ${errorMessage}`)
           }
         } catch (error) {
           console.error('Error uploading file:', error)

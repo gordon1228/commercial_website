@@ -5,6 +5,13 @@ import { v4 as uuidv4 } from 'uuid'
 export async function POST(request: NextRequest) {
   try {
     console.log('Upload API called')
+    
+    // Check if Vercel Blob token is configured
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.error('BLOB_READ_WRITE_TOKEN not configured')
+      return NextResponse.json({ error: 'Storage not configured' }, { status: 500 })
+    }
+    
     const formData = await request.formData()
     const file = formData.get('file') as File
     

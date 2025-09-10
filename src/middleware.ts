@@ -45,9 +45,14 @@ async function getTokenFromCookie(req: NextRequest) {
 }
 
 export default withAuth(
-  function middleware(req) {
+  async function middleware(req) {
     const pathname = req.nextUrl.pathname
-    const token = req.nextauth.token
+    let token = req.nextauth.token
+    
+    // If withAuth didn't provide a token, try to decode manually
+    if (!token) {
+      token = await getTokenFromCookie(req)
+    }
     
     console.log('Middleware:', {
       pathname,
@@ -93,6 +98,7 @@ export default withAuth(
     return response
   },
   {
+    secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
       authorized: async ({ token, req }) => {
         const { pathname } = req.nextUrl
