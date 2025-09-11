@@ -78,7 +78,7 @@ export const STATIC_FALLBACKS: StaticFallbacksConfig = {
   company: {
     name: 'EVTL',
     legalName: 'EVTL Sdn. Bhd.',
-    tagline: 'Next-Generation Electric Vehicle Solutions',
+    tagline: 'Mining 24 Hours a Day with Autonomous Trucks Coming Soon',
     description: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions. We collaborate with local and international partners to accelerate Malaysia\'s green logistics transformation.'
   },
 

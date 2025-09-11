@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useJsonData } from '@/lib/data-loader'
 import type { CompanyInfoConfig } from '@/types/data-config'
+import { STATIC_FALLBACKS } from '@/config/fallbacks'
 
 // Note: metadata moved to layout.tsx since this is now a client component
 
@@ -60,8 +61,30 @@ export default function AboutPage() {
   // const [certifications, setCertifications] = useState<Certification[]>([])
   const [isLoading, setIsLoading] = useState(true)
   
+  // Create fallback data structure
+  const defaultFallback: CompanyInfoConfig = {
+    companyInfo: {
+      id: 'default',
+      companyName: STATIC_FALLBACKS.company.name,
+      companyDescription: STATIC_FALLBACKS.company.description,
+      foundedYear: 2025,
+      totalVehiclesSold: 150,
+      totalHappyCustomers: 50,
+      totalYearsExp: 1,
+      satisfactionRate: 98,
+      storyTitle: 'Who We Are',
+      storyParagraph1: STATIC_FALLBACKS.company.description,
+      storyParagraph2: 'Founded in 2025, EVTL collaborates with local and international partners to accelerate Malaysia\'s green logistics transformation.',
+      storyParagraph3: 'We are committed to creating a sustainable future through innovative electric vehicle technology and smart mobility solutions that serve businesses and communities across Malaysia.',
+      missionTitle: 'Our Mission',
+      missionText: 'To accelerate Malaysia\'s green logistics transformation through innovative electric truck solutions and smart transport technologies, partnering with local and international stakeholders.',
+      visionTitle: 'Our Vision',
+      visionText: 'Zero Carbon, Smart Mobility for All'
+    }
+  }
+
   // Load fallback data from JSON
-  const { data: fallbackData, loading: fallbackLoading } = useJsonData<CompanyInfoConfig>('fallback/company-info.json')
+  const { data: fallbackData, loading: fallbackLoading } = useJsonData<CompanyInfoConfig>('fallback/company-info.json', defaultFallback)
 
   useEffect(() => {
     const fetchData = async () => {
