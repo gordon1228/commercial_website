@@ -124,7 +124,7 @@ function WhatsAppContact() {
     }
 
     fetchContactInfo()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const getWhatsAppNumber = () => {
     if (!contactInfo) return '+60103391414' // Default fallback
@@ -434,7 +434,7 @@ export default function ContactPage() {
     }
 
     fetchContactInfo()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="min-h-screen pt-20 bg-background">

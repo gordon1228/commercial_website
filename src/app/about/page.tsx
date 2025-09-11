@@ -10,7 +10,6 @@ import {
   Target,
   // Handshake
 } from 'lucide-react'
-import { useJsonData } from '@/lib/data-loader'
 import type { CompanyInfoConfig } from '@/types/data-config'
 import { STATIC_FALLBACKS } from '@/config/fallbacks'
 
