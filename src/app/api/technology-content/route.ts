@@ -3,6 +3,11 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+export const revalidate = 0
+
 export async function GET() {
   try {
     console.log('GET /api/technology-content called')
@@ -25,9 +30,13 @@ export async function GET() {
   }
 }
 
+
 export async function PUT(request: NextRequest) {
   try {
     console.log('PUT /api/technology-content called')
+    console.log('Request method:', request.method)
+    console.log('Request headers:', Object.fromEntries(request.headers.entries()))
+    
     const session = await getServerSession(authOptions)
     console.log('Session in technology-content PUT:', {
       hasSession: !!session,
