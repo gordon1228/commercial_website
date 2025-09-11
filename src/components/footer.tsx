@@ -167,6 +167,9 @@ export default function Footer() {
             </ul>
           </div> */}
 
+          {/* Empty space to push contact info to the right */}
+          <div></div>
+
           {/* Contact Info */}
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-white">Contact Info</h4>
