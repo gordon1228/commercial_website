@@ -299,7 +299,7 @@ export default function TechnologyManagementPage() {
                   Hero Subtitle
                 </label>
                 <textarea
-                  className="input min-h-[80px] resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[80px] resize-none"
                   value={content.heroSubtitle}
                   onChange={(e) => handleInputChange('heroSubtitle', e.target.value)}
                   placeholder="Advanced electric vehicle technology designed for commercial success..."
@@ -336,7 +336,7 @@ export default function TechnologyManagementPage() {
                     Section {num} Description
                   </label>
                   <textarea
-                    className="input min-h-[100px] resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px] resize-none"
                     value={content[`section${num}Description` as keyof TechnologyContent]}
                     onChange={(e) => handleInputChange(`section${num}Description` as keyof TechnologyContent, e.target.value)}
                     placeholder={`Section ${num} description...`}
@@ -398,7 +398,7 @@ export default function TechnologyManagementPage() {
                     Icon Name
                   </label>
                   <select
-                    className="input"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={newFeature.iconName}
                     onChange={(e) => setNewFeature(prev => ({ ...prev, iconName: e.target.value }))}
                   >
@@ -419,7 +419,7 @@ export default function TechnologyManagementPage() {
                   Description
                 </label>
                 <textarea
-                  className="input min-h-[80px] resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[80px] resize-none"
                   value={newFeature.description || ''}
                   onChange={(e) => setNewFeature(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Describe this technology feature..."
@@ -479,7 +479,7 @@ export default function TechnologyManagementPage() {
                             Icon Name
                           </label>
                           <select
-                            className="input"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={editingFeature?.iconName || ''}
                             onChange={(e) => setEditingFeature(prev => prev ? ({ ...prev, iconName: e.target.value }) : null)}
                           >
@@ -500,7 +500,7 @@ export default function TechnologyManagementPage() {
                           Description
                         </label>
                         <textarea
-                          className="input min-h-[80px] resize-none"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[80px] resize-none"
                           value={editingFeature?.description || ''}
                           onChange={(e) => setEditingFeature(prev => prev ? ({ ...prev, description: e.target.value }) : null)}
                         />
