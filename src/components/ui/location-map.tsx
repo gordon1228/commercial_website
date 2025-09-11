@@ -43,9 +43,9 @@ export function LocationMap({
 
   // Create a generic map embed URL (this will show a centered map of the area)
   const createEmbedUrl = () => {
-    // For demo purposes, using Empire State Building coordinates
-    // In production, you'd want to use geocoding to get the actual coordinates
-    return "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.681138873825!2d-73.98784368459395!3d40.74844797932847!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1642023456789!5m2!1sen!2sus"
+    // Using coordinates for MKH Boulevard, Kajang, Selangor, Malaysia
+    // Latitude: 2.9900434, Longitude: 101.7920339
+    return "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3984.394!2d101.7920339!3d2.9900434!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31cdcb0ab9b5d0a7%3A0x5c3a8a8a8a8a8a8a!2sMKH%20Boulevard%2C%20Jalan%20Changkat%2C%20Kajang%2C%20Selangor%2C%20Malaysia!5e0!3m2!1sen!2smy!4v1642023456789!5m2!1sen!2smy"
   }
 
   const openInGoogleMaps = () => {
