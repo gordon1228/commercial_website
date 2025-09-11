@@ -61,8 +61,8 @@ export default function AboutPage() {
   // const [certifications, setCertifications] = useState<Certification[]>([])
   const [isLoading, setIsLoading] = useState(true)
   
-  // Create fallback data structure
-  const defaultFallback: CompanyInfoConfig = {
+  // Use static fallback data since JSON file was removed
+  const fallbackData: CompanyInfoConfig = {
     companyInfo: {
       id: 'default',
       companyName: STATIC_FALLBACKS.company.name,
@@ -82,9 +82,6 @@ export default function AboutPage() {
       visionText: 'Zero Carbon, Smart Mobility for All'
     }
   }
-
-  // Load fallback data from JSON
-  const { data: fallbackData, loading: fallbackLoading } = useJsonData<CompanyInfoConfig>('fallback/company-info.json', defaultFallback)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -125,13 +122,10 @@ export default function AboutPage() {
       }
     }
 
-    // Only start fetching after fallback data is loaded (or failed to load)
-    if (!fallbackLoading) {
-      fetchData()
-    }
-  }, [fallbackData, fallbackLoading])
+    fetchData()
+  }, [])
 
-  if (isLoading || fallbackLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen pt-20 bg-background">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-20">

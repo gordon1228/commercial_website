@@ -80,3 +80,7 @@ export interface CompanyInfoConfig {
   values?: CompanyValueFallback[]
   certifications?: CertificationFallback[]
 }
+
+export interface ContactInfoConfig {
+  contactInfo: ContactInfoFallback
+}

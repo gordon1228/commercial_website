@@ -18,8 +18,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 // import { Input } from '@/components/ui/input'
 // import { LoadingSpinner } from '@/components/ui/loading-spinner'
-import { useJsonData } from '@/lib/data-loader'
 import type { ContactInfoConfig } from '@/types/data-config'
+import { STATIC_FALLBACKS } from '@/config/fallbacks'
 import { LocationMap } from '@/components/ui/location-map'
 
 interface ContactInfo {
@@ -73,8 +73,38 @@ function WhatsAppContact() {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   
-  // Load fallback data from JSON
-  const { data: fallbackData, loading: fallbackLoading } = useJsonData<ContactInfoConfig>('fallback/contact-info.json')
+  // Use static fallback data since JSON file was removed
+  const fallbackData: ContactInfoConfig = {
+    contactInfo: {
+      id: 'default',
+      salesPhone: STATIC_FALLBACKS.contact.salesPhone,
+      servicePhone: STATIC_FALLBACKS.contact.servicePhone,
+      financePhone: STATIC_FALLBACKS.contact.financePhone,
+      salesEmail: STATIC_FALLBACKS.contact.salesEmail,
+      serviceEmail: STATIC_FALLBACKS.contact.serviceEmail,
+      supportEmail: STATIC_FALLBACKS.contact.supportEmail,
+      address: STATIC_FALLBACKS.contact.address,
+      city: STATIC_FALLBACKS.contact.city,
+      state: STATIC_FALLBACKS.contact.state,
+      postcode: STATIC_FALLBACKS.contact.postcode,
+      country: STATIC_FALLBACKS.contact.country,
+      directions: STATIC_FALLBACKS.contact.directions || '',
+      mondayToFriday: STATIC_FALLBACKS.hours.mondayToFriday,
+      saturday: STATIC_FALLBACKS.hours.saturday,
+      sunday: STATIC_FALLBACKS.hours.sunday,
+      siteName: STATIC_FALLBACKS.company.name,
+      emailNotifications: true,
+      systemNotifications: true,
+      maintenanceMode: false,
+      companyDescription: STATIC_FALLBACKS.company.description,
+      facebookUrl: STATIC_FALLBACKS.navigation.socialMedia.facebook || '',
+      twitterUrl: STATIC_FALLBACKS.navigation.socialMedia.twitter || '',
+      instagramUrl: STATIC_FALLBACKS.navigation.socialMedia.instagram || '',
+      linkedinUrl: STATIC_FALLBACKS.navigation.socialMedia.linkedin || '',
+      privacyPolicyUrl: STATIC_FALLBACKS.navigation.legal.privacy,
+      termsOfServiceUrl: STATIC_FALLBACKS.navigation.legal.terms
+    }
+  }
 
   useEffect(() => {
     const fetchContactInfo = async () => {
@@ -86,20 +116,15 @@ function WhatsAppContact() {
         }
       } catch (error) {
         console.error('Error fetching contact info:', error)
-        // Use fallback data from JSON if available
-        if (fallbackData) {
-          setContactInfo(fallbackData.contactInfo)
-        }
+        // Use fallback data
+        setContactInfo(fallbackData.contactInfo)
       } finally {
         setIsLoading(false)
       }
     }
 
-    // Only start fetching after fallback data is loaded (or failed to load)
-    if (!fallbackLoading) {
-      fetchContactInfo()
-    }
-  }, [fallbackData, fallbackLoading])
+    fetchContactInfo()
+  }, [])
 
   const getWhatsAppNumber = () => {
     if (!contactInfo) return '+60103391414' // Default fallback
@@ -245,7 +270,7 @@ function WhatsAppContact() {
 
           {/* Contact Information */}
           <div className="space-y-6">
-            {(isLoading || fallbackLoading) ? (
+            {isLoading ? (
               <div className="animate-pulse space-y-4">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="bg-gray-200 h-32 rounded-lg" />
