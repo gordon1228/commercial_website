@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { STATIC_FALLBACKS } from '@/config/fallbacks'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -13,7 +14,7 @@ export default function Header() {
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link href="/" className="text-2xl font-display font-bold text-black">
-            EVTL
+            {STATIC_FALLBACKS.company.name}
           </Link>
 
           {/* Desktop Navigation */}

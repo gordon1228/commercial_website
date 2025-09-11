@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 // import { ChevronDown } from 'lucide-react'
 import ResponsiveImage from '@/components/ui/responsive-image'
+import { STATIC_FALLBACKS } from '@/config/fallbacks'
 
 export default function ComingSoonSection() {
   const [imageLoaded, setImageLoaded] = useState(false)
@@ -16,22 +17,22 @@ export default function ComingSoonSection() {
         const response = await fetch('/api/homepage-content?t=' + Date.now())
         if (response.ok) {
           const data = await response.json()
-          const imageUrl = data.comingSoonImage || '/uploads/ComingSoon.jpg'
-          const mobileImageUrl = data.comingSoonImageMobile || '/uploads/ComingSoon-mobile.jpg'
+          const imageUrl = data.comingSoonImage || STATIC_FALLBACKS.assets.comingSoonImage
+          const mobileImageUrl = data.comingSoonImageMobile || STATIC_FALLBACKS.assets.comingSoonImageMobile
           setComingSoonImage(imageUrl)
           setComingSoonImageMobile(mobileImageUrl)
           setDataLoaded(true)
         } else {
           // Fallback to default images
-          setComingSoonImage('/uploads/ComingSoon.jpg')
-          setComingSoonImageMobile('/uploads/ComingSoon-mobile.jpg')
+          setComingSoonImage(STATIC_FALLBACKS.assets.comingSoonImage)
+          setComingSoonImageMobile(STATIC_FALLBACKS.assets.comingSoonImageMobile)
           setDataLoaded(true)
         }
       } catch (error) {
         console.error('Error fetching coming soon image:', error)
         // Use fallback images if fetch fails
-        setComingSoonImage('/uploads/ComingSoon.jpg')
-        setComingSoonImageMobile('/uploads/ComingSoon-mobile.jpg')
+        setComingSoonImage(STATIC_FALLBACKS.assets.comingSoonImage)
+        setComingSoonImageMobile(STATIC_FALLBACKS.assets.comingSoonImageMobile)
         setDataLoaded(true)
       }
     }
@@ -39,7 +40,7 @@ export default function ComingSoonSection() {
     fetchComingSoonImage()
   }, [])
 
-  const comingSoonImageAlt = 'EVTL Commercial Trucks - Coming Soon'
+  const comingSoonImageAlt = `${STATIC_FALLBACKS.company.name} Commercial Trucks - Coming Soon`
 
   // const scrollToNext = () => {
   //   const nextSection = document.getElementById('PremiumCommercial')
@@ -76,9 +77,9 @@ export default function ComingSoonSection() {
             onError={(e) => {
               console.error('Failed to load coming soon image:', e)
               // Try fallback image if we haven't already
-              if (comingSoonImage !== '/uploads/ComingSoon.jpg') {
-                setComingSoonImage('/uploads/ComingSoon.jpg')
-                setComingSoonImageMobile('/uploads/ComingSoon-mobile.jpg')
+              if (comingSoonImage !== STATIC_FALLBACKS.assets.comingSoonImage) {
+                setComingSoonImage(STATIC_FALLBACKS.assets.comingSoonImage)
+                setComingSoonImageMobile(STATIC_FALLBACKS.assets.comingSoonImageMobile)
               } else {
                 // If even the fallback fails, show a placeholder
                 setImageLoaded(true)
