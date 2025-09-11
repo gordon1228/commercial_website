@@ -74,3 +74,9 @@ export interface CompanyValueFallback {
   order: number
   active: boolean
 }
+
+export interface CompanyInfoConfig {
+  companyInfo: CompanyInfoFallback
+  values?: CompanyValueFallback[]
+  certifications?: CertificationFallback[]
+}
