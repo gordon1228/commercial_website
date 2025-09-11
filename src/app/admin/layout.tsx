@@ -26,8 +26,18 @@ import {
   Cpu,
   Filter
 } from 'lucide-react'
-import { useJsonData } from '@/lib/data-loader'
-import type { AdminNavigationConfig } from '@/types/data-config'
+// Removed data-loader dependency - using static navigation config
+type AdminNavigationItem = {
+  id: string
+  name: string
+  href: string
+  icon: string
+  roles: string[]
+}
+
+type AdminNavigationConfig = {
+  navigationItems: AdminNavigationItem[]
+}
 
 // Icon mapping for dynamic rendering
 const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
@@ -70,11 +80,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   
-  // Load navigation from JSON
-  const { data: navigationConfig } = useJsonData<AdminNavigationConfig>(
-    'admin/navigation.json',
-    defaultNavigation
-  )
+  // Use static navigation configuration
+  const navigationConfig = defaultNavigation
   
   // Track user activity for session management
   const [, setLastActivity] = useState(Date.now())

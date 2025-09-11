@@ -6,8 +6,31 @@ import { Car, Users, MessageSquare, TrendingUp, Plus, Eye } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { useJsonData } from '@/lib/data-loader'
-import type { DashboardConfig, StatusColorMappings } from '@/types/data-config'
+// Removed data-loader dependency - using static configuration
+type DashboardStat = {
+  id: string
+  title: string
+  icon: string
+  href: string
+  dataKey: string
+}
+
+type QuickAction = {
+  id: string
+  title: string
+  icon: string
+  href: string
+}
+
+type DashboardConfig = {
+  stats: DashboardStat[]
+  quickActions: QuickAction[]
+}
+
+type StatusColorMappings = {
+  inquiryStatus: { [key: string]: string }
+  vehicleStatus: { [key: string]: string }
+}
 
 interface DashboardStats {
   vehiclesCount: number;
@@ -91,9 +114,9 @@ export default function AdminDashboard() {
   const [fetchingData, setFetchingData] = useState(false)
   const dataFetched = useRef(false)
 
-  // Load dashboard and status color configuration from JSON
-  const { data: dashboardConfig } = useJsonData<DashboardConfig>('admin/dashboard.json', defaultDashboardConfig)
-  const { data: statusColors } = useJsonData<StatusColorMappings>('admin/status-colors.json', defaultStatusColors)
+  // Use static configuration
+  const dashboardConfig = defaultDashboardConfig
+  const statusColors = defaultStatusColors
 
   const fetchDashboardData = useCallback(async () => {
     // Prevent multiple simultaneous fetches and re-fetching
