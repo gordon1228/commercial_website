@@ -52,7 +52,7 @@ export async function PUT(request: NextRequest) {
                            'section1Title', 'section1Description', 'section2Title', 'section2Description',
                            'section3Title', 'section3Description', 'section4Title', 'section4Description']
     
-    const validData: any = {}
+    const validData: Record<string, string> = {}
     for (const field of requiredFields) {
       if (body[field] !== undefined) {
         validData[field] = body[field]
@@ -92,14 +92,14 @@ export async function PUT(request: NextRequest) {
     }
     
     // Check for specific Prisma errors
-    if ((error as any)?.code === 'P2002') {
+    if ((error as { code?: string })?.code === 'P2002') {
       return NextResponse.json(
         { error: 'A unique constraint violation occurred' },
         { status: 400 }
       )
     }
     
-    if ((error as any)?.code === 'P2021' || (error as any)?.message?.includes('does not exist')) {
+    if ((error as { code?: string })?.code === 'P2021' || (error as Error)?.message?.includes('does not exist')) {
       return NextResponse.json(
         { error: 'Database table does not exist. Please run: npx prisma db push' },
         { status: 503 }
