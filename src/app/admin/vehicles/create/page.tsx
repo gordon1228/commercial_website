@@ -30,6 +30,7 @@ interface VehicleFormData {
   fuelType: string
   transmission: string
   images: string[]
+  mobileImages: string[]
   specs: {
     // Performance
     fuel: string
@@ -133,6 +134,7 @@ export default function CreateVehiclePage() {
     fuelType: '',
     transmission: '',
     images: [''],
+    mobileImages: [''],
     specs: {
       // Performance
       fuel: '',
@@ -225,6 +227,13 @@ export default function CreateVehiclePage() {
     }))
   }
 
+  const handleMobileImagesChange = (newImages: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      mobileImages: newImages.length > 0 ? newImages : ['']
+    }))
+  }
+
   const handleFeaturesChange = (newFeatures: string[]) => {
     setFormData(prev => ({
       ...prev,
@@ -241,6 +250,7 @@ export default function CreateVehiclePage() {
         ...formData,
         price: Number(formData.price),
         images: formData.images.filter(img => img.trim() !== ''),
+        mobileImages: formData.mobileImages.filter(img => img.trim() !== ''),
         specifications: formData.specs
       }
 
@@ -884,6 +894,21 @@ export default function CreateVehiclePage() {
             <ImageUpload
               images={formData.images}
               onImagesChange={handleImagesChange}
+              maxImages={10}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Mobile Images */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Mobile Truck Images</CardTitle>
+            <p className="text-sm text-gray-600">Optimized images for mobile devices (optional)</p>
+          </CardHeader>
+          <CardContent>
+            <ImageUpload
+              images={formData.mobileImages}
+              onImagesChange={handleMobileImagesChange}
               maxImages={10}
             />
           </CardContent>

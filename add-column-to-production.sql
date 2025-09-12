@@ -1,2 +1,0 @@
-ALTER TABLE "company_info" 
-ADD COLUMN "companyDescription2" TEXT DEFAULT 'We specialize in providing high-quality commercial vehicles and comprehensive fleet solutions to meet diverse business needs, ensuring operational efficiency and environmental sustainability.';

@@ -13,6 +13,7 @@ interface Category {
   name: string
   slug: string
   description?: string
+  image?: string
   active: boolean
   _count?: {
     vehicles: number
@@ -29,7 +30,8 @@ export default function CategoriesPage() {
   const [isCreating, setIsCreating] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
-    description: ''
+    description: '',
+    image: ''
   })
 
   useEffect(() => {
@@ -72,7 +74,8 @@ export default function CategoriesPage() {
         },
         body: JSON.stringify({
           name: formData.name.trim(),
-          description: formData.description.trim() || undefined
+          description: formData.description.trim() || undefined,
+          image: formData.image.trim() || undefined
         }),
       })
 
@@ -94,7 +97,8 @@ export default function CategoriesPage() {
     setEditingId(category.id)
     setFormData({
       name: category.name,
-      description: category.description || ''
+      description: category.description || '',
+      image: category.image || ''
     })
     setIsCreating(true)
   }
@@ -160,7 +164,7 @@ export default function CategoriesPage() {
   }
 
   const resetForm = () => {
-    setFormData({ name: '', description: '' })
+    setFormData({ name: '', description: '', image: '' })
     setEditingId(null)
     setIsCreating(false)
   }
@@ -233,6 +237,19 @@ export default function CategoriesPage() {
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category Image URL
+                </label>
+                <Input
+                  value={formData.image}
+                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                  placeholder="https://example.com/image.jpg or /images/category.jpg"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Optional image URL for the category
+                </p>
+              </div>
 
               <div className="flex gap-2">
                 <Button type="submit" className="flex items-center gap-2">

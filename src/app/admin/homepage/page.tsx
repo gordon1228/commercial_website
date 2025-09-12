@@ -12,15 +12,36 @@ import ImageSelector from '@/components/ui/image-selector'
 
 interface HomepageContent {
   id: string
-  // Essential Content Only
+  // Hero Section
   heroTitle: string
   heroSubtitle: string
   heroDescription: string
   heroButtonPrimary: string
   heroButtonSecondary: string
+  // Statistics
+  happyClients: number
+  yearsExperience: number
+  satisfactionRate: number
+  // Partners Section
+  partnersTitle: string
+  partnersDescription: string
+  // Features
+  feature1Title: string
+  feature1Description: string
+  feature2Title: string
+  feature2Description: string
+  feature3Title: string
+  feature3Description: string
   // Coming Soon Section
   comingSoonImage: string
+  comingSoonImageAlt: string
   comingSoonImageMobile?: string
+  // Section Visibility Controls
+  showComingSoonSection: boolean
+  showHeroSection: boolean
+  showVehicleCategories: boolean
+  showFeaturedVehicles: boolean
+  showTrustSection: boolean
 }
 
 export default function AdminHomepagePage() {
@@ -204,6 +225,219 @@ export default function AdminHomepagePage() {
         </CardContent>
       </Card>
 
+      {/* Statistics Section */}
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle>Company Statistics</CardTitle>
+          <p className="text-sm text-gray-600">Display key company achievements and statistics</p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="happyClients">Happy Clients</Label>
+              <Input
+                id="happyClients"
+                type="number"
+                value={content.happyClients}
+                onChange={(e) => updateContent('happyClients', parseInt(e.target.value) || 0)}
+                placeholder="25"
+              />
+            </div>
+            <div>
+              <Label htmlFor="yearsExperience">Years Experience</Label>
+              <Input
+                id="yearsExperience"
+                type="number"
+                value={content.yearsExperience}
+                onChange={(e) => updateContent('yearsExperience', parseInt(e.target.value) || 0)}
+                placeholder="10"
+              />
+            </div>
+            <div>
+              <Label htmlFor="satisfactionRate">Satisfaction Rate (%)</Label>
+              <Input
+                id="satisfactionRate"
+                type="number"
+                min="0"
+                max="100"
+                value={content.satisfactionRate}
+                onChange={(e) => updateContent('satisfactionRate', parseInt(e.target.value) || 0)}
+                placeholder="95"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Partners Section */}
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle>Partners Section</CardTitle>
+          <p className="text-sm text-gray-600">Content for the trusted partners section</p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <Label htmlFor="partnersTitle">Partners Section Title</Label>
+            <Input
+              id="partnersTitle"
+              value={content.partnersTitle}
+              onChange={(e) => updateContent('partnersTitle', e.target.value)}
+              placeholder="Trusted by Industry Leaders"
+            />
+          </div>
+          <div>
+            <Label htmlFor="partnersDescription">Partners Section Description</Label>
+            <Textarea
+              id="partnersDescription"
+              value={content.partnersDescription}
+              onChange={(e) => updateContent('partnersDescription', e.target.value)}
+              rows={3}
+              placeholder="We partner with the world's most respected commercial vehicle manufacturers..."
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Features Section */}
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle>Key Features</CardTitle>
+          <p className="text-sm text-gray-600">Three key features to highlight on the homepage</p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-4">
+              <h4 className="font-semibold text-gray-900">Feature 1</h4>
+              <div>
+                <Label htmlFor="feature1Title">Title</Label>
+                <Input
+                  id="feature1Title"
+                  value={content.feature1Title}
+                  onChange={(e) => updateContent('feature1Title', e.target.value)}
+                  placeholder="Quality Guarantee"
+                />
+              </div>
+              <div>
+                <Label htmlFor="feature1Description">Description</Label>
+                <Textarea
+                  id="feature1Description"
+                  value={content.feature1Description}
+                  onChange={(e) => updateContent('feature1Description', e.target.value)}
+                  rows={3}
+                  placeholder="Every vehicle undergoes rigorous inspection..."
+                />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h4 className="font-semibold text-gray-900">Feature 2</h4>
+              <div>
+                <Label htmlFor="feature2Title">Title</Label>
+                <Input
+                  id="feature2Title"
+                  value={content.feature2Title}
+                  onChange={(e) => updateContent('feature2Title', e.target.value)}
+                  placeholder="Fast Delivery"
+                />
+              </div>
+              <div>
+                <Label htmlFor="feature2Description">Description</Label>
+                <Textarea
+                  id="feature2Description"
+                  value={content.feature2Description}
+                  onChange={(e) => updateContent('feature2Description', e.target.value)}
+                  rows={3}
+                  placeholder="Quick processing and delivery..."
+                />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h4 className="font-semibold text-gray-900">Feature 3</h4>
+              <div>
+                <Label htmlFor="feature3Title">Title</Label>
+                <Input
+                  id="feature3Title"
+                  value={content.feature3Title}
+                  onChange={(e) => updateContent('feature3Title', e.target.value)}
+                  placeholder="24/7 Support"
+                />
+              </div>
+              <div>
+                <Label htmlFor="feature3Description">Description</Label>
+                <Textarea
+                  id="feature3Description"
+                  value={content.feature3Description}
+                  onChange={(e) => updateContent('feature3Description', e.target.value)}
+                  rows={3}
+                  placeholder="Round-the-clock customer support..."
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Section Visibility Controls */}
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle>Section Visibility</CardTitle>
+          <p className="text-sm text-gray-600">Control which sections are displayed on the homepage</p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="showHeroSection"
+                checked={content.showHeroSection}
+                onChange={(e) => updateContent('showHeroSection', e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <Label htmlFor="showHeroSection">Show Hero Section</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="showVehicleCategories"
+                checked={content.showVehicleCategories}
+                onChange={(e) => updateContent('showVehicleCategories', e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <Label htmlFor="showVehicleCategories">Show Vehicle Categories</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="showFeaturedVehicles"
+                checked={content.showFeaturedVehicles}
+                onChange={(e) => updateContent('showFeaturedVehicles', e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <Label htmlFor="showFeaturedVehicles">Show Featured Vehicles</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="showTrustSection"
+                checked={content.showTrustSection}
+                onChange={(e) => updateContent('showTrustSection', e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <Label htmlFor="showTrustSection">Show Trust Section</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="showComingSoonSection"
+                checked={content.showComingSoonSection}
+                onChange={(e) => updateContent('showComingSoonSection', e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <Label htmlFor="showComingSoonSection">Show Coming Soon Section</Label>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Coming Soon Section */}
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
@@ -236,6 +470,15 @@ export default function AdminHomepagePage() {
                 Optimal size: 750x1334 (portrait). Used for mobile devices. If not set, desktop image will be used.
               </p>
             </div>
+          </div>
+          <div>
+            <Label htmlFor="comingSoonImageAlt">Coming Soon Image Alt Text</Label>
+            <Input
+              id="comingSoonImageAlt"
+              value={content.comingSoonImageAlt}
+              onChange={(e) => updateContent('comingSoonImageAlt', e.target.value)}
+              placeholder="Coming Soon Background"
+            />
           </div>
         </CardContent>
       </Card>

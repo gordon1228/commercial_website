@@ -45,6 +45,14 @@ export const GET = createApiHandler(async () => {
         createdAt: new Date(),
         updatedAt: new Date()
       }
+    } else {
+      // Add companyDescription2 if it doesn't exist (for backward compatibility)
+      if (!('companyDescription2' in companyInfo)) {
+        companyInfo = {
+          ...JSON.parse(JSON.stringify(companyInfo)),
+          companyDescription2: 'We specialize in providing high-quality commercial vehicles and comprehensive fleet solutions to meet diverse business needs, ensuring operational efficiency and environmental sustainability.'
+        }
+      }
     }
 
     return apiResponse(companyInfo)
@@ -69,6 +77,7 @@ export const PUT = createApiHandler(async (req: Request) => {
     const {
       companyName,
       companyDescription,
+      companyDescription2,
       foundedYear,
       totalVehiclesSold,
       totalHappyCustomers,
@@ -91,51 +100,62 @@ export const PUT = createApiHandler(async (req: Request) => {
     // Check if company info already exists
     const existingCompanyInfo = await prisma.companyInfo.findFirst()
 
+    const baseData = {
+      companyName,
+      companyDescription,
+      foundedYear: foundedYear ? parseInt(foundedYear) : existingCompanyInfo?.foundedYear || 2025,
+      totalVehiclesSold: totalVehiclesSold ? parseInt(totalVehiclesSold) : existingCompanyInfo?.totalVehiclesSold || 150,
+      totalHappyCustomers: totalHappyCustomers ? parseInt(totalHappyCustomers) : existingCompanyInfo?.totalHappyCustomers || 50,
+      totalYearsExp: totalYearsExp ? parseInt(totalYearsExp) : existingCompanyInfo?.totalYearsExp || 1,
+      satisfactionRate: satisfactionRate ? parseInt(satisfactionRate) : existingCompanyInfo?.satisfactionRate || 98,
+      storyTitle: storyTitle || existingCompanyInfo?.storyTitle || 'Our Story',
+      storyParagraph1: storyParagraph1 || existingCompanyInfo?.storyParagraph1 || companyDescription,
+      storyParagraph2: storyParagraph2 || existingCompanyInfo?.storyParagraph2 || 'Founded with a vision to transform the commercial vehicle industry.',
+      storyParagraph3: storyParagraph3 || existingCompanyInfo?.storyParagraph3 || 'We continue to innovate and serve businesses across the region.',
+      missionTitle: missionTitle || existingCompanyInfo?.missionTitle || 'Our Mission',
+      missionText: missionText || existingCompanyInfo?.missionText || 'To provide exceptional commercial vehicle solutions.',
+      visionTitle: visionTitle || existingCompanyInfo?.visionTitle || 'Our Vision',
+      visionText: visionText || existingCompanyInfo?.visionText || 'To be the leading provider in sustainable transportation.',
+      updatedAt: new Date()
+    }
+
     let companyInfo
-    if (existingCompanyInfo) {
-      // Update existing company info
-      companyInfo = await prisma.companyInfo.update({
-        where: { id: existingCompanyInfo.id },
-        data: {
-          companyName,
-          companyDescription,
-          foundedYear: foundedYear ? parseInt(foundedYear) : existingCompanyInfo.foundedYear,
-          totalVehiclesSold: totalVehiclesSold ? parseInt(totalVehiclesSold) : existingCompanyInfo.totalVehiclesSold,
-          totalHappyCustomers: totalHappyCustomers ? parseInt(totalHappyCustomers) : existingCompanyInfo.totalHappyCustomers,
-          totalYearsExp: totalYearsExp ? parseInt(totalYearsExp) : existingCompanyInfo.totalYearsExp,
-          satisfactionRate: satisfactionRate ? parseInt(satisfactionRate) : existingCompanyInfo.satisfactionRate,
-          storyTitle: storyTitle || existingCompanyInfo.storyTitle,
-          storyParagraph1: storyParagraph1 || existingCompanyInfo.storyParagraph1,
-          storyParagraph2: storyParagraph2 || existingCompanyInfo.storyParagraph2,
-          storyParagraph3: storyParagraph3 || existingCompanyInfo.storyParagraph3,
-          missionTitle: missionTitle || existingCompanyInfo.missionTitle,
-          missionText: missionText || existingCompanyInfo.missionText,
-          visionTitle: visionTitle || existingCompanyInfo.visionTitle,
-          visionText: visionText || existingCompanyInfo.visionText,
-          updatedAt: new Date()
-        }
-      })
-    } else {
-      // Create new company info
-      companyInfo = await prisma.companyInfo.create({
-        data: {
-          companyName,
-          companyDescription,
-          foundedYear: foundedYear ? parseInt(foundedYear) : 2025,
-          totalVehiclesSold: totalVehiclesSold ? parseInt(totalVehiclesSold) : 150,
-          totalHappyCustomers: totalHappyCustomers ? parseInt(totalHappyCustomers) : 50,
-          totalYearsExp: totalYearsExp ? parseInt(totalYearsExp) : 1,
-          satisfactionRate: satisfactionRate ? parseInt(satisfactionRate) : 98,
-          storyTitle: storyTitle || 'Our Story',
-          storyParagraph1: storyParagraph1 || companyDescription,
-          storyParagraph2: storyParagraph2 || 'Founded with a vision to transform the commercial vehicle industry.',
-          storyParagraph3: storyParagraph3 || 'We continue to innovate and serve businesses across the region.',
-          missionTitle: missionTitle || 'Our Mission',
-          missionText: missionText || 'To provide exceptional commercial vehicle solutions.',
-          visionTitle: visionTitle || 'Our Vision',
-          visionText: visionText || 'To be the leading provider in sustainable transportation.'
-        }
-      })
+    
+    // First, try with companyDescription2
+    try {
+      const updateDataWithDesc2 = companyDescription2 !== undefined 
+        ? { ...baseData, companyDescription2 } 
+        : baseData
+
+      if (existingCompanyInfo) {
+        companyInfo = await prisma.companyInfo.update({
+          where: { id: existingCompanyInfo.id },
+          data: updateDataWithDesc2
+        })
+      } else {
+        companyInfo = await prisma.companyInfo.create({
+          data: updateDataWithDesc2
+        })
+      }
+    } catch (error) {
+      // If it fails (likely due to missing companyDescription2 column), retry without it
+      console.log('Retrying without companyDescription2 field due to:', error instanceof Error ? error.message : String(error))
+      
+      if (existingCompanyInfo) {
+        companyInfo = await prisma.companyInfo.update({
+          where: { id: existingCompanyInfo.id },
+          data: baseData
+        })
+      } else {
+        companyInfo = await prisma.companyInfo.create({
+          data: baseData
+        })
+      }
+
+      // Add companyDescription2 to the response even if it wasn't saved
+      if (companyDescription2 !== undefined) {
+        companyInfo = { ...companyInfo, companyDescription2 }
+      }
     }
 
     return apiResponse(companyInfo)

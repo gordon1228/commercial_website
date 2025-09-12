@@ -25,6 +25,17 @@ interface ContactInfo {
   mondayToFriday: string
   saturday: string
   sunday: string
+  siteName: string
+  emailNotifications: boolean
+  systemNotifications: boolean
+  maintenanceMode: boolean
+  companyDescription: string
+  facebookUrl: string
+  twitterUrl: string
+  instagramUrl: string
+  linkedinUrl: string
+  privacyPolicyUrl: string
+  termsOfServiceUrl: string
 }
 
 interface PhoneNumberParts {
@@ -134,7 +145,7 @@ export default function AdminContactInfoPage() {
     }
   }
 
-  const updateContactInfo = (field: keyof ContactInfo, value: string) => {
+  const updateContactInfo = (field: keyof ContactInfo, value: string | boolean) => {
     if (!contactInfo) return
     setContactInfo({
       ...contactInfo,
@@ -522,6 +533,133 @@ export default function AdminContactInfoPage() {
                 value={contactInfo.sunday}
                 onChange={(e) => updateContactInfo('sunday', e.target.value)}
                 placeholder="Closed"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Additional Settings */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Site Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Site Configuration</CardTitle>
+            <p className="text-sm text-gray-600">Basic site configuration and notifications</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="siteName">Site Name</Label>
+              <Input
+                id="siteName"
+                value={contactInfo.siteName}
+                onChange={(e) => updateContactInfo('siteName', e.target.value)}
+                placeholder="EVTL"
+              />
+            </div>
+            <div>
+              <Label htmlFor="companyDescription">Company Description</Label>
+              <Input
+                id="companyDescription"
+                value={contactInfo.companyDescription}
+                onChange={(e) => updateContactInfo('companyDescription', e.target.value)}
+                placeholder="Brief company description"
+              />
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="emailNotifications"
+                  checked={contactInfo.emailNotifications}
+                  onChange={(e) => updateContactInfo('emailNotifications', e.target.checked)}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                />
+                <Label htmlFor="emailNotifications">Enable Email Notifications</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="systemNotifications"
+                  checked={contactInfo.systemNotifications}
+                  onChange={(e) => updateContactInfo('systemNotifications', e.target.checked)}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                />
+                <Label htmlFor="systemNotifications">Enable System Notifications</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="maintenanceMode"
+                  checked={contactInfo.maintenanceMode}
+                  onChange={(e) => updateContactInfo('maintenanceMode', e.target.checked)}
+                  className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2"
+                />
+                <Label htmlFor="maintenanceMode" className="text-red-600">Maintenance Mode</Label>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Social Media & Links */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Social Media & Legal Links</CardTitle>
+            <p className="text-sm text-gray-600">Social media profiles and legal page URLs</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="facebookUrl">Facebook URL</Label>
+              <Input
+                id="facebookUrl"
+                value={contactInfo.facebookUrl}
+                onChange={(e) => updateContactInfo('facebookUrl', e.target.value)}
+                placeholder="https://facebook.com/yourpage"
+              />
+            </div>
+            <div>
+              <Label htmlFor="twitterUrl">Twitter URL</Label>
+              <Input
+                id="twitterUrl"
+                value={contactInfo.twitterUrl}
+                onChange={(e) => updateContactInfo('twitterUrl', e.target.value)}
+                placeholder="https://twitter.com/yourhandle"
+              />
+            </div>
+            <div>
+              <Label htmlFor="instagramUrl">Instagram URL</Label>
+              <Input
+                id="instagramUrl"
+                value={contactInfo.instagramUrl}
+                onChange={(e) => updateContactInfo('instagramUrl', e.target.value)}
+                placeholder="https://instagram.com/yourhandle"
+              />
+            </div>
+            <div>
+              <Label htmlFor="linkedinUrl">LinkedIn URL</Label>
+              <Input
+                id="linkedinUrl"
+                value={contactInfo.linkedinUrl}
+                onChange={(e) => updateContactInfo('linkedinUrl', e.target.value)}
+                placeholder="https://linkedin.com/company/yourcompany"
+              />
+            </div>
+            <div>
+              <Label htmlFor="privacyPolicyUrl">Privacy Policy URL</Label>
+              <Input
+                id="privacyPolicyUrl"
+                value={contactInfo.privacyPolicyUrl}
+                onChange={(e) => updateContactInfo('privacyPolicyUrl', e.target.value)}
+                placeholder="/privacy"
+              />
+            </div>
+            <div>
+              <Label htmlFor="termsOfServiceUrl">Terms of Service URL</Label>
+              <Input
+                id="termsOfServiceUrl"
+                value={contactInfo.termsOfServiceUrl}
+                onChange={(e) => updateContactInfo('termsOfServiceUrl', e.target.value)}
+                placeholder="/terms"
               />
             </div>
           </CardContent>
