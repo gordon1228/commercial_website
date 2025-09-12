@@ -10,7 +10,6 @@ import {
   Target,
   // Handshake
 } from 'lucide-react'
-import type { CompanyInfoConfig } from '@/types/data-config'
 // import { STATIC_FALLBACKS } from '@/config/fallbacks'
 
 // Note: metadata moved to layout.tsx since this is now a client component
@@ -60,47 +59,55 @@ export default function AboutPage() {
   // const [values, setValues] = useState<CompanyValue[]>([])
   // const [certifications, setCertifications] = useState<Certification[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  
-  // Page-specific fallback data state
-  const [fallbackData, setFallbackData] = useState<CompanyInfoConfig | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [companyRes, fallbackRes] = await Promise.all([
-          fetch('/api/company-info'),
-          fetch('/api/page-fallbacks?page=about')
-        ])
+        const fallbackRes = await fetch('/api/page-fallbacks/about')
 
-        // Load fallback data first
         if (fallbackRes.ok) {
           const fallbackResponse = await fallbackRes.json()
-          const fallbackInfo: CompanyInfoConfig = {
-            companyInfo: {
-              id: 'fallback',
-              ...fallbackResponse.fallbackData
-            }
-          }
-          setFallbackData(fallbackInfo)
-        }
-
-        if (companyRes.ok) {
-          const companyData = await companyRes.json()
+          const companyData = fallbackResponse.fallbackData
           setCompanyInfo(companyData)
+        } else {
+          // If API fails, use basic fallback
+          setCompanyInfo({
+            companyName: 'EVTL',
+            companyDescription: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.',
+            companyDescription2: 'We specialize in providing high-quality commercial vehicles and comprehensive fleet solutions.',
+            storyTitle: 'Our Story',
+            storyParagraph1: 'Founded in 1998, EVTL began as a small family business.',
+            storyParagraph2: 'Over the years, we\'ve built our reputation on quality.',
+            storyParagraph3: 'Today, we continue to evolve with the industry.',
+            missionTitle: 'Our Mission',
+            missionText: 'To empower businesses with premium commercial trucks.',
+            visionTitle: 'Our Vision',
+            visionText: 'To be the leading commercial truck provider.'
+          })
         }
       } catch (error) {
         console.error('Error fetching about page data:', error)
-        // Use page-specific fallback data if available
-        if (fallbackData) {
-          setCompanyInfo(fallbackData.companyInfo)
-        }
+        // Use basic fallback data
+        setCompanyInfo({
+          companyName: 'EVTL',
+          companyDescription: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.',
+          companyDescription2: 'We specialize in providing high-quality commercial vehicles and comprehensive fleet solutions.',
+          storyTitle: 'Our Story',
+          storyParagraph1: 'Founded in 1998, EVTL began as a small family business.',
+          storyParagraph2: 'Over the years, we\'ve built our reputation on quality.',
+          storyParagraph3: 'Today, we continue to evolve with the industry.',
+          missionTitle: 'Our Mission',
+          missionText: 'To empower businesses with premium commercial trucks.',
+          visionTitle: 'Our Vision',
+          visionText: 'To be the leading commercial truck provider.'
+        })
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchData()
-  }, [fallbackData])
+  }, [])
 
   if (isLoading) {
     return (
@@ -137,12 +144,16 @@ export default function AboutPage() {
               About {companyInfo.companyName}
             </h1>
             <div className="max-w-4xl mx-auto space-y-6">
-              <p className="text-xl text-muted-foreground leading-relaxed">
-                {companyInfo.companyDescription}
-              </p>
-              <p className="text-xl text-muted-foreground leading-relaxed">
-                {companyInfo.companyDescription2}
-              </p>
+              {companyInfo.companyDescription && companyInfo.companyDescription.trim() && (
+                <p className="text-xl text-muted-foreground leading-relaxed">
+                  {companyInfo.companyDescription}
+                </p>
+              )}
+              {companyInfo.companyDescription2 && companyInfo.companyDescription2.trim() && (
+                <p className="text-xl text-muted-foreground leading-relaxed">
+                  {companyInfo.companyDescription2}
+                </p>
+              )}
             </div>
           </div>
 

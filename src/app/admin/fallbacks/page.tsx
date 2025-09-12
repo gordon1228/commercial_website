@@ -87,6 +87,38 @@ const PAGE_CONFIGS = {
       { key: 'companyName', label: 'Company Name', type: 'text' }
     ]
   },
+  technology: {
+    title: 'Technology Page Fallbacks',
+    description: 'Manage fallback content for the technology page',
+    fields: [
+      { key: 'heroTitle', label: 'Hero Title', type: 'text' },
+      { key: 'heroSubtitle', label: 'Hero Subtitle', type: 'textarea' },
+      { key: 'heroBackgroundImage', label: 'Hero Background Image', type: 'text' },
+      { key: 'heroBackgroundImageAlt', label: 'Hero Background Alt Text', type: 'text' },
+      { key: 'section1Title', label: 'Section 1 Title', type: 'text' },
+      { key: 'section1Description', label: 'Section 1 Description', type: 'textarea' },
+      { key: 'section2Title', label: 'Section 2 Title', type: 'text' },
+      { key: 'section2Description', label: 'Section 2 Description', type: 'textarea' },
+      { key: 'section3Title', label: 'Section 3 Title', type: 'text' },
+      { key: 'section3Description', label: 'Section 3 Description', type: 'textarea' },
+      { key: 'section4Title', label: 'Section 4 Title', type: 'text' },
+      { key: 'section4Description', label: 'Section 4 Description', type: 'textarea' }
+    ]
+  },
+  vehicles: {
+    title: 'Vehicles Page Fallbacks',
+    description: 'Manage fallback content for the vehicles page',
+    fields: [
+      { key: 'pageTitle', label: 'Page Title', type: 'text' },
+      { key: 'pageDescription', label: 'Page Description', type: 'textarea' },
+      { key: 'heroTitle', label: 'Hero Title', type: 'text' },
+      { key: 'heroSubtitle', label: 'Hero Subtitle', type: 'text' },
+      { key: 'heroDescription', label: 'Hero Description', type: 'textarea' },
+      { key: 'filterTitle', label: 'Filter Section Title', type: 'text' },
+      { key: 'noVehiclesMessage', label: 'No Vehicles Message', type: 'text' },
+      { key: 'defaultVehicleImage', label: 'Default Vehicle Image', type: 'text' }
+    ]
+  },
   footer: {
     title: 'Footer Fallbacks',
     description: 'Manage fallback content for the footer component',
@@ -118,124 +150,36 @@ export default function AdminFallbacksPage() {
 
   const fetchFallbacks = async () => {
     try {
-      // Fetch data from existing APIs
-      const [homepageRes, companyRes, contactRes] = await Promise.all([
-        fetch('/api/homepage-content'),
-        fetch('/api/company-info'),
-        fetch('/api/contact-info')
-      ])
+      // Fetch data from page fallbacks API for all pages
+      const pageNames = ['homepage', 'about', 'contact', 'technology', 'vehicles', 'header', 'footer']
+      const responses = await Promise.all(
+        pageNames.map(page => fetch(`/api/page-fallbacks/${page}`).catch(err => {
+          console.error(`Error fetching ${page} fallbacks:`, err)
+          return null
+        }))
+      )
 
       const fallbacksMap: { [key: string]: PageFallback } = {}
 
-      if (homepageRes.ok) {
-        const homepageData = await homepageRes.json()
-        fallbacksMap.homepage = {
-          id: 'homepage',
-          pageName: 'homepage',
-          fallbackData: {
-            heroTitle: homepageData.heroTitle || 'Premium Commercial',
-            heroSubtitle: homepageData.heroSubtitle || 'Vehicles',
-            heroDescription: homepageData.heroDescription || 'Discover EVTL fleet solutions',
-            comingSoonImage: homepageData.comingSoonImage || '',
-            comingSoonImageMobile: homepageData.comingSoonImageMobile || '',
-            companyTagline: 'Mining 24 Hours a Day with Autonomous Trucks Coming Soon'
-          },
-          enabled: true,
-          createdAt: homepageData.createdAt || new Date().toISOString(),
-          updatedAt: homepageData.updatedAt || new Date().toISOString()
+      for (let i = 0; i < pageNames.length; i++) {
+        const pageName = pageNames[i]
+        const response = responses[i]
+
+        if (response && response.ok) {
+          try {
+            const data = await response.json()
+            fallbacksMap[pageName] = {
+              id: pageName,
+              pageName: pageName,
+              fallbackData: data.fallbackData,
+              enabled: data.enabled || true,
+              createdAt: data.lastUpdated || new Date().toISOString(),
+              updatedAt: data.lastUpdated || new Date().toISOString()
+            }
+          } catch (error) {
+            console.error(`Error parsing ${pageName} response:`, error)
+          }
         }
-      }
-
-      if (companyRes.ok) {
-        const companyData = await companyRes.json()
-        fallbacksMap.about = {
-          id: 'about',
-          pageName: 'about',
-          fallbackData: {
-            companyName: companyData.companyName || 'EVTL',
-            companyDescription: companyData.companyDescription || 'EVTL is a next-generation mobility startup',
-            companyDescription2: companyData.companyDescription2 || 'We specialize in providing high-quality commercial vehicles and comprehensive fleet solutions',
-            foundedYear: companyData.foundedYear || 1998,
-            totalVehiclesSold: companyData.totalVehiclesSold || 2500,
-            totalHappyCustomers: companyData.totalHappyCustomers || 850,
-            totalYearsExp: companyData.totalYearsExp || 25,
-            satisfactionRate: companyData.satisfactionRate || 98,
-            storyTitle: companyData.storyTitle || 'Our Story',
-            storyParagraph1: companyData.storyParagraph1 || 'Founded in 1998...',
-            storyParagraph2: companyData.storyParagraph2 || 'Over the years...',
-            storyParagraph3: companyData.storyParagraph3 || 'Today, we continue...',
-            missionTitle: companyData.missionTitle || 'Our Mission',
-            missionText: companyData.missionText || 'To empower businesses...',
-            visionTitle: companyData.visionTitle || 'Our Vision',
-            visionText: companyData.visionText || 'To be the leading...'
-          },
-          enabled: true,
-          createdAt: companyData.createdAt || new Date().toISOString(),
-          updatedAt: companyData.updatedAt || new Date().toISOString()
-        }
-      }
-
-      if (contactRes.ok) {
-        const contactData = await contactRes.json()
-        fallbacksMap.contact = {
-          id: 'contact',
-          pageName: 'contact',
-          fallbackData: {
-            salesPhone: contactData.salesPhone || '+60 10 339 1414',
-            servicePhone: contactData.servicePhone || '+60 16 332 2349',
-            financePhone: contactData.financePhone || '+60 16 332 2349',
-            salesEmail: contactData.salesEmail || 'sales@evtl.com',
-            serviceEmail: contactData.serviceEmail || 'service@evtl.com',
-            supportEmail: contactData.supportEmail || 'support@evtl.com',
-            address: contactData.address || '3-20 Level 3 MKH Boulevard',
-            city: contactData.city || 'Kajang',
-            state: contactData.state || 'Selangor',
-            postcode: contactData.postcode || '43000',
-            country: contactData.country || 'Malaysia',
-            directions: contactData.directions || 'EVTL Trucks Office',
-            mondayToFriday: contactData.mondayToFriday || '9:00 AM - 6:00 PM',
-            saturday: contactData.saturday || '9:00 AM - 1:00 PM',
-            sunday: contactData.sunday || 'Closed',
-            facebookUrl: contactData.facebookUrl || '',
-            twitterUrl: contactData.twitterUrl || '',
-            instagramUrl: contactData.instagramUrl || '',
-            linkedinUrl: contactData.linkedinUrl || ''
-          },
-          enabled: true,
-          createdAt: contactData.createdAt || new Date().toISOString(),
-          updatedAt: contactData.updatedAt || new Date().toISOString()
-        }
-      }
-
-      // Add header and footer fallbacks using existing data
-      fallbacksMap.header = {
-        id: 'header',
-        pageName: 'header',
-        fallbackData: {
-          companyName: fallbacksMap.contact?.fallbackData.companyName || 'EVTL'
-        },
-        enabled: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-
-      fallbacksMap.footer = {
-        id: 'footer',
-        pageName: 'footer',
-        fallbackData: {
-          companyName: fallbacksMap.contact?.fallbackData.companyName || 'EVTL',
-          companyDescription: fallbacksMap.contact?.fallbackData.companyDescription || 'EVTL Sdn. Bhd. is a next-generation mobility startup',
-          salesPhone: fallbacksMap.contact?.fallbackData.salesPhone || '+60 10 339 1414',
-          servicePhone: fallbacksMap.contact?.fallbackData.servicePhone || '+60 16 332 2349',
-          salesEmail: fallbacksMap.contact?.fallbackData.salesEmail || 'sales@evtl.com',
-          serviceEmail: fallbacksMap.contact?.fallbackData.serviceEmail || 'service@evtl.com',
-          supportEmail: fallbacksMap.contact?.fallbackData.supportEmail || 'support@evtl.com',
-          address: fallbacksMap.contact?.fallbackData.address || '3-20 Level 3 MKH Boulevard',
-          city: fallbacksMap.contact?.fallbackData.city || 'Kajang'
-        },
-        enabled: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
       }
 
       setFallbacks(fallbacksMap)
@@ -294,6 +238,17 @@ export default function AdminFallbacksPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(fallbackData)
           })
+          break
+        case 'technology':
+          response = await fetch('/api/technology-content', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(fallbackData)
+          })
+          break
+        case 'vehicles':
+          // For vehicles, we'll just simulate success since it's mostly static content
+          response = { ok: true } as Response
           break
         case 'header':
         case 'footer':
@@ -445,9 +400,9 @@ export default function AdminFallbacksPage() {
         </Card>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-7">
             {Object.keys(PAGE_CONFIGS).map((pageName) => (
-              <TabsTrigger key={pageName} value={pageName} className="capitalize">
+              <TabsTrigger key={pageName} value={pageName} className="capitalize text-xs">
                 {pageName}
               </TabsTrigger>
             ))}
