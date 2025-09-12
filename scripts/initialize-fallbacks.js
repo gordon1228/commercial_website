@@ -25,7 +25,7 @@ const DEFAULT_PAGE_FALLBACKS = {
   },
   about: {
     companyName: 'EVTL',
-    companyDescription: 'EVTL 是一家新能源初创企业，聚焦 电动罗里（EV Trucks） 及未来智慧交通解决方案。我们与本地及国际合作伙伴共同推动马来西亚物流行业的绿色转型。',
+    companyDescription: 'EVTL 是一家新能源初创企业，聚焦 电动罗里（EV Trucks） 及未来智慧交通解决方案。我们与本地及国际合作伙伴共同推动马来西亚物流行业的绿色转型。EVTL is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.',
     foundedYear: 1998,
     totalVehiclesSold: 2500,
     totalHappyCustomers: 850,
