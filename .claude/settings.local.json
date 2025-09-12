@@ -159,7 +159,8 @@
       "Bash(rm:*)",
       "Bash(del check-company-info.js update-company-info.js)",
       "Bash(del create-filter-table.sql setup-filter-table.js)",
-      "Bash(del \"C:\\Users\\User\\Desktop\\commercial_website\\src\\app\\api\\page-fallbacks\\route.ts\")"
+      "Bash(del \"C:\\Users\\User\\Desktop\\commercial_website\\src\\app\\api\\page-fallbacks\\route.ts\")",
+      "Bash(del add-company-description2.sql)"
     ],
     "deny": [],
     "ask": []
