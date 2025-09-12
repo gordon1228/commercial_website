@@ -84,7 +84,7 @@ export const PUT = createApiHandler(async (req: Request) => {
     } = body
 
     if (!companyName || !companyDescription) {
-      return apiResponse({ error: 'Company name and description are required' }, 400)
+      return apiResponse({ error: 'Company name and description are required' }, { status: 400 })
     }
 
     // Check if company info already exists
@@ -140,6 +140,6 @@ export const PUT = createApiHandler(async (req: Request) => {
     return apiResponse(companyInfo)
   } catch (error) {
     console.error('Error updating company info:', error instanceof Error ? error.message : String(error))
-    return apiResponse({ error: 'Failed to update company info' }, 500)
+    return apiResponse({ error: 'Failed to update company info' }, { status: 500 })
   }
 })

@@ -106,7 +106,7 @@ export const GET = createApiHandler(async (req: Request) => {
             }
           })
         } else {
-          return apiResponse({ error: 'Invalid page name' }, 400)
+          return apiResponse({ error: 'Invalid page name' }, { status: 400 })
         }
       }
 
@@ -121,7 +121,7 @@ export const GET = createApiHandler(async (req: Request) => {
     }
   } catch (error) {
     console.error('Error fetching page fallbacks:', error instanceof Error ? error.message : String(error))
-    return apiResponse({ error: 'Failed to fetch page fallbacks' }, 500)
+    return apiResponse({ error: 'Failed to fetch page fallbacks' }, { status: 500 })
   }
 })
 
@@ -131,13 +131,13 @@ export const PUT = createApiHandler(async (req: Request) => {
     const { pageName, fallbackData, enabled } = body
 
     if (!pageName || !fallbackData) {
-      return apiResponse({ error: 'Page name and fallback data are required' }, 400)
+      return apiResponse({ error: 'Page name and fallback data are required' }, { status: 400 })
     }
 
     // Validate page name
     const validPages = Object.keys(DEFAULT_PAGE_FALLBACKS)
     if (!validPages.includes(pageName)) {
-      return apiResponse({ error: 'Invalid page name' }, 400)
+      return apiResponse({ error: 'Invalid page name' }, { status: 400 })
     }
 
     // Check if page fallback exists
@@ -170,7 +170,7 @@ export const PUT = createApiHandler(async (req: Request) => {
     return apiResponse(pageFallback)
   } catch (error) {
     console.error('Error updating page fallback:', error instanceof Error ? error.message : String(error))
-    return apiResponse({ error: 'Failed to update page fallback' }, 500)
+    return apiResponse({ error: 'Failed to update page fallback' }, { status: 500 })
   }
 })
 
@@ -206,9 +206,9 @@ export const POST = createApiHandler(async (req: Request) => {
       })
     }
 
-    return apiResponse({ error: 'Invalid action' }, 400)
+    return apiResponse({ error: 'Invalid action' }, { status: 400 })
   } catch (error) {
     console.error('Error initializing page fallbacks:', error instanceof Error ? error.message : String(error))
-    return apiResponse({ error: 'Failed to initialize page fallbacks' }, 500)
+    return apiResponse({ error: 'Failed to initialize page fallbacks' }, { status: 500 })
   }
 })

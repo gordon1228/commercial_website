@@ -17,9 +17,6 @@ model User {
   inquiries Inquiry[]
   sessions  Session[]
 
-  @@index([createdAt], map: "idx_users_created_at")
-  @@index([role], map: "idx_users_role")
-  @@index([role, createdAt], map: "idx_users_role_created")
   @@map("users")
 }
 
@@ -34,10 +31,6 @@ model Session {
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([createdAt], map: "idx_sessions_created_at")
-  @@index([expiresAt], map: "idx_sessions_expires_at")
-  @@index([userId, expiresAt], map: "idx_sessions_user_expires")
-  @@index([userId], map: "idx_sessions_user_id")
   @@map("sessions")
 }
 
@@ -46,6 +39,7 @@ model Category {
   name        String
   slug        String    @unique
   description String?
+  image       String?
   active      Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -82,16 +76,6 @@ model Vehicle {
   @@index([featured], map: "idx_vehicles_featured")
   @@index([status], map: "idx_vehicles_status")
   @@index([status, active], map: "idx_vehicles_status_active")
-  @@index([active, categoryId, status], map: "idx_vehicles_active_category_status")
-  @@index([active, featured, createdAt], map: "idx_vehicles_active_featured_created")
-  @@index([categoryId, active, status, createdAt], map: "idx_vehicles_category_active_status_created")
-  @@index([createdAt], map: "idx_vehicles_created_at")
-  @@index([fuelType, active], map: "idx_vehicles_fuel_type_active")
-  @@index([make, active], map: "idx_vehicles_make_active")
-  @@index([name], map: "idx_vehicles_name")
-  @@index([price], map: "idx_vehicles_price")
-  @@index([transmission, active], map: "idx_vehicles_transmission_active")
-  @@index([year], map: "idx_vehicles_year")
   @@map("vehicles")
 }
 
@@ -112,12 +96,6 @@ model Inquiry {
 
   @@index([status], map: "idx_inquiries_status")
   @@index([vehicleId], map: "idx_inquiries_vehicle_id")
-  @@index([createdAt], map: "idx_inquiries_created_at")
-  @@index([email], map: "idx_inquiries_email")
-  @@index([status, createdAt], map: "idx_inquiries_status_created")
-  @@index([updatedAt], map: "idx_inquiries_updated_at")
-  @@index([userId], map: "idx_inquiries_user_id")
-  @@index([vehicleId, status], map: "idx_inquiries_vehicle_status")
   @@map("inquiries")
 }
 
@@ -272,30 +250,18 @@ model TechnologyFeature {
 }
 
 model FilterOption {
-  id        String   @id @default(cuid())
+  id        String   @id @default(dbgenerated("('c'::text || substr(md5((random())::text), 1, 24))"))
   type      String
   value     String
   label     String
   order     Int      @default(0)
   active    Boolean  @default(true)
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@unique([type, value], map: "unique_type_value")
   @@index([type, active, order], map: "idx_filter_options_type_active_order")
   @@map("filter_options")
-}
-
-model PageFallback {
-  id           String   @id @default(cuid())
-  pageName     String   @unique
-  fallbackData Json
-  enabled      Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@index([pageName, enabled], map: "idx_page_fallbacks_page_enabled")
-  @@map("page_fallbacks")
 }
 
 enum Role {
