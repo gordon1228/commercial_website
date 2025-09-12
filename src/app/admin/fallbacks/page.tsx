@@ -117,15 +117,126 @@ export default function AdminFallbacksPage() {
 
   const fetchFallbacks = async () => {
     try {
-      const response = await fetch('/api/page-fallbacks')
-      if (response.ok) {
-        const data = await response.json()
-        const fallbacksMap: { [key: string]: PageFallback } = {}
-        data.forEach((fallback: PageFallback) => {
-          fallbacksMap[fallback.pageName] = fallback
-        })
-        setFallbacks(fallbacksMap)
+      // Fetch data from existing APIs
+      const [homepageRes, companyRes, contactRes] = await Promise.all([
+        fetch('/api/homepage-content'),
+        fetch('/api/company-info'),
+        fetch('/api/contact-info')
+      ])
+
+      const fallbacksMap: { [key: string]: PageFallback } = {}
+
+      if (homepageRes.ok) {
+        const homepageData = await homepageRes.json()
+        fallbacksMap.homepage = {
+          id: 'homepage',
+          pageName: 'homepage',
+          fallbackData: {
+            heroTitle: homepageData.heroTitle || 'Premium Commercial',
+            heroSubtitle: homepageData.heroSubtitle || 'Vehicles',
+            heroDescription: homepageData.heroDescription || 'Discover EVTL fleet solutions',
+            comingSoonImage: homepageData.comingSoonImage || '',
+            comingSoonImageMobile: homepageData.comingSoonImageMobile || '',
+            companyTagline: 'Mining 24 Hours a Day with Autonomous Trucks Coming Soon'
+          },
+          enabled: true,
+          createdAt: homepageData.createdAt || new Date().toISOString(),
+          updatedAt: homepageData.updatedAt || new Date().toISOString()
+        }
       }
+
+      if (companyRes.ok) {
+        const companyData = await companyRes.json()
+        fallbacksMap.about = {
+          id: 'about',
+          pageName: 'about',
+          fallbackData: {
+            companyName: companyData.companyName || 'EVTL',
+            companyDescription: companyData.companyDescription || 'EVTL is a next-generation mobility startup',
+            foundedYear: companyData.foundedYear || 1998,
+            totalVehiclesSold: companyData.totalVehiclesSold || 2500,
+            totalHappyCustomers: companyData.totalHappyCustomers || 850,
+            totalYearsExp: companyData.totalYearsExp || 25,
+            satisfactionRate: companyData.satisfactionRate || 98,
+            storyTitle: companyData.storyTitle || 'Our Story',
+            storyParagraph1: companyData.storyParagraph1 || 'Founded in 1998...',
+            storyParagraph2: companyData.storyParagraph2 || 'Over the years...',
+            storyParagraph3: companyData.storyParagraph3 || 'Today, we continue...',
+            missionTitle: companyData.missionTitle || 'Our Mission',
+            missionText: companyData.missionText || 'To empower businesses...',
+            visionTitle: companyData.visionTitle || 'Our Vision',
+            visionText: companyData.visionText || 'To be the leading...'
+          },
+          enabled: true,
+          createdAt: companyData.createdAt || new Date().toISOString(),
+          updatedAt: companyData.updatedAt || new Date().toISOString()
+        }
+      }
+
+      if (contactRes.ok) {
+        const contactData = await contactRes.json()
+        fallbacksMap.contact = {
+          id: 'contact',
+          pageName: 'contact',
+          fallbackData: {
+            salesPhone: contactData.salesPhone || '+60 10 339 1414',
+            servicePhone: contactData.servicePhone || '+60 16 332 2349',
+            financePhone: contactData.financePhone || '+60 16 332 2349',
+            salesEmail: contactData.salesEmail || 'sales@evtl.com',
+            serviceEmail: contactData.serviceEmail || 'service@evtl.com',
+            supportEmail: contactData.supportEmail || 'support@evtl.com',
+            address: contactData.address || '3-20 Level 3 MKH Boulevard',
+            city: contactData.city || 'Kajang',
+            state: contactData.state || 'Selangor',
+            postcode: contactData.postcode || '43000',
+            country: contactData.country || 'Malaysia',
+            directions: contactData.directions || 'EVTL Trucks Office',
+            mondayToFriday: contactData.mondayToFriday || '9:00 AM - 6:00 PM',
+            saturday: contactData.saturday || '9:00 AM - 1:00 PM',
+            sunday: contactData.sunday || 'Closed',
+            facebookUrl: contactData.facebookUrl || '',
+            twitterUrl: contactData.twitterUrl || '',
+            instagramUrl: contactData.instagramUrl || '',
+            linkedinUrl: contactData.linkedinUrl || ''
+          },
+          enabled: true,
+          createdAt: contactData.createdAt || new Date().toISOString(),
+          updatedAt: contactData.updatedAt || new Date().toISOString()
+        }
+      }
+
+      // Add header and footer fallbacks using existing data
+      fallbacksMap.header = {
+        id: 'header',
+        pageName: 'header',
+        fallbackData: {
+          companyName: fallbacksMap.contact?.fallbackData.companyName || 'EVTL'
+        },
+        enabled: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+
+      fallbacksMap.footer = {
+        id: 'footer',
+        pageName: 'footer',
+        fallbackData: {
+          companyName: fallbacksMap.contact?.fallbackData.companyName || 'EVTL',
+          companyDescription: fallbacksMap.contact?.fallbackData.companyDescription || 'EVTL Sdn. Bhd. is a next-generation mobility startup',
+          salesPhone: fallbacksMap.contact?.fallbackData.salesPhone || '+60 10 339 1414',
+          servicePhone: fallbacksMap.contact?.fallbackData.servicePhone || '+60 16 332 2349',
+          salesEmail: fallbacksMap.contact?.fallbackData.salesEmail || 'sales@evtl.com',
+          serviceEmail: fallbacksMap.contact?.fallbackData.serviceEmail || 'service@evtl.com',
+          supportEmail: fallbacksMap.contact?.fallbackData.supportEmail || 'support@evtl.com',
+          address: fallbacksMap.contact?.fallbackData.address || '3-20 Level 3 MKH Boulevard',
+          city: fallbacksMap.contact?.fallbackData.city || 'Kajang'
+        },
+        enabled: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+
+      setFallbacks(fallbacksMap)
     } catch (error) {
       console.error('Error fetching fallbacks:', error)
     } finally {
@@ -136,20 +247,9 @@ export default function AdminFallbacksPage() {
   const handleInitialize = async () => {
     setIsInitializing(true)
     try {
-      const response = await fetch('/api/page-fallbacks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action: 'initialize' }),
-      })
-
-      if (response.ok) {
-        setSaveMessage('Page fallbacks initialized successfully!')
-        await fetchFallbacks()
-      } else {
-        setSaveMessage('Error initializing fallbacks. Please try again.')
-      }
+      // Since we're using existing APIs, just refetch the data
+      await fetchFallbacks()
+      setSaveMessage('Fallback data loaded successfully!')
     } catch (error) {
       console.error('Error initializing fallbacks:', error)
       setSaveMessage('Error initializing fallbacks. Please try again.')
@@ -167,19 +267,46 @@ export default function AdminFallbacksPage() {
     setSaveMessage('')
 
     try {
-      const response = await fetch('/api/page-fallbacks', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          pageName,
-          fallbackData: fallback.fallbackData,
-          enabled: fallback.enabled
-        }),
-      })
+      let response
+      const fallbackData = fallback.fallbackData
 
-      if (response.ok) {
+      // Route to appropriate API based on page name
+      switch (pageName) {
+        case 'homepage':
+          response = await fetch('/api/homepage-content', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(fallbackData)
+          })
+          break
+        case 'about':
+          response = await fetch('/api/company-info', {
+            method: 'PUT', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(fallbackData)
+          })
+          break
+        case 'contact':
+          response = await fetch('/api/contact-info', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(fallbackData)
+          })
+          break
+        case 'header':
+        case 'footer':
+          // For header/footer, update contact-info since that's where company name is stored
+          response = await fetch('/api/contact-info', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ siteName: fallbackData.companyName })
+          })
+          break
+        default:
+          throw new Error(`Unknown page: ${pageName}`)
+      }
+
+      if (response && response.ok) {
         setSaveMessage(`${PAGE_CONFIGS[pageName as keyof typeof PAGE_CONFIGS]?.title} saved successfully!`)
         setTimeout(() => setSaveMessage(''), 3000)
       } else {
