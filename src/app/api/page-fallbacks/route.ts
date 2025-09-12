@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma'
 import { createApiHandler, apiResponse } from '@/lib/api-handler'
-import { STATIC_FALLBACKS } from '@/config/fallbacks'
 
 // Define fallback data structure for each page (updated with current database data)
 const DEFAULT_PAGE_FALLBACKS = {

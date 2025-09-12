@@ -246,7 +246,7 @@ export default function AdminAboutPage() {
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle>Mission & Vision</CardTitle>
-          <p className="text-sm text-gray-600">Define your company's mission and vision statements</p>
+          <p className="text-sm text-gray-600">Define your company&apos;s mission and vision statements</p>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -296,7 +296,7 @@ export default function AdminAboutPage() {
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle>Company Story</CardTitle>
-          <p className="text-sm text-gray-600">Tell your company's story in three paragraphs</p>
+          <p className="text-sm text-gray-600">Tell your company&apos;s story in three paragraphs</p>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>

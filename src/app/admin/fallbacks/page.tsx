@@ -14,7 +14,7 @@ import Link from 'next/link'
 interface PageFallback {
   id: string
   pageName: string
-  fallbackData: any
+  fallbackData: Record<string, string | number | boolean>
   enabled: boolean
   createdAt: string
   updatedAt: string
@@ -216,7 +216,7 @@ export default function AdminFallbacksPage() {
     }))
   }
 
-  const renderField = (pageName: string, field: any) => {
+  const renderField = (pageName: string, field: { key: string; label: string; type: string }) => {
     const value = fallbacks[pageName]?.fallbackData?.[field.key] || ''
 
     switch (field.type) {
