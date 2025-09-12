@@ -217,7 +217,8 @@ export default function AdminFallbacksPage() {
   }
 
   const renderField = (pageName: string, field: { key: string; label: string; type: string }) => {
-    const value = fallbacks[pageName]?.fallbackData?.[field.key] || ''
+    const rawValue = fallbacks[pageName]?.fallbackData?.[field.key] || ''
+    const value = typeof rawValue === 'boolean' ? String(rawValue) : String(rawValue || '')
 
     switch (field.type) {
       case 'textarea':
@@ -233,7 +234,7 @@ export default function AdminFallbacksPage() {
         return (
           <Input
             type="number"
-            value={value}
+            value={rawValue === '' ? '' : String(rawValue)}
             onChange={(e) => updateFallbackData(pageName, field.key, parseInt(e.target.value) || 0)}
             placeholder={`Enter ${field.label.toLowerCase()}`}
           />
