@@ -16,6 +16,7 @@ async function getFallbackCompanyInfo(): Promise<CompanyInfoFallback> {
     id: 'default',
     companyName: 'EVTL',
     companyDescription: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions.',
+    companyDescription2: 'We specialize in providing high-quality commercial vehicles and comprehensive fleet solutions to meet diverse business needs, ensuring operational efficiency and environmental sustainability.',
     foundedYear: 2025,
     totalVehiclesSold: 150,
     totalHappyCustomers: 50,

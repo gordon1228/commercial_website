@@ -16,6 +16,7 @@ export interface CompanyFallbacks {
   legalName: string
   tagline: string
   description: string
+  description2: string
 }
 
 export interface ContactFallbacks {
@@ -79,7 +80,8 @@ export const STATIC_FALLBACKS: StaticFallbacksConfig = {
     name: 'EVTL',
     legalName: 'EVTL Sdn. Bhd.',
     tagline: 'Mining 24 Hours a Day with Autonomous Trucks Coming Soon',
-    description: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions. We collaborate with local and international partners to accelerate Malaysia\'s green logistics transformation.'
+    description: 'EVTL Sdn. Bhd. is a next-generation mobility startup focusing on Electric Trucks (EV Trucks) and future smart transport solutions. We collaborate with local and international partners to accelerate Malaysia\'s green logistics transformation.',
+    description2: 'We specialize in providing high-quality commercial vehicles and comprehensive fleet solutions to meet diverse business needs, ensuring operational efficiency and environmental sustainability.'
   },
 
   // Contact Information - Critical business data that must always be available

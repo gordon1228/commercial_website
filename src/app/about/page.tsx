@@ -26,6 +26,7 @@ import type { CompanyInfoConfig } from '@/types/data-config'
 interface CompanyInfo {
   companyName: string
   companyDescription: string
+  companyDescription2: string
   storyTitle: string
   storyParagraph1: string
   storyParagraph2: string
@@ -135,9 +136,14 @@ export default function AboutPage() {
             <h1 className="text-4xl md:text-6xl font-display font-bold text-gray-900 mb-6">
               About {companyInfo.companyName}
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              {companyInfo.companyDescription}
-            </p>
+            <div className="max-w-4xl mx-auto space-y-6">
+              <p className="text-xl text-muted-foreground leading-relaxed">
+                {companyInfo.companyDescription}
+              </p>
+              <p className="text-xl text-muted-foreground leading-relaxed">
+                {companyInfo.companyDescription2}
+              </p>
+            </div>
           </div>
 
         </div>

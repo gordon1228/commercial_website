@@ -14,6 +14,7 @@ export interface CompanyInfoFallback {
   id: string
   companyName: string
   companyDescription: string
+  companyDescription2: string
   foundedYear: number
   totalVehiclesSold: number
   totalHappyCustomers: number

@@ -38,7 +38,8 @@ const PAGE_CONFIGS = {
     description: 'Manage fallback content for the about page',
     fields: [
       { key: 'companyName', label: 'Company Name', type: 'text' },
-      { key: 'companyDescription', label: 'Company Description', type: 'textarea' },
+      { key: 'companyDescription', label: 'Company Description 1', type: 'textarea' },
+      { key: 'companyDescription2', label: 'Company Description 2', type: 'textarea' },
       { key: 'foundedYear', label: 'Founded Year', type: 'number' },
       { key: 'totalVehiclesSold', label: 'Total Vehicles Sold', type: 'number' },
       { key: 'totalHappyCustomers', label: 'Total Happy Customers', type: 'number' },
@@ -153,6 +154,7 @@ export default function AdminFallbacksPage() {
           fallbackData: {
             companyName: companyData.companyName || 'EVTL',
             companyDescription: companyData.companyDescription || 'EVTL is a next-generation mobility startup',
+            companyDescription2: companyData.companyDescription2 || 'We specialize in providing high-quality commercial vehicles and comprehensive fleet solutions',
             foundedYear: companyData.foundedYear || 1998,
             totalVehiclesSold: companyData.totalVehiclesSold || 2500,
             totalHappyCustomers: companyData.totalHappyCustomers || 850,

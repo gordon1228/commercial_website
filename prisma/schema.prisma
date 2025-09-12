@@ -151,6 +151,7 @@ model CompanyInfo {
   visionText          String   @default("To be the leading commercial truck provider.")
   createdAt           DateTime @default(now())
   updatedAt           DateTime @default(now()) @updatedAt
+  companyDescription2 String   @default("We specialize in providing high-quality commercial vehicles and comprehensive fleet solutions to meet diverse business needs.")
 
   @@map("company_info")
 }
