@@ -13,6 +13,7 @@ interface CompanyInfo {
   id: string
   companyName: string
   companyDescription: string
+  companyDescription2: string
   foundedYear: number
   totalVehiclesSold: number
   totalHappyCustomers: number
@@ -175,15 +176,27 @@ export default function AdminAboutPage() {
               />
             </div>
           </div>
-          <div>
-            <Label htmlFor="companyDescription">Company Description</Label>
-            <Textarea
-              id="companyDescription"
-              value={companyInfo.companyDescription}
-              onChange={(e) => updateCompanyInfo('companyDescription', e.target.value)}
-              rows={3}
-              placeholder="Brief description of your company"
-            />
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="companyDescription">Company Description</Label>
+              <Textarea
+                id="companyDescription"
+                value={companyInfo.companyDescription}
+                onChange={(e) => updateCompanyInfo('companyDescription', e.target.value)}
+                rows={3}
+                placeholder="Brief description of your company"
+              />
+            </div>
+            <div>
+              <Label htmlFor="companyDescription2">Additional Company Description</Label>
+              <Textarea
+                id="companyDescription2"
+                value={companyInfo.companyDescription2}
+                onChange={(e) => updateCompanyInfo('companyDescription2', e.target.value)}
+                rows={3}
+                placeholder="Additional details about your company services and specialization"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
