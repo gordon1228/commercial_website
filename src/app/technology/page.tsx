@@ -77,8 +77,8 @@ export default function TechnologyPage() {
         console.error('Error loading technology data:', error)
         // Set fallback data
         setContent({
-          heroTitle: 'Next-Generation Electric Truck Technology',
-          heroSubtitle: 'Advanced electric vehicle technology designed for commercial success and environmental sustainability',
+          heroTitle: 'Mining 24 Hours a Day with Autonomous Trucks',
+          heroSubtitle: 'Coming Soon',
           heroBackgroundImage: '/uploads/Technology_background.png',
           heroBackgroundImageAlt: 'Electric Truck Technology Background',
           section1Title: 'Advanced Battery Technology',

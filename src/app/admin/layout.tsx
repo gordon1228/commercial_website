@@ -24,7 +24,9 @@ import {
   Eye,
   Image,
   Cpu,
-  Filter
+  Filter,
+  Building2,
+  Database
 } from 'lucide-react'
 // Removed data-loader dependency - using static navigation config
 type AdminNavigationItem = {
@@ -54,7 +56,9 @@ const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = 
   Image,
   Settings,
   Eye,
-  Filter
+  Filter,
+  Building2,
+  Database
 }
 
 // Fallback navigation data
@@ -67,8 +71,10 @@ const defaultNavigation: AdminNavigationConfig = {
     { id: 'inquiries', name: 'Inquiries', href: '/admin/inquiries', icon: 'MessageCircle', roles: ['ADMIN', 'MANAGER', 'USER'] },
     { id: 'users', name: 'Users', href: '/admin/users', icon: 'Users', roles: ['ADMIN', 'MANAGER'] },
     { id: 'homepage', name: 'Homepage', href: '/admin/homepage', icon: 'Home', roles: ['ADMIN', 'MANAGER'] },
+    { id: 'about', name: 'About Page', href: '/admin/about', icon: 'Building2', roles: ['ADMIN', 'MANAGER'] },
     { id: 'contact-info', name: 'Contact Info', href: '/admin/contact-info', icon: 'Phone', roles: ['ADMIN', 'MANAGER'] },
     { id: 'technology', name: 'Technology', href: '/admin/technology', icon: 'Cpu', roles: ['ADMIN', 'MANAGER'] },
+    { id: 'fallbacks', name: 'Fallback Data', href: '/admin/fallbacks', icon: 'Database', roles: ['ADMIN'] },
     { id: 'media', name: 'Media', href: '/admin/media', icon: 'Image', roles: ['ADMIN', 'MANAGER'] },
     { id: 'settings', name: 'Settings', href: '/admin/settings', icon: 'Settings', roles: ['ADMIN', 'MANAGER'] },
     { id: 'preview', name: 'Preview', href: '/admin/preview', icon: 'Eye', roles: ['ADMIN', 'MANAGER'] }

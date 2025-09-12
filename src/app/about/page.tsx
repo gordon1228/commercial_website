@@ -11,7 +11,7 @@ import {
   // Handshake
 } from 'lucide-react'
 import type { CompanyInfoConfig } from '@/types/data-config'
-import { STATIC_FALLBACKS } from '@/config/fallbacks'
+// import { STATIC_FALLBACKS } from '@/config/fallbacks'
 
 // Note: metadata moved to layout.tsx since this is now a client component
 
@@ -60,61 +60,38 @@ export default function AboutPage() {
   // const [certifications, setCertifications] = useState<Certification[]>([])
   const [isLoading, setIsLoading] = useState(true)
   
-  // Use static fallback data since JSON file was removed
-  const fallbackData: CompanyInfoConfig = {
-    companyInfo: {
-      id: 'default',
-      companyName: STATIC_FALLBACKS.company.name,
-      companyDescription: STATIC_FALLBACKS.company.description,
-      foundedYear: 2025,
-      totalVehiclesSold: 150,
-      totalHappyCustomers: 50,
-      totalYearsExp: 1,
-      satisfactionRate: 98,
-      storyTitle: 'Who We Are',
-      storyParagraph1: STATIC_FALLBACKS.company.description,
-      storyParagraph2: 'Founded in 2025, EVTL collaborates with local and international partners to accelerate Malaysia\'s green logistics transformation.',
-      storyParagraph3: 'We are committed to creating a sustainable future through innovative electric vehicle technology and smart mobility solutions that serve businesses and communities across Malaysia.',
-      missionTitle: 'Our Mission',
-      missionText: 'To accelerate Malaysia\'s green logistics transformation through innovative electric truck solutions and smart transport technologies, partnering with local and international stakeholders.',
-      visionTitle: 'Our Vision',
-      visionText: 'Zero Carbon, Smart Mobility for All'
-    }
-  }
+  // Page-specific fallback data state
+  const [fallbackData, setFallbackData] = useState<CompanyInfoConfig | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [companyRes] = await Promise.all([
-          fetch('/api/company-info')
+        const [companyRes, fallbackRes] = await Promise.all([
+          fetch('/api/company-info'),
+          fetch('/api/page-fallbacks?page=about')
         ])
-        // const [companyRes, valuesRes, certsRes] = await Promise.all([
-        //   fetch('/api/company-info'),
-        //   fetch('/api/company-values'),
-        //   fetch('/api/certifications')
-        // ])
+
+        // Load fallback data first
+        if (fallbackRes.ok) {
+          const fallbackResponse = await fallbackRes.json()
+          const fallbackInfo: CompanyInfoConfig = {
+            companyInfo: {
+              id: 'fallback',
+              ...fallbackResponse.fallbackData
+            }
+          }
+          setFallbackData(fallbackInfo)
+        }
 
         if (companyRes.ok) {
           const companyData = await companyRes.json()
           setCompanyInfo(companyData)
         }
-
-        // if (valuesRes.ok) {
-        //   const valuesData = await valuesRes.json()
-        //   setValues(valuesData)
-        // }
-
-        // if (certsRes.ok) {
-        //   const certsData = await certsRes.json()
-        //   setCertifications(certsData)
-        // }
       } catch (error) {
         console.error('Error fetching about page data:', error)
-        // Use fallback data from JSON if available
+        // Use page-specific fallback data if available
         if (fallbackData) {
           setCompanyInfo(fallbackData.companyInfo)
-          // setValues(fallbackData.values)
-          // setCertifications(fallbackData.certifications)
         }
       } finally {
         setIsLoading(false)
@@ -122,7 +99,7 @@ export default function AboutPage() {
     }
 
     fetchData()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fallbackData])
 
   if (isLoading) {
     return (

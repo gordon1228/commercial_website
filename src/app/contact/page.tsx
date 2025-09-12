@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 // import { Input } from '@/components/ui/input'
 // import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import type { ContactInfoConfig } from '@/types/data-config'
-import { STATIC_FALLBACKS } from '@/config/fallbacks'
+// import { STATIC_FALLBACKS } from '@/config/fallbacks'
 import { LocationMap } from '@/components/ui/location-map'
 
 interface ContactInfo {
@@ -73,58 +73,50 @@ function WhatsAppContact() {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   
-  // Use static fallback data since JSON file was removed
-  const fallbackData: ContactInfoConfig = {
-    contactInfo: {
-      id: 'default',
-      salesPhone: STATIC_FALLBACKS.contact.salesPhone,
-      servicePhone: STATIC_FALLBACKS.contact.servicePhone,
-      financePhone: STATIC_FALLBACKS.contact.financePhone,
-      salesEmail: STATIC_FALLBACKS.contact.salesEmail,
-      serviceEmail: STATIC_FALLBACKS.contact.serviceEmail,
-      supportEmail: STATIC_FALLBACKS.contact.supportEmail,
-      address: STATIC_FALLBACKS.contact.address,
-      city: STATIC_FALLBACKS.contact.city,
-      state: STATIC_FALLBACKS.contact.state,
-      postcode: STATIC_FALLBACKS.contact.postcode,
-      country: STATIC_FALLBACKS.contact.country,
-      directions: STATIC_FALLBACKS.contact.directions || '',
-      mondayToFriday: STATIC_FALLBACKS.hours.mondayToFriday,
-      saturday: STATIC_FALLBACKS.hours.saturday,
-      sunday: STATIC_FALLBACKS.hours.sunday,
-      siteName: STATIC_FALLBACKS.company.name,
-      emailNotifications: true,
-      systemNotifications: true,
-      maintenanceMode: false,
-      companyDescription: STATIC_FALLBACKS.company.description,
-      facebookUrl: STATIC_FALLBACKS.navigation.socialMedia.facebook || '',
-      twitterUrl: STATIC_FALLBACKS.navigation.socialMedia.twitter || '',
-      instagramUrl: STATIC_FALLBACKS.navigation.socialMedia.instagram || '',
-      linkedinUrl: STATIC_FALLBACKS.navigation.socialMedia.linkedin || '',
-      privacyPolicyUrl: STATIC_FALLBACKS.navigation.legal.privacy,
-      termsOfServiceUrl: STATIC_FALLBACKS.navigation.legal.terms
-    }
-  }
+  // Page-specific fallback data state
+  const [fallbackData, setFallbackData] = useState<ContactInfoConfig | null>(null)
 
   useEffect(() => {
     const fetchContactInfo = async () => {
       try {
-        const response = await fetch('/api/contact-info')
-        if (response.ok) {
-          const data = await response.json()
+        const [contactRes, fallbackRes] = await Promise.all([
+          fetch('/api/contact-info'),
+          fetch('/api/page-fallbacks?page=contact')
+        ])
+
+        // Load fallback data first
+        if (fallbackRes.ok) {
+          const fallbackResponse = await fallbackRes.json()
+          const fallbackContactInfo: ContactInfoConfig = {
+            contactInfo: {
+              id: 'fallback',
+              ...fallbackResponse.fallbackData,
+              siteName: fallbackResponse.fallbackData.companyName || 'EVTL',
+              emailNotifications: true,
+              systemNotifications: true,
+              maintenanceMode: false
+            }
+          }
+          setFallbackData(fallbackContactInfo)
+        }
+
+        if (contactRes.ok) {
+          const data = await contactRes.json()
           setContactInfo(data)
         }
       } catch (error) {
         console.error('Error fetching contact info:', error)
-        // Use fallback data
-        setContactInfo(fallbackData.contactInfo)
+        // Use page-specific fallback data if available
+        if (fallbackData) {
+          setContactInfo(fallbackData.contactInfo)
+        }
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchContactInfo()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fallbackData])
 
   const getWhatsAppNumber = () => {
     if (!contactInfo) return '+60103391414' // Default fallback

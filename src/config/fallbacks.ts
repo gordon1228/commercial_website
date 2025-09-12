@@ -130,7 +130,7 @@ export const STATIC_FALLBACKS: StaticFallbacksConfig = {
   // Business Hours - Stable operating schedule
   hours: {
     mondayToFriday: '8:00 AM - 6:00 PM',
-    saturday: '9:00 AM - 4:00 PM',
+    saturday: '9:00 AM - 1:00 PM',
     sunday: 'Closed'
   }
 }

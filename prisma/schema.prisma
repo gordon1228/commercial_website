@@ -286,6 +286,18 @@ model FilterOption {
   @@map("filter_options")
 }
 
+model PageFallback {
+  id           String   @id @default(cuid())
+  pageName     String   @unique
+  fallbackData Json
+  enabled      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([pageName, enabled], map: "idx_page_fallbacks_page_enabled")
+  @@map("page_fallbacks")
+}
+
 enum Role {
   ADMIN
   MANAGER
