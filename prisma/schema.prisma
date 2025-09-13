@@ -8,22 +8,15 @@ datasource db {
 }
 
 model User {
-  id                                    String            @id @default(cuid())
-  email                                 String            @unique
-  password                              String
-  role                                  Role              @default(USER)
-  createdAt                             DateTime          @default(now())
-  updatedAt                             DateTime          @updatedAt
-  lastName                              String?
-  isActive                              Boolean?          @default(true)
-  lastLogin                             DateTime?         @db.Timestamp(6)
-  firstName                             String?
-  inquiries_inquiries_assignedToTousers Inquiry[]         @relation("inquiries_assignedToTousers")
-  inquiries                             Inquiry[]
-  inquiry_history                       inquiry_history[]
-  sessions                              Session[]
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  inquiries Inquiry[]
+  sessions  Session[]
 
-  @@index([role, isActive], map: "idx_users_role_active")
   @@map("users")
 }
 
@@ -38,147 +31,102 @@ model Session {
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([sessionId], map: "idx_sessions_sessionId")
-  @@index([userId], map: "idx_sessions_userId")
   @@map("sessions")
 }
 
 model Category {
-  id              String    @id @default(cuid())
-  name            String
-  slug            String    @unique
-  description     String?
-  image           String?
-  active          Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  metaTitle       String?
-  metaDescription String?
-  displayOrder    Int?      @default(0)
-  vehicles        Vehicle[]
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  vehicles    Vehicle[]
 
   @@index([active], map: "idx_categories_active")
-  @@index([active, displayOrder], map: "idx_categories_active_order")
   @@map("categories")
 }
 
 model Vehicle {
-  id                String              @id @default(cuid())
-  name              String
-  slug              String              @unique
-  description       String?
-  price             Float
-  images            String[]
-  specs             Json?
-  status            Status              @default(AVAILABLE)
-  featured          Boolean             @default(false)
-  active            Boolean             @default(true)
-  categoryId        String
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  year              Int?                @default(2024)
-  make              String?             @default("Isuzu") @db.VarChar(255)
-  fuelType          String?             @default("Electric") @db.VarChar(255)
-  transmission      String?
-  mobileImages      String[]            @default([])
-  model             String?
-  shortDescription  String?
-  originalPrice     Float?
-  vin               String?
-  stockNumber       String?
-  views             Int?                @default(0)
-  inquiries         Inquiry[]
-  vehicle_analytics vehicle_analytics[]
-  vehicle_features  vehicle_features[]
-  vehicle_specs     vehicle_specs[]
-  category          Category            @relation(fields: [categoryId], references: [id])
+  id           String    @id @default(cuid())
+  name         String
+  slug         String    @unique
+  description  String?
+  price        Float
+  images       String[]
+  specs        Json?
+  status       Status    @default(AVAILABLE)
+  featured     Boolean   @default(false)
+  active       Boolean   @default(true)
+  categoryId   String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  year         Int?      @default(2024)
+  make         String?   @default("Isuzu") @db.VarChar(255)
+  fuelType     String?   @default("Electric") @db.VarChar(255)
+  transmission String?
+  mobileImages String[]  @default([])
+  inquiries    Inquiry[]
+  category     Category  @relation(fields: [categoryId], references: [id])
 
   @@index([active], map: "idx_vehicles_active")
   @@index([categoryId], map: "idx_vehicles_category_id")
   @@index([featured], map: "idx_vehicles_featured")
   @@index([status], map: "idx_vehicles_status")
   @@index([status, active], map: "idx_vehicles_status_active")
-  @@index([make, fuelType], map: "idx_vehicles_make_fueltype")
   @@map("vehicles")
 }
 
 model Inquiry {
-  id                                String            @id @default(cuid())
-  vehicleId                         String?
-  userId                            String?
-  customerName                      String
-  email                             String
-  phone                             String?
-  message                           String
-  notes                             String?
-  status                            InquiryStatus     @default(NEW)
-  createdAt                         DateTime          @default(now())
-  updatedAt                         DateTime          @updatedAt
-  firstName                         String?
-  lastName                          String?
-  company                           String?
-  jobTitle                          String?
-  source                            String?
-  budget                            Float?
-  timeframe                         String?
-  assignedTo                        String?
-  followUpDate                      DateTime?         @db.Timestamp(6)
-  closedAt                          DateTime?         @db.Timestamp(6)
-  inquiryType                       String?           @default("GENERAL")
-  priority                          String?           @default("MEDIUM")
-  users_inquiries_assignedToTousers User?             @relation("inquiries_assignedToTousers", fields: [assignedTo], references: [id])
-  user                              User?             @relation(fields: [userId], references: [id])
-  vehicle                           Vehicle?          @relation(fields: [vehicleId], references: [id])
-  inquiry_history                   inquiry_history[]
+  id           String        @id @default(cuid())
+  vehicleId    String?
+  userId       String?
+  customerName String
+  email        String
+  phone        String?
+  message      String
+  notes        String?
+  status       InquiryStatus @default(NEW)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User?         @relation(fields: [userId], references: [id])
+  vehicle      Vehicle?      @relation(fields: [vehicleId], references: [id])
 
   @@index([status], map: "idx_inquiries_status")
   @@index([vehicleId], map: "idx_inquiries_vehicle_id")
-  @@index([assignedTo], map: "idx_inquiries_assigned")
-  @@index([email], map: "idx_inquiries_email")
-  @@index([status, priority], map: "idx_inquiries_status_priority")
   @@map("inquiries")
 }
 
 model HomepageContent {
-  id                        String   @id @default(cuid())
-  heroTitle                 String   @default("Premium Commercial")
-  heroSubtitle              String   @default("Vehicles")
-  heroDescription           String   @default("Discover elite fleet solutions built for businesses that demand excellence, reliability, and uncompromising quality.")
-  heroButtonPrimary         String   @default("Explore Fleet")
-  heroButtonSecondary       String   @default("Get Quote")
-  happyClients              Int      @default(25)
-  yearsExperience           Int      @default(10)
-  satisfactionRate          Int      @default(95)
-  partnersTitle             String   @default("Trusted by Industry Leaders")
-  partnersDescription       String   @default("We partner with the world's most respected commercial vehicle manufacturers to bring you unparalleled quality and reliability.")
-  feature1Title             String   @default("Quality Guarantee")
-  feature1Description       String   @default("Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.")
-  feature2Title             String   @default("Fast Delivery")
-  feature2Description       String   @default("Quick processing and delivery to get your business moving without unnecessary delays.")
-  feature3Title             String   @default("24/7 Support")
-  feature3Description       String   @default("Round-the-clock customer support to assist you with any questions or concerns.")
-  comingSoonImage           String   @default("/images/comming soon.jpg")
-  comingSoonImageAlt        String   @default("Coming Soon")
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
-  showComingSoonSection     Boolean? @default(true)
-  showHeroSection           Boolean? @default(true)
-  showVehicleCategories     Boolean? @default(true)
-  showFeaturedVehicles      Boolean? @default(true)
-  showTrustSection          Boolean? @default(true)
-  comingSoonImageMobile     String?  @default("/images/comming-soon-mobile.jpg")
-  heroBackgroundImage       String?
-  heroBackgroundImageMobile String?
-  totalVehiclesSold         Int?     @default(150)
-  feature1Icon              String?  @default("shield")
-  feature2Icon              String?  @default("truck")
-  feature3Icon              String?  @default("headphones")
-  comingSoonTitle           String?  @default("Exciting Updates Coming Soon")
-  comingSoonDescription     String?
-  showStatsSection          Boolean? @default(true)
-  showPartnersSection       Boolean? @default(true)
-  metaTitle                 String?
-  metaDescription           String?
+  id                    String   @id @default(cuid())
+  heroTitle             String   @default("Premium Commercial")
+  heroSubtitle          String   @default("Vehicles")
+  heroDescription       String   @default("Discover elite fleet solutions built for businesses that demand excellence, reliability, and uncompromising quality.")
+  heroButtonPrimary     String   @default("Explore Fleet")
+  heroButtonSecondary   String   @default("Get Quote")
+  happyClients          Int      @default(25)
+  yearsExperience       Int      @default(10)
+  satisfactionRate      Int      @default(95)
+  partnersTitle         String   @default("Trusted by Industry Leaders")
+  partnersDescription   String   @default("We partner with the world's most respected commercial vehicle manufacturers to bring you unparalleled quality and reliability.")
+  feature1Title         String   @default("Quality Guarantee")
+  feature1Description   String   @default("Every vehicle undergoes rigorous inspection and comes with comprehensive warranty coverage.")
+  feature2Title         String   @default("Fast Delivery")
+  feature2Description   String   @default("Quick processing and delivery to get your business moving without unnecessary delays.")
+  feature3Title         String   @default("24/7 Support")
+  feature3Description   String   @default("Round-the-clock customer support to assist you with any questions or concerns.")
+  comingSoonImage       String   @default("/images/comming soon.jpg")
+  comingSoonImageAlt    String   @default("Coming Soon")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  showComingSoonSection Boolean? @default(true)
+  showHeroSection       Boolean? @default(true)
+  showVehicleCategories Boolean? @default(true)
+  showFeaturedVehicles  Boolean? @default(true)
+  showTrustSection      Boolean? @default(true)
+  comingSoonImageMobile String?  @default("/images/comming-soon-mobile.jpg")
 
   @@index([updatedAt], map: "idx_homepage_content_updated_at")
   @@map("homepage_content")
@@ -204,9 +152,6 @@ model CompanyInfo {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @default(now()) @updatedAt
   companyDescription2 String   @default("We specialize in providing high-quality commercial vehicles and comprehensive fleet solutions to meet diverse business needs.")
-  logo                String?
-  employeeCount       Int?
-  coreValues          Json?
 
   @@map("company_info")
 }
@@ -267,9 +212,6 @@ model ContactInfo {
   linkedinUrl         String?  @default("") @db.VarChar(255)
   privacyPolicyUrl    String?  @default("/privacy") @db.VarChar(255)
   termsOfServiceUrl   String?  @default("/terms") @db.VarChar(255)
-  latitude            Float?
-  longitude           Float?
-  youtubeUrl          String?
 
   @@map("contact_info")
 }
@@ -290,15 +232,6 @@ model TechnologyContent {
   section4Description    String   @default("Eco-friendly production processes that reduce environmental impact while maintaining quality.")
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
-  section1Image          String?
-  section1Icon           String?  @default("battery")
-  section2Image          String?
-  section2Icon           String?  @default("wifi")
-  section3Image          String?
-  section3Icon           String?  @default("zap")
-  section4Image          String?
-  section4Icon           String?  @default("leaf")
-  additionalFeatures     Json?
 
   @@map("technology_content")
 }
@@ -332,78 +265,6 @@ model FilterOption {
   @@map("filter_options")
 }
 
-model business_metrics {
-  id             String         @id
-  metricType     BusinessMetric
-  value          Float
-  date           DateTime
-  additionalData Json?
-  createdAt      DateTime       @default(now())
-
-  @@index([date], map: "idx_business_metrics_date")
-  @@index([metricType, date], map: "idx_business_metrics_type_date")
-}
-
-model inquiry_history {
-  id        String   @id
-  inquiryId String
-  userId    String?
-  action    String
-  oldValue  String?
-  newValue  String?
-  comment   String?
-  createdAt DateTime @default(now())
-  inquiries Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
-  users     User?    @relation(fields: [userId], references: [id])
-
-  @@index([createdAt], map: "idx_inquiry_history_created")
-  @@index([inquiryId], map: "idx_inquiry_history_inquiryId")
-}
-
-model vehicle_analytics {
-  id        String         @id
-  vehicleId String
-  eventType AnalyticsEvent
-  ipAddress String?
-  userAgent String?
-  referrer  String?
-  createdAt DateTime       @default(now())
-  vehicles  Vehicle        @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-
-  @@index([createdAt], map: "idx_vehicle_analytics_created")
-  @@index([vehicleId, eventType], map: "idx_vehicle_analytics_vehicle_event")
-}
-
-model vehicle_features {
-  id           String   @id
-  vehicleId    String
-  name         String
-  category     String?
-  included     Boolean  @default(true)
-  displayOrder Int      @default(0)
-  createdAt    DateTime @default(now())
-  vehicles     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-
-  @@index([name], map: "idx_vehicle_features_name")
-  @@index([vehicleId], map: "idx_vehicle_features_vehicleId")
-}
-
-model vehicle_specs {
-  id           String       @id
-  vehicleId    String
-  category     SpecCategory
-  name         String
-  value        String
-  unit         String?
-  displayOrder Int          @default(0)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @default(now())
-  vehicles     Vehicle      @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-
-  @@index([name, value], map: "idx_vehicle_specs_name_value")
-  @@index([vehicleId, category], map: "idx_vehicle_specs_vehicle_category")
-}
-
 enum Role {
   ADMIN
   MANAGER
@@ -421,47 +282,4 @@ enum InquiryStatus {
   CONTACTED
   RESOLVED
   CLOSED
-}
-
-enum AnalyticsEvent {
-  VIEW
-  INQUIRY
-  FAVORITE
-  SHARE
-  BROCHURE_DOWNLOAD
-}
-
-enum BusinessMetric {
-  DAILY_INQUIRIES
-  WEEKLY_VIEWS
-  MONTHLY_SALES
-  CONVERSION_RATE
-  POPULAR_VEHICLES
-  TOP_CATEGORIES
-}
-
-enum InquiryType {
-  GENERAL
-  PURCHASE
-  SERVICE
-  FINANCING
-  LEASING
-  PARTS
-}
-
-enum Priority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
-
-enum SpecCategory {
-  PERFORMANCE
-  INTERIOR
-  SAFETY
-  EXTERIOR
-  TECHNOLOGY
-  DIMENSIONS
-  CAPACITY
 }
